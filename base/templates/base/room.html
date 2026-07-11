@@ -12,7 +12,7 @@
           </a>
           <h3 style="margin-left: 14px;">{{ room.name }}</h3>
         </div>
-        <div class="room__topRight" style="display: flex; gap: 10px; align-items: center;">
+        <div class="room__topRight" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
           {% if request.user == room.host or request.user.role == 'faculty' %}
           <a href="{% url 'create-quiz' room.id %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 8px 18px; border-radius: 8px; font-size: 0.88rem; text-decoration: none; font-weight: 700; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25);">
             + Sınav Tasarla / Oluştur
@@ -96,7 +96,7 @@
           </div>
 
           <!-- Avrasya Study Resources & Files Section -->
-          <div style="background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(15,59,140,0.06); margin: 15px 20px; padding: 22px; border-radius: 12px;">
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(15,59,140,0.06); margin: 15px 0; padding: 20px; border-radius: 12px;">
               <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
                   <div>
                       <h4 style="color: #0f3b8c; font-size: 1.15rem; font-weight: 800; margin: 0;">Ders Materyalleri, Dosyalar & Sesli Anonslar ({{resources.count}})</h4>

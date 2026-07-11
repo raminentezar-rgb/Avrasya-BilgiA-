@@ -1207,3 +1207,119 @@ a {
   color: var(--color-main);
   font-weight: 1.4rem;
 }
+
+/* ==========================================================================
+   PROFESSIONAL MOBILE & TABLET RESPONSIVE OPTIMIZATIONS (max-width: 768px)
+   ========================================================================== */
+@media screen and (max-width: 768px) {
+  /* Header & Navigation Optimization */
+  .header > .container {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .header__logo {
+    gap: 8px !important;
+  }
+
+  .header__logo img {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .header__logo h1 {
+    font-size: 1.12rem !important;
+  }
+
+  /* Hide long subtitle on mobile to keep navbar sleek & single line */
+  .header__logo span {
+    display: none !important;
+  }
+
+  .header__menu {
+    gap: 8px !important;
+    flex-wrap: wrap;
+  }
+
+  /* Compact button styling on mobile */
+  .header__menu a {
+    padding: 6px 12px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .header__user {
+    padding: 4px 10px !important;
+    gap: 8px !important;
+  }
+
+  .header__user p {
+    font-size: 0.85rem !important;
+  }
+
+  /* Main grid columns collapse clean to 100% width on mobile */
+  .layout--2,
+  .layout--3,
+  .layout {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .container {
+    padding: 0 10px !important;
+  }
+
+  /* Room List Card Responsive Polish */
+  .roomListRoom {
+    padding: 14px !important;
+  }
+
+  .roomListRoom__header {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .roomListRoom__meta {
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Room Detail Mobile Polish */
+  audio {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .room__header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .room__topRight {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px !important;
+  }
+
+  .roomList__header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .header__user span {
+    display: none !important;
+  }
+
+  .header__user img {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}

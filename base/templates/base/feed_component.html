@@ -1,6 +1,6 @@
 {% for room in rooms %}
 <div class="roomListRoom" style="border-left: 4px solid #71c6dd;">
-    <div class="roomListRoom__header">
+    <div class="roomListRoom__header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
         <a href="{% url 'user-profile' room.host.id %}" class="roomListRoom__author">
             <div class="avatar avatar--small">
                 <img src="{{room.host.avatar.url}}" />
