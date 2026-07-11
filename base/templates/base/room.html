@@ -55,7 +55,7 @@
                       <h4 style="color: #c2410c; font-size: 1.1rem; font-weight: 700; margin: 0;">Bu Odadaki Çevrimiçi Sınavlar ve Testler ({{quizzes.count}})</h4>
                       <span style="font-size: 0.83rem; color: #9a3412;">Öğretim üyeleri bu odada sınav ve soru tasarımı yapabilir.</span>
                   </div>
-                  {% if request.user.role != 'student' and (request.user == room.host or request.user.role == 'faculty') %}
+                  {% if request.user == room.host or request.user.role == 'faculty' %}
                   <a href="{% url 'create-quiz' room.id %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 9px 18px; border-radius: 8px; font-size: 0.88rem; text-decoration: none; font-weight: 700; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25);">+ Yeni Sınav Tasarla</a>
                   {% endif %}
               </div>
