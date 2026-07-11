@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/metropolis/index.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="{% static 'styles/style.css' %}?v=20260710_cleanheaders" />
+    <title>Avrasya BilgiAğı - Avrasya Üniversitesi Akademik Paylaşım Platformu</title>
+</head>
+
+<body style="background-color: #f8fafc; color: #1e293b; min-height: 100vh;">
+
+    {% include 'navbar.html' %}
+
+    {% if messages %}
+    <div class="toast-container" style="max-width: 680px; margin: 20px auto 10px auto; padding: 0 16px;">
+        {% for message in messages %}
+        <div class="alert-banner {% if message.tags %}alert-banner--{{ message.tags }}{% endif %}"
+             style="background: #ffffff; border-radius: 12px; padding: 18px 24px; margin-bottom: 14px; box-shadow: 0 10px 30px rgba(15, 59, 140, 0.08); border: 1px solid #e2e8f0; border-left: 6px solid {% if message.tags == 'error' %}#dc2626{% else %}#16a34a{% endif %}; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease;">
+            <div>
+                <span style="font-weight: 700; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.5px; color: {% if message.tags == 'error' %}#b91c1c{% else %}#15803d{% endif %}; display: block; margin-bottom: 5px;">
+                    {% if message.tags == 'error' %}Sistem Uyarı Bildirimi{% else %}İşlem Başarılı{% endif %}
+                </span>
+                <p style="margin: 0; font-size: 1.02rem; font-weight: 600; color: #1e293b; line-height: 1.5;">
+                    {{ message }}
+                </p>
+            </div>
+            <button onclick="this.parentElement.style.display='none'" 
+                    style="background: #f1f5f9; border: 1px solid #cbd5e1; font-size: 0.85rem; font-weight: 600; color: #475569; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; margin-left: 18px;">
+                Kapat
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}
+
+
+    {% endblock %}
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+
+</html>

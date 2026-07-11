@@ -1,0 +1,471 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="profile-page layout layout--2">
+  <div class="container">
+    <!-- Room Start -->
+    <div class="room">
+      <div class="room__top" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 20px;">
+        <div class="room__topLeft">
+          <a href="{% url 'home' %}" style="font-weight: 700; color: #0f3b8c; text-decoration: none;">
+            &larr; Ana Sayfaya Dön
+          </a>
+          <h3 style="margin-left: 14px;">{{ room.name }}</h3>
+        </div>
+        <div class="room__topRight" style="display: flex; gap: 10px; align-items: center;">
+          {% if request.user == room.host or request.user.role == 'faculty' %}
+          <a href="{% url 'create-quiz' room.id %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 8px 18px; border-radius: 8px; font-size: 0.88rem; text-decoration: none; font-weight: 700; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25);">
+            + Sınav Tasarla / Oluştur
+          </a>
+          <a href="{% url 'update-room' room.id %}" style="font-weight: 600; color: #1e40af; font-size: 0.85rem; text-decoration: none;">
+            Odayı Düzenle
+          </a>
+          <a href="{% url 'delete-room' room.id %}" style="font-weight: 600; color: #dc2626; font-size: 0.85rem; text-decoration: none;">
+            Odayı Sil
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="room__box scroll">
+          <div class="room__header scroll">
+            <div class="room__info">
+              <h3>{{room.name}}</h3>
+              <span>{{room.created|timesince}} ago</span>
+            </div>
+            <div class="room__hosted">
+              <p>Hosted By</p>
+              <a href="{% url 'user-profile' room.host.id %}" class="room__author">
+                <div class="avatar avatar--small">
+                  <img src="{{room.host.avatar.url}}" />
+                </div>
+                <span>@{{room.host.username}}</span>
+              </a>
+            </div>
+            <span class="room__topics">{{room.topic}}</span>
+            {% if room.course_code %}
+            <span style="background: #3b82f6; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; margin-left: 10px; font-weight: bold;">Ders: {{room.course_code}}</span>
+            {% endif %}
+          </div>
+
+          <!-- Avrasya Online Quizzes Section inside room__box -->
+          <div style="background: #fffaf5; border: 2px solid #fdba74; margin: 16px 24px; padding: 18px 22px; border-radius: 12px; box-shadow: 0 4px 15px rgba(234, 88, 12, 0.08);">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+                  <div>
+                      <h4 style="color: #c2410c; font-size: 1.1rem; font-weight: 700; margin: 0;">Bu Odadaki Çevrimiçi Sınavlar ve Testler ({{quizzes.count}})</h4>
+                      <span style="font-size: 0.83rem; color: #9a3412;">Öğretim üyeleri bu odada sınav ve soru tasarımı yapabilir.</span>
+                  </div>
+                  {% if request.user.role != 'student' and (request.user == room.host or request.user.role == 'faculty') %}
+                  <a href="{% url 'create-quiz' room.id %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 9px 18px; border-radius: 8px; font-size: 0.88rem; text-decoration: none; font-weight: 700; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25);">+ Yeni Sınav Tasarla</a>
+                  {% endif %}
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                  {% for q in quizzes %}
+                  <div style="background: #ffffff; border: 1px solid #fdba74; padding: 16px 18px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: 0 2px 8px rgba(234, 88, 12, 0.05);">
+                      <div>
+                          <a href="{% url 'quiz-detail' q.id %}" style="color: #c2410c; font-size: 1.15rem; font-weight: 700; text-decoration: none;">
+                              {{ q.title }}
+                          </a>
+                          <div style="font-size: 0.92rem; color: #64748b; margin-top: 5px;">
+                              Süre: <strong style="color: #ea580c;">{{ q.duration_minutes }} Dakika</strong> | 
+                              {{ q.questions.count }} Soru | 
+                              Oluşturan: @{{ q.creator.username }}
+                          </div>
+                          {% if q.description %}
+                          <p style="margin: 5px 0 0; font-size: 0.95rem; color: #334155;">{{ q.description }}</p>
+                          {% endif %}
+                      </div>
+                      <div style="display: flex; gap: 8px; align-items: center;">
+                          {% if request.user == q.creator or request.user == room.host %}
+                          <a href="{% url 'quiz-detail' q.id %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 8px 15px; border-radius: 6px; font-size: 0.88rem; font-weight: 700; text-decoration: none;">
+                              Sınavı Yönet / Sonuçlar
+                          </a>
+                          <a href="{% url 'delete-quiz' q.id %}" style="color: #ef4444; font-size: 0.88rem; font-weight: 700; margin-left: 6px; text-decoration: none;">Sil</a>
+                          {% else %}
+                          <a href="{% url 'quiz-detail' q.id %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 8px 18px; border-radius: 6px; font-size: 0.92rem; font-weight: 700; text-decoration: none;">
+                              Sınava Gir &rarr;
+                          </a>
+                          {% endif %}
+                      </div>
+                  </div>
+                  {% empty %}
+                  <p style="color: #9a3412; font-size: 0.88rem; margin: 0;">Bu oda için henüz tanımlanmış bir sınav bulunmamaktadır. Yukarıdaki <strong>+ Yeni Sınav Tasarla</strong> butonundan hemen bir sınav oluşturabilirsiniz.</p>
+                  {% endfor %}
+              </div>
+          </div>
+
+          <!-- Avrasya Study Resources & Files Section -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(15,59,140,0.06); margin: 15px 20px; padding: 22px; border-radius: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+                  <div>
+                      <h4 style="color: #0f3b8c; font-size: 1.15rem; font-weight: 800; margin: 0;">Ders Materyalleri, Dosyalar & Sesli Anonslar ({{resources.count}})</h4>
+                      <span style="font-size: 0.82rem; color: #64748b;">PDF, Word, Excel, Resim, Video ve sesli anonslar</span>
+                  </div>
+
+                  {% if request.user == room.host or request.user.role == 'faculty' or request.user.role == 'teacher' or request.user.is_superuser %}
+                  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                      <button onclick="document.getElementById('resourceFormCard').style.display = document.getElementById('resourceFormCard').style.display === 'none' ? 'block' : 'none'; document.getElementById('voiceRecorderCard').style.display = 'none';" class="btn btn--main" type="button" style="padding: 8px 16px; font-size: 0.85rem; font-weight: 700; border-radius: 50px;">
+                          + Dosya / Materyal Yükle
+                      </button>
+                      <button onclick="document.getElementById('voiceRecorderCard').style.display = document.getElementById('voiceRecorderCard').style.display === 'none' ? 'block' : 'none'; document.getElementById('resourceFormCard').style.display = 'none';" type="button" style="background: #10b981; color: #ffffff; border: 1px solid #059669; padding: 8px 16px; font-size: 0.85rem; font-weight: 700; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+                          Sesli Anons Kaydet
+                      </button>
+                  </div>
+                  {% endif %}
+              </div>
+
+              <!-- TEACHER ONLY: FILE UPLOAD FORM -->
+              {% if request.user == room.host or request.user.role == 'faculty' or request.user.role == 'teacher' or request.user.is_superuser %}
+              <div id="resourceFormCard" style="display: none; background: #f8fafc; border: 1px solid #cbd5e1; padding: 18px; border-radius: 12px; margin-bottom: 20px;">
+                  <h5 style="margin: 0 0 12px 0; color: #0f3b8c; font-size: 0.95rem;">Çoklu Dosya Yükleme Paneli (PDF, Word DOCX, Excel XLSX, Resim, MP4 Video)</h5>
+                  <form action="{% url 'room' room.id %}" method="POST" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <input type="hidden" name="resource_submit" value="1">
+                      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                          <input name="title" required placeholder="Materyal Başlığı (örn: 3. Hafta Ders Sunumu PDF)" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 10px 14px; border-radius: 8px; color: #1e293b; width: 100%;">
+                          <input name="link" placeholder="Harici Bağlantı URL (İsteğe Bağlı)" style="background: #ffffff; border: 1px solid #cbd5e1; padding: 10px 14px; border-radius: 8px; color: #1e293b; width: 100%;">
+                      </div>
+                      <div style="margin-bottom: 12px; background: #ffffff; border: 2px dashed #94a3b8; padding: 16px; border-radius: 8px; text-align: center;">
+                          <span style="font-size: 0.88rem; color: #475569; display: block; margin-bottom: 8px;">Yüklemek istediğiniz dosyayı seçin:</span>
+                          <input type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.mp4,.mov,.mp3,.wav,.ogg,.webm" style="color: #1e293b; font-size: 0.88rem;">
+                      </div>
+                      <textarea name="description" rows="2" placeholder="Öğrenciler için materyal hakkında kısa açıklama..." style="width: 100%; background: #ffffff; border: 1px solid #cbd5e1; padding: 10px 14px; border-radius: 8px; color: #1e293b; margin-bottom: 12px;"></textarea>
+                      <button class="btn btn--main" type="submit" style="padding: 10px 22px; font-size: 0.9rem; font-weight: 700;">Materyali Odada Paylaş</button>
+                  </form>
+              </div>
+
+              <!-- TEACHER ONLY: GREEN VOICE RECORDER -->
+              <div id="voiceRecorderCard" style="display: none; background: #f0fdf4; border: 2px solid #34d399; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.08);">
+                  <div style="margin-bottom: 12px;">
+                      <h5 style="margin: 0; color: #065f46; font-size: 1.05rem; font-weight: 800;">Sesli Anons ve Mesaj Kayıt Stüdyosu</h5>
+                      <span style="font-size: 0.85rem; color: #047857;">Mikrofona konuşarak öğrencilerinizin hemen dinleyebileceği sesli bildirim bırakın.</span>
+                  </div>
+
+                  <div style="margin: 16px 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                      <button id="startRecordBtn" type="button" style="background: #10b981; color: #ffffff; padding: 12px 24px; border-radius: 50px; border: none; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+                          Mikrofonu Aç & Kayda Başla
+                      </button>
+                      <button id="stopRecordBtn" type="button" style="display: none; background: #ef4444; color: #ffffff; padding: 12px 24px; border-radius: 50px; border: none; font-weight: 700; font-size: 0.95rem; cursor: pointer;">
+                          Kaydı Durdur (<span id="recordTimer">00:00</span>)
+                      </button>
+                  </div>
+
+                  <div id="audioPreviewBox" style="display: none; background: #ffffff; border: 1px solid #34d399; padding: 16px; border-radius: 10px;">
+                      <span style="font-size: 0.88rem; font-weight: 700; color: #065f46; display: block; margin-bottom: 8px;">Ses Kaydınız Hazır (Önizleme Dinle):</span>
+                      <audio id="audioPreviewPlayer" controls style="width: 100%; height: 44px; margin-bottom: 12px;"></audio>
+                      <div style="margin-bottom: 12px;">
+                          <input id="voiceTitleInput" type="text" placeholder="Sesli Anons Başlığı (örn: Vize Sınavı Öncesi Sesli Duyuru)" style="width: 100%; background: #ffffff; border: 1px solid #cbd5e1; padding: 10px 14px; border-radius: 8px; color: #1e293b;">
+                      </div>
+                      <div style="display: flex; gap: 10px;">
+                          <button id="sendVoiceBtn" type="button" style="background: #10b981; color: #ffffff; padding: 10px 24px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 0.95rem;">
+                              Sesli Anonsu Odada Paylaş
+                          </button>
+                          <button id="cancelVoiceBtn" type="button" style="background: #64748b; color: #ffffff; padding: 10px 18px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">
+                              İptal
+                          </button>
+                      </div>
+                  </div>
+              </div>
+
+              <script>
+              (function(){
+                  let mediaRecorder = null;
+                  let audioChunks = [];
+                  let recordInterval = null;
+                  let recordSeconds = 0;
+                  let recordedAudioBlob = null;
+
+                  function formatTime(sec) {
+                      let m = Math.floor(sec / 60).toString().padStart(2, '0');
+                      let s = (sec % 60).toString().padStart(2, '0');
+                      return m + ':' + s;
+                  }
+
+                  const startBtn = document.getElementById('startRecordBtn');
+                  const stopBtn = document.getElementById('stopRecordBtn');
+                  const timerSpan = document.getElementById('recordTimer');
+                  const previewBox = document.getElementById('audioPreviewBox');
+                  const previewPlayer = document.getElementById('audioPreviewPlayer');
+                  const cancelBtn = document.getElementById('cancelVoiceBtn');
+                  const sendBtn = document.getElementById('sendVoiceBtn');
+
+                  if (startBtn) {
+                      startBtn.addEventListener('click', async () => {
+                          try {
+                              const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                              mediaRecorder = new MediaRecorder(stream);
+                              audioChunks = [];
+                              recordSeconds = 0;
+
+                              mediaRecorder.ondataavailable = event => {
+                                  if (event.data.size > 0) audioChunks.push(event.data);
+                              };
+
+                              mediaRecorder.onstop = () => {
+                                  recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                                  const audioUrl = URL.createObjectURL(recordedAudioBlob);
+                                  previewPlayer.src = audioUrl;
+                                  previewBox.style.display = 'block';
+                              };
+
+                              mediaRecorder.start();
+                              startBtn.style.display = 'none';
+                              stopBtn.style.display = 'inline-block';
+                              timerSpan.innerText = '00:00';
+
+                              recordInterval = setInterval(() => {
+                                  recordSeconds++;
+                                  timerSpan.innerText = formatTime(recordSeconds);
+                              }, 1000);
+
+                          } catch (err) {
+                              alert('Mikrofon erişimine izin verilmedi veya mikrofon algılanamadı.');
+                          }
+                      });
+                  }
+
+                  if (stopBtn) {
+                      stopBtn.addEventListener('click', () => {
+                          if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                              mediaRecorder.stop();
+                              mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                          }
+                          clearInterval(recordInterval);
+                          stopBtn.style.display = 'none';
+                          startBtn.style.display = 'inline-flex';
+                      });
+                  }
+
+                  if (cancelBtn) {
+                      cancelBtn.addEventListener('click', () => {
+                          previewBox.style.display = 'none';
+                          recordedAudioBlob = null;
+                      });
+                  }
+
+                  if (sendBtn) {
+                      sendBtn.addEventListener('click', async () => {
+                          if (!recordedAudioBlob) return;
+                          sendBtn.disabled = true;
+                          sendBtn.innerText = 'Paylaşılıyor...';
+
+                          const formData = new FormData();
+                          formData.append('resource_submit', '1');
+                          formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                          const titleVal = document.getElementById('voiceTitleInput').value.trim() || 'Öğretim Üyesi Sesli Anonsu';
+                          formData.append('title', titleVal);
+                          formData.append('description', 'Sesli anons kaydı');
+                          formData.append('file', recordedAudioBlob, 'sesli_anons.webm');
+
+                          try {
+                              const response = await fetch('{% url "room" room.id %}', {
+                                  method: 'POST',
+                                  body: formData
+                              });
+                              window.location.reload();
+                          } catch (err) {
+                              alert('Ses kaydı paylaşılırken hata oluştu.');
+                              sendBtn.disabled = false;
+                              sendBtn.innerText = 'Sesli Anonsu Odada Paylaş';
+                          }
+                      });
+                  }
+              })();
+              </script>
+              {% endif %}
+
+              <!-- RESOURCE ITEMS DISPLAY LIST -->
+              <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px;">
+                  {% for res in resources %}
+                  <div style="{% if res.is_audio %}background: #f0fdf4; border: 2px solid #34d399;{% else %}background: #f8fafc; border: 1px solid #e2e8f0;{% endif %} padding: 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(15,59,140,0.03);">
+                      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+                          <div style="flex: 1; min-width: 250px;">
+                              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                  {% if res.is_audio %}
+                                      <span style="background: #10b981; color: #fff; padding: 4px 11px; border-radius: 20px; font-size: 0.82rem; font-weight: 700;">SESLİ ANONS</span>
+                                  {% elif res.is_video %}
+                                      <span style="background: #8b5cf6; color: #fff; padding: 4px 11px; border-radius: 20px; font-size: 0.82rem; font-weight: 700;">VİDEO DERS</span>
+                                  {% elif res.is_pdf %}
+                                      <span style="background: #ef4444; color: #fff; padding: 4px 11px; border-radius: 20px; font-size: 0.82rem; font-weight: 700;">PDF</span>
+                                  {% elif res.is_word %}
+                                      <span style="background: #2563eb; color: #fff; padding: 4px 11px; border-radius: 20px; font-size: 0.82rem; font-weight: 700;">WORD</span>
+                                  {% elif res.is_excel %}
+                                      <span style="background: #10b981; color: #fff; padding: 4px 11px; border-radius: 20px; font-size: 0.82rem; font-weight: 700;">EXCEL</span>
+                                  {% elif res.is_image %}
+                                      <span style="background: #f59e0b; color: #fff; padding: 4px 11px; border-radius: 20px; font-size: 0.82rem; font-weight: 700;">GÖRSEL</span>
+                                  {% else %}
+                                      <span style="background: #64748b; color: #fff; padding: 4px 11px; border-radius: 20px; font-size: 0.82rem; font-weight: 700;">DOSYA</span>
+                                  {% endif %}
+                                  <strong style="color: #0f3b8c; font-size: 1.15rem;">{{res.title}}</strong>
+                              </div>
+                              <div style="font-size: 0.92rem; color: #64748b; margin-bottom: 8px;">
+                                  Paylaşan: <strong style="color: #334155;">@{{res.user.username}}</strong> &bull; {{res.created|timesince}} ago
+                              </div>
+                              {% if res.description %}
+                              <p style="margin: 6px 0 0; font-size: 0.98rem; color: #334155; line-height: 1.45;">{{res.description}}</p>
+                              {% endif %}
+
+                              {% if res.is_audio and res.file %}
+                              <div style="margin-top: 12px;">
+                                  <audio controls style="width: 100%; height: 42px; border-radius: 30px;">
+                                      <source src="{{ res.file.url }}" type="audio/webm">
+                                      <source src="{{ res.file.url }}" type="audio/mpeg">
+                                      Tarayıcınız ses oynatıcıyı desteklemiyor.
+                                  </audio>
+                              </div>
+                              {% endif %}
+
+                              {% if res.is_video and res.file %}
+                              <div style="margin-top: 12px;">
+                                  <video controls style="width: 100%; max-height: 320px; border-radius: 8px; background: #000;">
+                                      <source src="{{ res.file.url }}">
+                                      Tarayıcınız video oynatıcıyı desteklemiyor.
+                                  </video>
+                              </div>
+                              {% endif %}
+                          </div>
+
+                          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                              {% if res.file %}
+                              <a href="{{res.file.url}}" download target="_blank" class="btn btn--main" style="padding: 8px 16px; font-size: 0.88rem; font-weight: 700; border-radius: 8px;">
+                                  İndir / Aç
+                              </a>
+                              {% endif %}
+                              {% if res.link %}
+                              <a href="{{res.link}}" target="_blank" style="background: #10b981; color: #fff; padding: 8px 16px; font-size: 0.88rem; font-weight: 700; border-radius: 8px; text-decoration: none;">
+                                  Bağlantıya Git
+                              </a>
+                              {% endif %}
+                              {% if request.user == res.user or request.user == room.host %}
+                              <a href="{% url 'delete-resource' res.id %}" style="color: #ef4444; font-size: 0.88rem; margin-left: 6px; font-weight: 700; text-decoration: none;">Sil</a>
+                              {% endif %}
+                          </div>
+                      </div>
+                  </div>
+                  {% endfor %}
+              </div>
+          </div>
+
+          <!-- Room Conversation Section -->
+          <div class="room__conversation" style="padding: 10px 20px;">
+            <h4 style="color: #0f3b8c; margin: 10px 0 14px 0;">Canlı Sohbet</h4>
+            <div class="threads" id="chatThreads">
+              {% for message in room_messages %}
+              <div class="thread">
+                <div class="thread__top">
+                  <div class="thread__author">
+                    <a href="{% url 'user-profile' message.user.id %}" class="thread__authorInfo">
+                      <div class="avatar avatar--small">
+                        <img src="{{message.user.avatar.url}}" />
+                      </div>
+                      <span>@{{message.user.username}}</span>
+                    </a>
+                    <span class="thread__date">{{message.created|timesince}} ago</span>
+                  </div>
+
+                  {% if request.user == message.user %}
+                  <a href="{% url 'delete-message' message.id %}">
+                    <div class="thread__delete">
+                      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                        <title>remove</title>
+                        <path
+                          d="M27.314 6.019l-1.333-1.333-9.98 9.981-9.981-9.981-1.333 1.333 9.981 9.981-9.981 9.98 1.333 1.333 9.981-9.98 9.98 9.98 1.333-1.333-9.98-9.98 9.98-9.981z">
+                        </path>
+                      </svg>
+                    </div>
+                  </a>
+                  {% endif %}
+                </div>
+                <div class="thread__details">
+                  {{message.body}}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+        </div>
+        <div class="room__message">
+          <form id="chatForm" action="" method="POST">
+            {% csrf_token %}
+            <input id="chatInput" name="body" placeholder="Mesajınızı yazın (Canlı / AJAX)..." autocomplete="off" />
+          </form>
+        </div>
+      </div>
+      <!-- Room End -->
+
+    <!--   Start -->
+    <div class="participants">
+      <h3 class="participants__top">Katılımcılar <span>({{participants.count}} Kişi)</span></h3>
+      <div class="participants__list scroll">
+        {% for user in participants %}
+        <a href="{%  url 'user-profile' user.id %}" class="participant">
+          <div class="avatar avatar--medium">
+            <img src="{{user.avatar.url}}" />
+          </div>
+          <p>
+            {{user.name|default:user.username}}
+            <span>@{{user.username}} ({{user.department|truncatechars:15}})</span>
+          </p>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    <!--  End -->
+  </div>
+</main>
+
+<script>
+// Avrasya Live AJAX Chat Engine
+const chatForm = document.getElementById('chatForm');
+const chatInput = document.getElementById('chatInput');
+const chatThreads = document.getElementById('chatThreads');
+
+if (chatForm) {
+    chatForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        const csrfToken = chatForm.querySelector('[name=csrfmiddlewaretoken]').value;
+        chatInput.value = '';
+
+        try {
+            const response = await fetch("{% url 'ajax-room-messages' room.id %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ body: text })
+            });
+            const result = await response.json();
+            if (result.status === 'ok') {
+                const msg = result.message;
+                const div = document.createElement('div');
+                div.className = 'thread';
+                div.innerHTML = `
+                    <div class="thread__top">
+                        <div class="thread__author">
+                            <a href="/profile/${msg.user}/" class="thread__authorInfo">
+                                <div class="avatar avatar--small">
+                                    <img src="${msg.avatar}" />
+                                </div>
+                                <span>@${msg.user}</span>
+                            </a>
+                            <span class="thread__date">Şimdi</span>
+                        </div>
+                    </div>
+                    <div class="thread__details">${msg.body}</div>
+                `;
+                chatThreads.appendChild(div);
+                chatThreads.scrollTop = chatThreads.scrollHeight;
+            }
+        } catch(err) {
+            console.error('Mesaj gönderilemedi:', err);
+        }
+    });
+}
+</script>
+{% endblock content %}

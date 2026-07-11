@@ -1,0 +1,53 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="layout">
+  <div class="container" style="max-width: 680px; margin: 0 auto; padding: 32px 16px; display: block !important; width: 100%;">
+    
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 30px; box-shadow: 0 10px 25px rgba(15, 59, 140, 0.05);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div>
+          <a href="{% url 'quizzes' %}" style="color: #0f3b8c; font-weight: 600; font-size: 0.9rem; text-decoration: none; display: inline-block; margin-bottom: 6px;">
+            &larr; Tüm Sınavlara Geri Dön
+          </a>
+          <h2 style="margin: 0; font-size: 1.5rem; color: #0f3b8c; font-weight: 700;">Yeni Çevrimiçi Sınav / Test Oluştur</h2>
+        </div>
+      </div>
+
+      <form action="" method="POST" class="form">
+        {% csrf_token %}
+
+        <div class="form__group" style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 8px;">1. Sınavın Ait Olduğu Ders / Çalışma Odasını Seçin</label>
+          <select name="room_id" required style="width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; font-size: 0.95rem; color: #0f3b8c; font-weight: 600;">
+            <option value="">-- Lütfen Bir Oda / Ders Seçin --</option>
+            {% for rm in rooms %}
+              <option value="{{ rm.id }}">{{ rm.name }} {% if rm.course_code %}(Ders: {{ rm.course_code }}){% endif %}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form__group" style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 8px;">2. Sınav Başlığı (örn: Vize Sınavı, Hafta 3 Testi)</label>
+          <input type="text" name="title" required placeholder="Sınav başlığını girin..." style="width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
+        </div>
+
+        <div class="form__group" style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 8px;">3. Sınav Açıklaması & Kurallar (İsteğe Bağlı)</label>
+          <textarea name="description" rows="3" placeholder="Öğrenciler için sınav kurallarını veya açıklamayı yazın..." style="width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;"></textarea>
+        </div>
+
+        <div class="form__group" style="margin-bottom: 26px;">
+          <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 8px;">4. Sınav Süresi (Dakika)</label>
+          <input type="number" name="duration_minutes" value="30" min="1" max="360" required style="width: 180px; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; font-weight: 700; color: #0f3b8c;">
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 14px; font-size: 1rem; font-weight: 700; background: #ea580c; color: #ffffff; border: 1px solid #c2410c; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(234, 88, 12, 0.25);">
+          Sınavı Oluştur ve Soru Eklemeye Başla &rarr;
+        </button>
+      </form>
+    </div>
+
+  </div>
+</main>
+{% endblock %}

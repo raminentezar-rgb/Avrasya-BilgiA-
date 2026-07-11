@@ -1,0 +1,164 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="auth layout">
+
+  {% if page == 'login' %}
+  <div class="container" style="max-width: 540px;">
+    <div class="layout__box">
+      <div class="layout__boxHeader">
+        <div class="layout__boxTitle">
+          <h3>Giriş Yap / Avrasya BilgiAğı</h3>
+        </div>
+      </div>
+      <div class="layout__body">
+        <h2 class="auth__tagline" style="margin-bottom: 18px;">Avrasya Üniversitesi Akademik Platformu</h2>
+
+        <!-- Tab Switcher -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px; background: #f1f5f9; padding: 6px; border-radius: 10px;">
+          <button type="button" id="tabObsBtn" onclick="switchLoginTab('obs')" 
+                  style="background: #0f3b8c; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.2s;">
+            Öğrenci OBS Girişi
+          </button>
+          <button type="button" id="tabTeacherBtn" onclick="switchLoginTab('teacher')" 
+                  style="background: transparent; color: #475569; border: none; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s;">
+            Akademisyen Girişi
+          </button>
+        </div>
+
+        <!-- 1. ÖĞRENCİ OBS GİRİŞİ (PROLİZ OBS ENTEGRASYONU) -->
+        <form id="formObsLogin" class="form" action="" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="login_type" value="student_obs" />
+
+          <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 8px; margin-bottom: 16px; color: #1e40af; font-size: 0.81rem; line-height: 1.45;">
+            <strong>Proliz OBS v2.1 Güvenli Kimlik Doğrulama:</strong> Yalnızca Proliz OBS sisteminde kayıtlı resmi öğrenci numaraları ve şifreleri kabul edilmektedir.<br>
+            <span style="font-size: 0.77rem; color: #1d4ed8; display: block; margin-top: 6px;">
+              <strong>Örnek Kayıtlı OBS Öğrenci Hesapları:</strong><br>
+              • <code>2024001</code> (Ahmet Demir - Bilgisayar Müh.) | Şifre: <code>obs12345</code><br>
+              • <code>2024002</code> (Zeynep Yılmaz - Web Tasarım) | Şifre: <code>obs12345</code><br>
+              • <code>211101001</code> (Mehmet Kaya - EEM) | Şifre: <code>obs12345</code>
+            </span>
+          </div>
+
+          <div class="form__group">
+            <label for="student_no">Öğrenci Numarası (Örn: 2024001, 211101001)</label>
+            <input id="student_no" name="student_no" type="text" placeholder="Öğrenci Numaranızı giriniz..." required />
+          </div>
+          <div class="form__group">
+            <label for="obs_password">OBS Şifresi</label>
+            <input id="obs_password" name="obs_password" type="password" placeholder="OBS Şifreniz..." />
+          </div>
+
+          <button class="btn btn--main" type="submit" style="width: 100%;">
+            Proliz OBS ile Doğrula ve Giriş Yap
+          </button>
+        </form>
+
+        <!-- 2. AKADEMİSYEN / ÖĞRETİM ÜYESİ GİRİŞİ (@avrasya.edu.tr) -->
+        <form id="formTeacherLogin" class="form" action="" method="POST" style="display: none;">
+          {% csrf_token %}
+          <input type="hidden" name="login_type" value="teacher" />
+
+          <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 12px; border-radius: 8px; margin-bottom: 16px; color: #991b1b; font-size: 0.82rem; line-height: 1.4;">
+            <strong>Resmi E-Posta Zorunluluğu:</strong> Akademisyen / Öğretim Üyesi girişlerinde yalnızca resmi Avrasya Üniversitesi kurumsal e-posta adresi (<strong>@avrasya.edu.tr</strong>) kabul edilmektedir.
+          </div>
+
+          <div class="form__group">
+            <label for="teacher_email">Kurumsal E-Posta Adresi (@avrasya.edu.tr)</label>
+            <input id="teacher_email" name="email" type="email" placeholder="hocadi@avrasya.edu.tr" />
+          </div>
+          <div class="form__group">
+            <label for="teacher_password">Şifre</label>
+            <input id="teacher_password" name="password" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
+          </div>
+
+          <button class="btn btn--main" type="submit" style="width: 100%;">
+            Akademisyen Olarak Giriş Yap
+          </button>
+        </form>
+
+        <div class="auth__action">
+          <p>Henüz hesabınız yok mu?</p>
+          <a href="{% url 'register' %}" class="btn btn--link">Kayıt Ol (Akademisyen / Öğrenci)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchLoginTab(type) {
+      const obsForm = document.getElementById('formObsLogin');
+      const teacherForm = document.getElementById('formTeacherLogin');
+      const obsBtn = document.getElementById('tabObsBtn');
+      const teacherBtn = document.getElementById('tabTeacherBtn');
+
+      if (type === 'obs') {
+        obsForm.style.display = 'block';
+        teacherForm.style.display = 'none';
+        obsBtn.style.background = '#0f3b8c';
+        obsBtn.style.color = '#fff';
+        teacherBtn.style.background = 'transparent';
+        teacherBtn.style.color = '#475569';
+      } else {
+        obsForm.style.display = 'none';
+        teacherForm.style.display = 'block';
+        teacherBtn.style.background = '#0f3b8c';
+        teacherBtn.style.color = '#fff';
+        obsBtn.style.background = 'transparent';
+        obsBtn.style.color = '#475569';
+      }
+    }
+  </script>
+
+  {% else %}
+  <div class="container" style="max-width: 580px;">
+    <div class="layout__box">
+      <div class="layout__boxHeader">
+        <div class="layout__boxTitle">
+          <h3>Kayıt Ol / Yeni Hesap Oluştur</h3>
+        </div>
+      </div>
+      <div class="layout__body">
+        <h2 class="auth__tagline">Avrasya Üniversitesi Akademik Kayıt</h2>
+
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 8px; margin-bottom: 16px; color: #1e40af; font-size: 0.83rem; line-height: 1.45;">
+          <strong>Öğrenciler İçin Önemli Not:</strong> Öğrencilerimizin ayrıca kayıt formunu doldurmasına gerek yoktur. Proliz OBS Entegrasyonu sayesinde <a href="{% url 'login' %}" style="font-weight: 700; text-decoration: underline;">Giriş ekranındaki Öğrenci OBS Girişi</a> sekmesinden Öğrenci Numaranız ile doğrudan girebilirsiniz.
+        </div>
+
+        <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 12px; border-radius: 8px; margin-bottom: 18px; color: #991b1b; font-size: 0.83rem; line-height: 1.45;">
+          <strong>Akademisyen / Öğretim Üyesi Kayıt Kuralı:</strong> Akademisyen rolü seçildiğinde yalnızca <strong>@avrasya.edu.tr</strong> uzantılı kurumsal üniversite e-posta adresine izin verilir. Farklı bir e-posta ile kayıt engellenir.
+        </div>
+
+        <form class="form" action="" method="POST">
+          {% csrf_token %}
+
+          {% for field in form %}
+          <div class="form__group">
+            <label for="{{field.id_for_label}}">{{field.label}}</label>
+            {{field}}
+            {% if field.help_text %}
+            <small style="color: #64748b; font-size: 0.78rem;">{{field.help_text}}</small>
+            {% endif %}
+            {% for err in field.errors %}
+            <div style="color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 4px;">{{err}}</div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+
+          <button class="btn btn--main" type="submit" style="width: 100%; margin-top: 10px;">
+            Hesap Oluştur / Kaydı Tamamla
+          </button>
+        </form>
+
+        <div class="auth__action">
+          <p>Zaten hesabınız var mı?</p>
+          <a href="{% url 'login' %}" class="btn btn--link">Giriş Yap</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</main>
+{% endblock content %}

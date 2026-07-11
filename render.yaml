@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: avrasya-bilgiagi
+    runtime: python
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate"
+    startCommand: "gunicorn studybud.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.13
+      - key: SECRET_KEY
+        generateValue: true

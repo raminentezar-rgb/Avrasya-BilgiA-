@@ -1,0 +1,76 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="layout">
+  <div class="container" style="max-width: 920px; margin: 0 auto; padding: 24px 16px; display: block !important; width: 100%;">
+    
+    <!-- Header with Create Quiz Button -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(15, 59, 140, 0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <h1 style="margin: 0; font-size: 1.5rem; color: #0f3b8c; font-weight: 700;">Çevrimiçi Sınavlar ve Testler Merkezi</h1>
+        <p style="color: #475569; font-size: 0.92rem; margin: 8px 0 0 0;">
+          Üniversitemizin ders odalarında tanımlanmış aktif sınavlar aşağıda listelenmektedir.
+        </p>
+      </div>
+      {% if request.user.is_authenticated and request.user.role != 'student' %}
+      <div>
+        <a href="{% url 'create-quiz-general' %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 11px 22px; font-size: 0.95rem; font-weight: 700; text-decoration: none; display: inline-block; border-radius: 8px; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);">
+          + Yeni Çevrimiçi Sınav / Test Oluştur
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Instruction Guide Box -->
+    <div style="background: #fffaf5; border: 2px solid #fdba74; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.06);">
+      <div style="font-size: 0.88rem; color: #9a3412; line-height: 1.5;">
+        <strong style="color: #c2410c;">Nasıl Çalışır?</strong><br>
+        {% if request.user.role != 'student' %}
+        • <strong style="color: #c2410c;">Öğretim Üyeleri:</strong> Yukarıdaki turuncu <em>"+ Yeni Sınav Oluştur"</em> butonuna tıklayarak herhangi bir ders odası için sınav tasarlayabilir, soru ekleyebilir ve öğrenci notlarını/sonuçlarını yönetebilir.<br>
+        {% endif %}
+        • <strong style="color: #c2410c;">Öğrenciler:</strong> Aşağıdaki listeden ilgili dersin sınavına tıklayıp turuncu <em>"Sınava Katıl / Başla"</em> butonuna basarak soruları cevaplayabilirsiniz.
+      </div>
+    </div>
+
+    <!-- Quizzes List -->
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      {% for quiz in quizzes %}
+      <div style="background: #ffffff; border: 1px solid #fed7aa; border-radius: 12px; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.05);">
+        <div>
+          <div style="margin-bottom: 6px;">
+            <span style="background: #ffedd5; color: #c2410c; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; border: 1px solid #fed7aa;">
+              Ders: {{ quiz.room.name }} {% if quiz.room.course_code %}({{ quiz.room.course_code }}){% endif %}
+            </span>
+          </div>
+          <a href="{% url 'quiz-detail' quiz.id %}" style="color: #c2410c; font-size: 1.18rem; font-weight: 700; text-decoration: none; display: block; margin: 6px 0;">
+            {{ quiz.title }}
+          </a>
+          <div style="font-size: 0.86rem; color: #64748b; margin-top: 6px;">
+            Oluşturan: <strong style="color: #334155;">@{{ quiz.creator.username }}</strong> | Süre: <strong style="color: #c2410c;">{{ quiz.duration_minutes }} Dakika</strong> | Soru Sayısı: <strong style="color: #334155;">{{ quiz.questions.count }} Soru</strong>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <a href="{% url 'quiz-detail' quiz.id %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 10px 20px; font-size: 0.9rem; font-weight: 700; text-decoration: none; white-space: nowrap; border-radius: 8px; box-shadow: 0 3px 10px rgba(234, 88, 12, 0.22);">
+            {% if request.user == quiz.creator or request.user == quiz.room.host %}Sınavı ve Soruları Yönet{% else %}Sınava Katıl / Başla{% endif %}
+          </a>
+          {% if request.user == quiz.creator or request.user == quiz.room.host %}
+          <a href="{% url 'delete-quiz' quiz.id %}" onclick="return confirm('Bu sınavı silmek istediğinize emin misiniz?')" style="color: #dc2626; font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 6px 10px;">
+            Sil
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 36px; text-align: center; color: #64748b;">
+        {% if request.user.role == 'student' %}
+        Bölümünüz için henüz tanımlanmış aktif bir sınav bulunmamaktadır. Öğretim üyeleriniz sınav tasarladığında burada listelenecektir.
+        {% else %}
+        Henüz tanımlanmış bir sınav bulunmamaktadır. Yukarıdaki <strong>"+ Yeni Çevrimiçi Sınav / Test Oluştur"</strong> butonuna tıklayarak ilk sınavı oluşturabilirsiniz.
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</main>
+{% endblock %}
