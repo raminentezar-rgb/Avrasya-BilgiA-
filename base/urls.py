@@ -29,5 +29,13 @@ urlpatterns = [
     path('delete-question/<str:pk>/', views.delete_question, name="delete-question"),
     path('create-quiz/', views.create_quiz_general, name="create-quiz-general"),
     path('quizzes/', views.quizzesPage, name="quizzes"),
+    path('quiz/<str:pk>/export-results/', views.export_quiz_results, name="export-quiz-results"),
+    path('message/<str:pk>/verify/', views.verify_message, name="verify-message"),
+    path('resource/<str:pk>/save/', views.toggle_save_resource, name="toggle-save-resource"),
+    path('my-saved-resources/', views.saved_resources, name="saved-resources"),
+    path('room/<str:pk>/create-assignment/', views.create_assignment, name="create-assignment"),
+    path('assignment/<str:pk>/submit/', views.submit_assignment, name="submit-assignment"),
+    path('notification/<str:pk>/read/', views.read_notification, name="read-notification"),
+    path('notifications/clear/', views.clear_all_notifications, name="clear-notifications"),
 ]
 

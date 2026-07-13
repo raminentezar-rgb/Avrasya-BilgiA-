@@ -7,21 +7,24 @@
     <div class="room">
       <div class="room__top" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 20px;">
         <div class="room__topLeft">
-          <a href="{% url 'home' %}" style="font-weight: 700; color: #0f3b8c; text-decoration: none;">
-            &larr; Ana Sayfaya Dön
+          <a href="{% url 'home' %}" style="font-weight: 700; color: #0f3b8c; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="bi bi-arrow-left"></i> Ana Sayfaya Dön
           </a>
           <h3 style="margin-left: 14px;">{{ room.name }}</h3>
         </div>
         <div class="room__topRight" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
           {% if request.user == room.host or request.user.role == 'faculty' %}
-          <a href="{% url 'create-quiz' room.id %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 8px 18px; border-radius: 8px; font-size: 0.88rem; text-decoration: none; font-weight: 700; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25);">
-            + Sınav Tasarla / Oluştur
+          <button onclick="alert('📋 Canlı Yoklama Kaydı Alındı! Odadaki Aktif Katılımcılar:\n' + Array.from(document.querySelectorAll('.participant p')).map(el => '• ' + el.innerText.trim()).join('\n'));" type="button" style="background: #059669; color: #ffffff; border: 1px solid #047857; padding: 8px 16px; border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="bi bi-clipboard2-check-fill"></i> Yoklama Al ({{ participants.count }} Kişi)
+          </button>
+          <a href="{% url 'create-quiz' room.id %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 8px 18px; border-radius: 8px; font-size: 0.88rem; text-decoration: none; font-weight: 700; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25); display: inline-flex; align-items: center; gap: 6px;">
+            <i class="bi bi-plus-circle-fill"></i> Sınav Tasarla / Oluştur
           </a>
-          <a href="{% url 'update-room' room.id %}" style="font-weight: 600; color: #1e40af; font-size: 0.85rem; text-decoration: none;">
-            Odayı Düzenle
+          <a href="{% url 'update-room' room.id %}" style="font-weight: 600; color: #1e40af; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+            <i class="bi bi-pencil-square"></i> Odayı Düzenle
           </a>
-          <a href="{% url 'delete-room' room.id %}" style="font-weight: 600; color: #dc2626; font-size: 0.85rem; text-decoration: none;">
-            Odayı Sil
+          <a href="{% url 'delete-room' room.id %}" style="font-weight: 600; color: #dc2626; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+            <i class="bi bi-trash3-fill"></i> Odayı Sil
           </a>
           {% endif %}
         </div>
@@ -95,21 +98,95 @@
               </div>
           </div>
 
+          <!-- Avrasya Assignments & Deadlines Section -->
+          <div class="assignment-box" style="margin: 16px 24px; padding: 18px 22px; border-radius: 12px; box-shadow: 0 4px 15px rgba(30, 58, 138, 0.05);">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+                  <div>
+                      <h4 style="font-size: 1.1rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                          <i class="bi bi-stack" style="color: #2563eb;"></i> Ödevler, Projeler ve Son Teslim Tarihleri ({{room.assignments.count}})
+                      </h4>
+                      <span style="font-size: 0.83rem;">Öğrenciler belirtilen teslim tarihine kadar dosyalarını ve notlarını yükleyebilir.</span>
+                  </div>
+                  {% if request.user == room.host or request.user.role == 'faculty' %}
+                  <button onclick="const af=document.getElementById('assignmentFormBox'); af.style.display = af.style.display === 'none' ? 'block' : 'none';" type="button" style="background: #2563eb; color: #ffffff; border: 1px solid #1d4ed8; padding: 9px 18px; border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                      <i class="bi bi-plus-lg"></i> Yeni Ödev Tanımla
+                  </button>
+                  {% endif %}
+              </div>
+
+              <!-- Create Assignment Modal Form -->
+              {% if request.user == room.host or request.user.role == 'faculty' %}
+              <div id="assignmentFormBox" class="assignment-form-box" style="display: none; padding: 18px; border-radius: 10px; margin-bottom: 16px;">
+                  <form action="{% url 'create-assignment' room.id %}" method="POST">
+                      {% csrf_token %}
+                      <div style="margin-bottom: 12px;">
+                          <label style="font-size: 0.85rem; font-weight: 700;">Ödev Başlığı:</label>
+                          <input type="text" name="title" required placeholder="örn: 1. Dönem Final Ödevi" style="width: 100%; padding: 8px 12px; border-radius: 8px;">
+                      </div>
+                      <div style="margin-bottom: 12px;">
+                          <label style="font-size: 0.85rem; font-weight: 700;">Ödev Açıklaması:</label>
+                          <textarea name="description" rows="2" placeholder="Talimatları ve kuralları yazın..." style="width: 100%; padding: 8px 12px; border-radius: 8px;"></textarea>
+                      </div>
+                      <div style="margin-bottom: 12px;">
+                          <label style="font-size: 0.85rem; font-weight: 700;">Son Teslim Tarihi (Deadline):</label>
+                          <input type="datetime-local" name="deadline" required style="width: 100%; padding: 8px 12px; border-radius: 8px;">
+                      </div>
+                      <button type="submit" style="background: #16a34a; color: #ffffff; border: none; padding: 9px 20px; border-radius: 8px; font-weight: 700; cursor: pointer;">Ödevi Kaydet & Yayınla</button>
+                  </form>
+              </div>
+              {% endif %}
+
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                  {% for ass in room.assignments.all %}
+                  <div class="assignment-card" style="padding: 16px 18px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                      <div>
+                          <h5 style="margin: 0; font-size: 1.05rem; font-weight: 700;">{{ ass.title }}</h5>
+                          <p style="margin: 4px 0 0 0; font-size: 0.85rem;">{{ ass.description }}</p>
+                          <small style="color: #dc2626; font-weight: 700; display: block; margin-top: 6px;">⏰ Son Teslim: {{ ass.deadline|date:"d M Y H:i" }} | Teslim Eden: {{ ass.submissions.count }} Öğrenci</small>
+                      </div>
+                      <div>
+                          <button onclick="const s=document.getElementById('subForm_{{ass.id}}'); s.style.display = s.style.display === 'none' ? 'block' : 'none';" type="button" style="background: #3b82f6; color: #ffffff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer;">
+                              Ödev Teslim Et / Gönder
+                          </button>
+                      </div>
+                  </div>
+
+                  <div id="subForm_{{ass.id}}" class="submission-form-box" style="display: none; padding: 14px; border-radius: 8px;">
+                      <form action="{% url 'submit-assignment' ass.id %}" method="POST" enctype="multipart/form-data">
+                          {% csrf_token %}
+                          <div style="margin-bottom: 10px;">
+                              <label style="font-size: 0.82rem; font-weight: 700;">Ödev Dosyası Yükle (PDF, ZIP, Word vb.):</label>
+                              <input type="file" name="file" style="display: block; margin-top: 4px;">
+                          </div>
+                          <div style="margin-bottom: 10px;">
+                              <input type="text" name="notes" placeholder="Öğretim üyesi için notunuz varsa ekleyin..." style="width: 100%; padding: 8px 12px; border-radius: 6px;">
+                          </div>
+                          <button type="submit" style="background: #10b981; color: #fff; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 700; cursor: pointer;">Dosyayı Gönder</button>
+                      </form>
+                  </div>
+                  {% empty %}
+                  <p style="color: #3b82f6; font-size: 0.88rem; margin: 0;">Bu odada henüz aktif bir ödev bulunmamaktadır.</p>
+                  {% endfor %}
+              </div>
+          </div>
+
           <!-- Avrasya Study Resources & Files Section -->
           <div style="background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(15,59,140,0.06); margin: 15px 0; padding: 20px; border-radius: 12px;">
               <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
                   <div>
-                      <h4 style="color: #0f3b8c; font-size: 1.15rem; font-weight: 800; margin: 0;">Ders Materyalleri, Dosyalar & Sesli Anonslar ({{resources.count}})</h4>
+                      <h4 style="color: #0f3b8c; font-size: 1.15rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 8px;">
+                          <i class="bi bi-folder2-open" style="color: #2563eb;"></i> Ders Materyalleri, Dosyalar & Sesli Anonslar ({{resources.count}})
+                      </h4>
                       <span style="font-size: 0.82rem; color: #64748b;">PDF, Word, Excel, Resim, Video ve sesli anonslar</span>
                   </div>
 
                   {% if request.user == room.host or request.user.role == 'faculty' or request.user.role == 'teacher' or request.user.is_superuser %}
                   <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                      <button onclick="document.getElementById('resourceFormCard').style.display = document.getElementById('resourceFormCard').style.display === 'none' ? 'block' : 'none'; document.getElementById('voiceRecorderCard').style.display = 'none';" class="btn btn--main" type="button" style="padding: 8px 16px; font-size: 0.85rem; font-weight: 700; border-radius: 50px;">
-                          + Dosya / Materyal Yükle
+                      <button onclick="document.getElementById('resourceFormCard').style.display = document.getElementById('resourceFormCard').style.display === 'none' ? 'block' : 'none'; document.getElementById('voiceRecorderCard').style.display = 'none';" class="btn btn--main" type="button" style="padding: 8px 16px; font-size: 0.85rem; font-weight: 700; border-radius: 50px; display: inline-flex; align-items: center; gap: 6px;">
+                          <i class="bi bi-cloud-arrow-up-fill"></i> Dosya / Materyal Yükle
                       </button>
-                      <button onclick="document.getElementById('voiceRecorderCard').style.display = document.getElementById('voiceRecorderCard').style.display === 'none' ? 'block' : 'none'; document.getElementById('resourceFormCard').style.display = 'none';" type="button" style="background: #10b981; color: #ffffff; border: 1px solid #059669; padding: 8px 16px; font-size: 0.85rem; font-weight: 700; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
-                          Sesli Anons Kaydet
+                      <button onclick="document.getElementById('voiceRecorderCard').style.display = document.getElementById('voiceRecorderCard').style.display === 'none' ? 'block' : 'none'; document.getElementById('resourceFormCard').style.display = 'none';" type="button" style="background: #10b981; color: #ffffff; border: 1px solid #059669; padding: 8px 16px; font-size: 0.85rem; font-weight: 700; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); display: inline-flex; align-items: center; gap: 6px;">
+                          <i class="bi bi-mic-fill"></i> Sesli Anons Kaydet
                       </button>
                   </div>
                   {% endif %}
@@ -337,6 +414,11 @@
                                   Bağlantıya Git
                               </a>
                               {% endif %}
+                              {% if request.user.is_authenticated %}
+                              <a href="{% url 'toggle-save-resource' res.id %}" title="Kütüphaneme Kaydet" style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                  <i class="bi bi-bookmark-heart-fill"></i> {% if request.user in res.saved_by.all %}Kaydedildi{% else %}Kaydet{% endif %}
+                              </a>
+                              {% endif %}
                               {% if request.user == res.user or request.user == room.host %}
                               <a href="{% url 'delete-resource' res.id %}" style="color: #ef4444; font-size: 0.88rem; margin-left: 6px; font-weight: 700; text-decoration: none;">Sil</a>
                               {% endif %}
@@ -361,7 +443,13 @@
                       </div>
                       <span>@{{message.user.username}}</span>
                     </a>
-                    <span class="thread__date">{{message.created|timesince}} ago</span>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="thread__date">{{message.created|timesince}} ago</span>
+                      {% if request.user == room.host or request.user.role == 'faculty' %}
+                      <a href="{% url 'verify-message' message.id %}" class="btn--verify-msg" title="Doğru / Onaylı Cevap olarak işaretle">
+                          {% if message.is_verified_answer %}✅ Onaylı (Kaldır){% else %}✔ Onayla{% endif %}
+                      </a>
+                      {% endif %}
                   </div>
 
                   {% if request.user == message.user %}
@@ -377,7 +465,12 @@
                   </a>
                   {% endif %}
                 </div>
-                <div class="thread__details">
+                <div class="thread__details {% if message.is_verified_answer %}thread__details--verified{% endif %}">
+                  {% if message.is_verified_answer %}
+                  <div class="verified-answer-badge" style="font-size: 0.8rem; font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                      <span>✅ ÖĞRETİM ÜYESİ ONAYLI DOĞRU CEVAP</span>
+                  </div>
+                  {% endif %}
                   {{message.body}}
                 </div>
               </div>

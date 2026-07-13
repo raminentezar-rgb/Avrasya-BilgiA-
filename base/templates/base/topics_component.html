@@ -11,16 +11,16 @@
 
     <ul class="topics__list scroll" id="topicsListUl" style="max-height: 560px; overflow-y: auto; padding-right: 6px; list-style: none;">
         <li style="margin-bottom: 8px;">
-            <a href="{% url 'home' %}" class="active" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 6px; background: #e0f2fe; color: #0f3b8c; font-weight: 700; text-decoration: none;">
+            <a href="{% url 'home' %}" class="topic-pill active">
                 <span>Tümü (All)</span>
-                <span style="background: #0f3b8c; color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">{{topics.count}}</span>
+                <span class="topic-count-badge">{{topics.count}}</span>
             </a>
         </li>
         {% for topic in topics %}
         <li class="topic-item" style="margin-bottom: 6px;">
-            <a href="{% url 'home' %}?q={{topic.name}}" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 6px; background: #f8fafc; border: 1px solid #f1f5f9; color: #1e293b; font-weight: 500; text-decoration: none; transition: all 0.2s ease;">
-                <span class="topic-name" style="font-size: 0.9rem;">{{topic.name}}</span>
-                <span style="background: #e2e8f0; color: #0f3b8c; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">{{topic.room_set.all.count}}</span>
+            <a href="{% url 'home' %}?q={{topic.name}}" class="topic-pill">
+                <span class="topic-name">{{topic.name}}</span>
+                <span class="topic-count-badge">{{topic.room_set.all.count}}</span>
             </a>
         </li>
         {% endfor %}

@@ -157,6 +157,14 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
+    @property
+    def unread_notifications_count(self):
+        return self.notifications.filter(is_read=False).count()
+
+    @property
+    def unread_notifications(self):
+        return self.notifications.filter(is_read=False)
+
 
 class Topic(models.Model):
     name = models.CharField(max_length=200)
@@ -188,6 +196,7 @@ class Message(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     body = models.TextField()
+    is_verified_answer = models.BooleanField(default=False, verbose_name="Öğretim Üyesi Onaylı Cevap")
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -205,6 +214,7 @@ class Resource(models.Model):
     file = models.FileField(upload_to="resources/%Y/%m/", null=True, blank=True, verbose_name="Dosya (PDF, ZIP, Resim)")
     link = models.URLField(max_length=500, null=True, blank=True, verbose_name="Bağlantı (URL)")
     description = models.TextField(null=True, blank=True, verbose_name="Açıklama")
+    saved_by = models.ManyToManyField(User, related_name='saved_resources', blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -303,4 +313,50 @@ class QuizSubmission(models.Model):
 
     def __str__(self):
         return f"{self.student.username} - {self.quiz.title} ({self.score}/{self.total_questions})"
+
+
+class Notification(models.Model):
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    message = models.CharField(max_length=255, verbose_name="Bildirim Mesajı")
+    link = models.CharField(max_length=255, blank=True, null=True, verbose_name="Bağlantı URL")
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.recipient.username}: {self.message}"
+
+
+class Assignment(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='assignments')
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200, verbose_name="Ödev Başlığı")
+    description = models.TextField(verbose_name="Ödev Açıklaması ve Talimatlar")
+    deadline = models.DateTimeField(verbose_name="Son Teslim Tarihi")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-deadline']
+
+    def __str__(self):
+        return self.title
+
+
+class AssignmentSubmission(models.Model):
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    file = models.FileField(upload_to="assignments/%Y/%m/", null=True, blank=True, verbose_name="Ödev Dosyası")
+    notes = models.TextField(null=True, blank=True, verbose_name="Öğrenci Notu")
+    grade = models.CharField(max_length=20, null=True, blank=True, verbose_name="Not / Puan")
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-submitted_at']
+        unique_together = ['assignment', 'student']
+
+    def __str__(self):
+        return f"{self.student.username} - {self.assignment.title}"
 

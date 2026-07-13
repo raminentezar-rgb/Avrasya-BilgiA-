@@ -13,17 +13,17 @@
 
     <!-- Academic Activities -->
     <div>
-        <div class="activities__header" style="margin-bottom: 12px;">
-            <h2>Son Akademik Paylaşımlar & Etkinlikler</h2>
+        <div class="activities__header" style="margin-bottom: 12px; background: transparent; border: none; padding: 0;">
+            <h2 style="font-size: 1.15rem; font-weight: 700;">Son Akademik Paylaşımlar & Etkinlikler</h2>
         </div>
         {% for message in room_messages %}
-        <div class="activities__box" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 10px; padding: 14px;">
+        <div class="activities__box">
             <div class="activities__boxHeader roomListRoom__header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <a href="{% url 'user-profile' message.user.id %}" class="roomListRoom__author" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
                     <div class="avatar avatar--small">
                         <img src="{{message.user.avatar.url}}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;" />
                     </div>
-                    <p style="margin: 0; font-weight: 600; color: #0f3b8c; font-size: 0.85rem;">
+                    <p style="margin: 0; font-weight: 600; font-size: 0.85rem;">
                         @{{message.user.username}}
                         <span style="color: #64748b; font-weight: 400;">{{message.created|timesince}} önce</span>
                     </p>
@@ -36,8 +36,8 @@
                 {% endif %}
             </div>
             <div class="activities__boxContent">
-                <p style="margin: 0 0 6px 0; font-size: 0.82rem; color: #475569;">şu odada mesaj paylaştı: “<a href="{% url 'room' message.room.id %}" style="color: #1e40af; font-weight: 600; text-decoration: none;">{{message.room}}</a>”</p>
-                <div class="activities__boxRoomContent" style="background: #f8fafc; padding: 8px 12px; border-radius: 6px; font-size: 0.88rem; color: #1e293b;">{{message.body}}</div>
+                <p style="margin: 0 0 6px 0; font-size: 0.82rem; color: #64748b;">şu odada mesaj paylaştı: “<a href="{% url 'room' message.room.id %}" style="font-weight: 600; text-decoration: none;">{{message.room}}</a>”</p>
+                <div class="activities__boxRoomContent">{{message.body}}</div>
             </div>
         </div>
         {% empty %}

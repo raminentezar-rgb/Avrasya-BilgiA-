@@ -5,7 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 import json
-from .models import Room, Topic, Message, User, Resource, Quiz, Question, QuizSubmission, DEPARTMENT_CHOICES
+import csv
+from .models import Room, Topic, Message, User, Resource, Quiz, Question, QuizSubmission, Notification, Assignment, AssignmentSubmission, DEPARTMENT_CHOICES
 from .forms import RoomForm, UserForm, MyUserCreationForm, ResourceForm, QuizForm, QuestionForm
 from .proliz_obs import ProlizOBSClient
 
@@ -408,6 +409,14 @@ def create_quiz(request, pk):
             quiz.room = room
             quiz.creator = request.user
             quiz.save()
+            for p in room.participants.all():
+                if p != request.user:
+                    Notification.objects.create(
+                        recipient=p,
+                        sender=request.user,
+                        message=f"'{room.name}' odasında yeni çevrimiçi sınav yayınlandı: {quiz.title} 📝",
+                        link=f"/quiz/{quiz.id}/"
+                    )
             messages.success(request, "Sınav başarıyla oluşturuldu. Şimdi soru ekleyebilirsiniz.")
             return redirect('quiz-detail', pk=quiz.id)
 
@@ -435,6 +444,14 @@ def create_quiz_general(request):
             description=description,
             duration_minutes=duration_minutes
         )
+        for p in room.participants.all():
+            if p != request.user:
+                Notification.objects.create(
+                    recipient=p,
+                    sender=request.user,
+                    message=f"'{room.name}' odasında yeni çevrimiçi sınav yayınlandı: {quiz.title} 📝",
+                    link=f"/quiz/{quiz.id}/"
+                )
         messages.success(request, "Sınav başarıyla oluşturuldu! Şimdi aşağıdan soruları ekleyebilir ve sınavı yönetebilirsiniz.")
         return redirect('quiz-detail', pk=quiz.id)
 
@@ -540,3 +557,145 @@ def quizzesPage(request):
             query |= Q(room__topic__name__icontains=kw) | Q(room__name__icontains=kw) | Q(room__course_code__icontains=kw)
         quizzes = quizzes.filter(query).distinct()
     return render(request, 'base/quizzes.html', {'quizzes': quizzes})
+
+
+@login_required(login_url='login')
+def export_quiz_results(request, pk):
+    quiz = Quiz.objects.get(id=pk)
+    if request.user != quiz.creator and request.user != quiz.room.host and request.user.role != 'faculty':
+        return HttpResponse("Bu sınavın sonuçlarını indirme yetkiniz yoktur.")
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = f'attachment; filename="sinav_sonuclari_quiz_{quiz.id}.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Öğrenci Adı Soyadı', 'Kullanıcı Adı', 'Bölümü', 'Puan', 'Toplam Soru', 'Yüzde (%)', 'Teslim Tarihi'])
+
+    for sub in quiz.submissions.all():
+        pct = round((sub.score / sub.total_questions) * 100, 1) if sub.total_questions > 0 else 0
+        writer.writerow([
+            sub.student.name or sub.student.username,
+            sub.student.username,
+            sub.student.department or '-',
+            sub.score,
+            sub.total_questions,
+            f"%{pct}",
+            sub.submitted_at.strftime('%Y-%m-%d %H:%M:%S')
+        ])
+    return response
+
+
+@login_required(login_url='login')
+def verify_message(request, pk):
+    message = Message.objects.get(id=pk)
+    room_id = message.room.id
+    if request.user == message.room.host or request.user.role == 'faculty':
+        message.is_verified_answer = not message.is_verified_answer
+        message.save()
+        status_txt = "onaylandı" if message.is_verified_answer else "onayı kaldırıldı"
+        messages.success(request, f"Cevap öğretim üyesi tarafından {status_txt}.")
+        # Create notification for message author if verified
+        if message.is_verified_answer and message.user != request.user:
+            Notification.objects.create(
+                recipient=message.user,
+                sender=request.user,
+                message=f"'{message.room.name}' odasındaki cevabınız Öğretim Üyesi tarafından Doğru Cevap olarak onaylandı! ✅",
+                link=f"/room/{room_id}/"
+            )
+    else:
+        messages.error(request, "Bu işlem için öğretim üyesi yetkiniz olmalıdır.")
+    return redirect('room', pk=room_id)
+
+
+@login_required(login_url='login')
+def toggle_save_resource(request, pk):
+    resource = Resource.objects.get(id=pk)
+    if request.user in resource.saved_by.all():
+        resource.saved_by.remove(request.user)
+        messages.info(request, "Materyal kütüphanenizden çıkarıldı.")
+    else:
+        resource.saved_by.add(request.user)
+        messages.success(request, "Materyal kişisel kütüphanenize kaydedildi! 🔖")
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+
+@login_required(login_url='login')
+def saved_resources(request):
+    resources = request.user.saved_resources.all()
+    return render(request, 'base/saved_resources.html', {'resources': resources})
+
+
+@login_required(login_url='login')
+def create_assignment(request, pk):
+    room = Room.objects.get(id=pk)
+    if request.user != room.host and request.user.role != 'faculty':
+        return HttpResponse("Ödev oluşturma yetkiniz yok.")
+
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        deadline = request.POST.get('deadline')
+        if title and deadline:
+            assignment = Assignment.objects.create(
+                room=room,
+                creator=request.user,
+                title=title,
+                description=description or '',
+                deadline=deadline
+            )
+            messages.success(request, "Ödev başarıyla oluşturuldu!")
+            # Notify room participants
+            for p in room.participants.all():
+                if p != request.user:
+                    Notification.objects.create(
+                        recipient=p,
+                        sender=request.user,
+                        message=f"'{room.name}' odasında yeni ödev eklendi: {title} (Son Teslim: {deadline})",
+                        link=f"/room/{room.id}/"
+                    )
+    return redirect('room', pk=room.id)
+
+
+@login_required(login_url='login')
+def submit_assignment(request, pk):
+    assignment = Assignment.objects.get(id=pk)
+    if request.method == 'POST':
+        notes = request.POST.get('notes', '')
+        file = request.FILES.get('file')
+        sub, created = AssignmentSubmission.objects.get_or_create(
+            assignment=assignment,
+            student=request.user,
+            defaults={'notes': notes, 'file': file}
+        )
+        if not created:
+            sub.notes = notes
+            if file:
+                sub.file = file
+            sub.save()
+        if assignment.creator and assignment.creator != request.user:
+            Notification.objects.create(
+                recipient=assignment.creator,
+                sender=request.user,
+                message=f"@{request.user.username} öğrencisi '{assignment.title}' ödevini teslim etti! 📂",
+                link=f"/room/{assignment.room.id}/"
+            )
+        messages.success(request, "Ödeviniz başarıyla teslim edildi! 🎉")
+    return redirect('room', pk=assignment.room.id)
+
+
+@login_required(login_url='login')
+def read_notification(request, pk):
+    try:
+        notif = Notification.objects.get(id=pk, recipient=request.user)
+        link = notif.link or '/'
+        notif.is_read = True
+        notif.save()
+    except Notification.DoesNotExist:
+        link = '/'
+    return redirect(link)
+
+
+@login_required(login_url='login')
+def clear_all_notifications(request):
+    request.user.notifications.filter(is_read=False).update(is_read=True)
+    return redirect(request.META.get('HTTP_REFERER', 'home'))

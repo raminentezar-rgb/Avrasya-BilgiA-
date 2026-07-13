@@ -125,10 +125,13 @@
 
         <!-- SECTION 3: Student Submissions Table -->
         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; box-shadow: 0 8px 25px rgba(15, 59, 140, 0.05); width: 100%;">
-          <div style="border-bottom: 2px solid #f1f5f9; padding-bottom: 16px; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
             <h2 style="margin: 0; font-size: 1.35rem; color: #0f3b8c; font-weight: 800;">
               3. Öğrenci Sonuçları ve Gönderimler ({{ submissions.count }} Katılımcı)
             </h2>
+            <a href="{% url 'export-quiz-results' quiz.id %}" class="btn btn--main" style="background: #16a34a; border-color: #15803d; color: #ffffff; padding: 10px 20px; border-radius: 50px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+              📊 Sonuçları Excel Olarak İndir
+            </a>
           </div>
 
           {% if submissions %}

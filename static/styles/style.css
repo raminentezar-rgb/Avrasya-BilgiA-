@@ -419,7 +419,8 @@ a {
 }
 
 .layout--2 > .container > div:first-child {
-  flex-basis: 72%;
+  flex: 1 1 72%;
+  min-width: 0;
 }
 
 .layout--2 > .container > div:last-child {
@@ -591,13 +592,18 @@ a {
   color: var(--color-main);
 }
 
-.topics__list li a span {
-  padding: 0.5rem 1rem;
-  background-color: var(--color-dark);
-  border-radius: 3px;
-  font-size: 1.3rem;
+.topics__list li a span:not(.topic-count-badge) {
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0;
+  font-weight: 500;
+}
+
+.topics__list li a span.topic-count-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 1px;
 }
 
 .topics-page a:hover {
@@ -748,16 +754,16 @@ a {
 ================================*/
 
 .activities {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 15px rgba(15, 59, 140, 0.05);
-  border-radius: 12px;
-  overflow: hidden;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
 }
 
 .activities__header {
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border: none;
+  background: transparent;
 }
 
 .activities__header h2 {
@@ -1322,4 +1328,450 @@ a {
     width: 32px !important;
     height: 32px !important;
   }
+}
+
+/* Base Topics Sidebar Pill Styling */
+.topic-pill {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  color: #1e293b;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.topic-pill.active {
+  background: #e0f2fe;
+  color: #0f3b8c;
+  font-weight: 700;
+}
+
+.topic-count-badge {
+  background: #e2e8f0;
+  color: #0f3b8c;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.topic-pill.active .topic-count-badge {
+  background: #0f3b8c;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   AVRASYA OBSIDIAN DARK THEME (GECE MODU 🌙 - FLAWLESS HIGH-CONTRAST OVERHAUL)
+   ========================================================================== */
+.header__logo img {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body.dark-theme {
+  background-color: #0f172a !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark-theme .header {
+  background-color: #1e293b !important;
+  border-bottom: 1px solid #334155 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 1. Header Search Bar Fix */
+body.dark-theme .header__search > label {
+  background-color: #0f172a !important;
+  border: 1px solid #334155 !important;
+}
+
+body.dark-theme .header__search input,
+body.dark-theme .navbar-search-input {
+  background-color: transparent !important;
+  border: none !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+body.dark-theme .header__user,
+body.dark-theme .header__user p,
+body.dark-theme .header__user span {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+/* 2. All Main Cards, Sidebars & Containers */
+body.dark-theme .layout__box,
+body.dark-theme .topics,
+body.dark-theme .activities__box,
+body.dark-theme .activities__boxRoomContent,
+body.dark-theme .roomList__header,
+body.dark-theme .roomListRoom,
+body.dark-theme .room__box,
+body.dark-theme .room__message,
+body.dark-theme .navbar-modal-box,
+body.dark-theme [style*="background: #ffffff"],
+body.dark-theme [style*="background: #f8fafc"],
+body.dark-theme [style*="background: #fffaf5"],
+body.dark-theme [style*="background: #eff6ff"],
+body.dark-theme [style*="background: #e0f2fe"],
+body.dark-theme [style*="background-color: #ffffff"],
+body.dark-theme [style*="background-color: #f8fafc"] {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+/* 3. Topics Sidebar Pills Flawless Contrast */
+body.dark-theme .topic-pill,
+body.dark-theme .topics__list li a {
+  background-color: #0f172a !important;
+  border: 1px solid #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .topic-pill span:not(.topic-count-badge),
+body.dark-theme .topics__list li a span:not(.topic-count-badge) {
+  background-color: transparent !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .topic-pill.active,
+body.dark-theme .topics__list li a.active {
+  background-color: #2563eb !important;
+  border-color: #1d4ed8 !important;
+}
+
+body.dark-theme .topic-pill.active span,
+body.dark-theme .topics__list li a.active span {
+  color: #ffffff !important;
+}
+
+body.dark-theme .topic-count-badge {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .topic-pill.active .topic-count-badge {
+  background-color: #1e3a8a !important;
+  color: #ffffff !important;
+}
+
+/* 3.5 Room Topic Pills & Activity Headers in Dark Mode */
+body.dark-theme .roomListRoom__topic {
+  background-color: #0f172a !important;
+  border: 1px solid #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .roomListRoom__meta a[style*="background"] {
+  background-color: #1e3a8a !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+body.dark-theme .activities__header {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* 4. Headings & Readable Text Elements */
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme h4,
+body.dark-theme h5,
+body.dark-theme h6,
+body.dark-theme p,
+body.dark-theme label,
+body.dark-theme td,
+body.dark-theme th,
+body.dark-theme span:not(.topic-count-badge),
+body.dark-theme a:not(.btn):not(.header__logo),
+body.dark-theme .roomListRoom__name {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .roomListRoom__author span,
+body.dark-theme .room__author span {
+  color: #94a3b8 !important;
+}
+
+/* 5. Form Inputs & Selects */
+body.dark-theme input:not(.navbar-search-input),
+body.dark-theme textarea,
+body.dark-theme select {
+  background-color: #0f172a !important;
+  border-color: #475569 !important;
+  color: #f8fafc !important;
+}
+
+/* 6. Theme Toggle Button */
+body.dark-theme #themeToggleBtn {
+  background: #334155 !important;
+  border-color: #475569 !important;
+  color: #fbbf24 !important;
+}
+
+/* 7. Auth / Login / Register / Layout Box Flawless Dark Mode */
+body.dark-theme .layout__box {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-theme .layout__boxHeader {
+  background-color: #0f172a !important;
+  border-bottom: 1px solid #334155 !important;
+}
+
+body.dark-theme .layout__boxTitle h3 {
+  color: #60a5fa !important;
+}
+
+body.dark-theme .layout__body {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .auth__tagline {
+  color: #94a3b8 !important;
+}
+
+body.dark-theme .auth [style*="background: #f1f5f9"] {
+  background-color: #0f172a !important;
+  border: 1px solid #334155 !important;
+}
+
+body.dark-theme .auth [style*="background: #eff6ff"] {
+  background-color: #0f172a !important;
+  border: 1px solid #1e3a8a !important;
+  color: #93c5fd !important;
+}
+
+body.dark-theme .auth [style*="background: #eff6ff"] span,
+body.dark-theme .auth [style*="background: #eff6ff"] code {
+  color: #bfdbfe !important;
+}
+
+body.dark-theme .auth [style*="background: #fef2f2"] {
+  background-color: #450a0a !important;
+  border: 1px solid #7f1d1d !important;
+  color: #fca5a5 !important;
+}
+
+/* 8. Room Detail Page (/room/<id>/) Complete Dark Mode Overhaul */
+body.dark-theme .room,
+body.dark-theme .participants,
+body.dark-theme .room__header,
+body.dark-theme .threads {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .room__top,
+body.dark-theme .participants__top {
+  background-color: #0f172a !important;
+  border-bottom: 1px solid #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .room__top a,
+body.dark-theme .room__topLeft a {
+  color: #60a5fa !important;
+}
+
+body.dark-theme .room__info h3,
+body.dark-theme .room__topLeft h3,
+body.dark-theme .threads h3 {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .room__topics {
+  background-color: #0f172a !important;
+  border: 1px solid #3b82f6 !important;
+  color: #60a5fa !important;
+}
+
+body.dark-theme .thread {
+  background-color: #0f172a !important;
+  border-left: 3px solid #3b82f6 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .thread__details {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .thread__author span,
+body.dark-theme .thread__date {
+  color: #94a3b8 !important;
+}
+
+body.dark-theme .room__message {
+  background-color: #0f172a !important;
+  border-top: 1px solid #334155 !important;
+}
+
+body.dark-theme .room__message input {
+  background-color: #1e293b !important;
+  border: 1px solid #475569 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .room__message input::placeholder {
+  color: #94a3b8 !important;
+}
+
+body.dark-theme .room__box [style*="background: #fffaf5"] {
+  background-color: #0f172a !important;
+  border: 1px solid #c2410c !important;
+}
+
+body.dark-theme .room__box [style*="background: #ffffff"],
+body.dark-theme .room__box [style*="background: #f8fafc"] {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+/* 9. Assignment Cards, Forms & Verified Answer Messages (Light & Dark Mode) */
+.thread__details--verified {
+  background: #ecfdf5;
+  border-left: 4px solid #10b981;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: #065f46;
+}
+
+.verified-answer-badge {
+  color: #059669;
+}
+
+.assignment-box {
+  background: #eff6ff;
+  border: 2px solid #bfdbfe;
+}
+
+.assignment-form-box,
+.assignment-card {
+  background: #ffffff;
+  border: 1px solid #93c5fd;
+}
+
+.submission-form-box {
+  background: #f8fafc;
+  border: 1px dashed #93c5fd;
+}
+
+/* Dark Mode Overrides for Section 9 */
+body.dark-theme .thread__details--verified {
+  background-color: #064e3b !important;
+  border-left: 4px solid #10b981 !important;
+  color: #ecfdf5 !important;
+}
+
+body.dark-theme .verified-answer-badge {
+  color: #a7f3d0 !important;
+}
+
+body.dark-theme .assignment-box {
+  background-color: #0f172a !important;
+  border: 2px solid #1e3a8a !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .assignment-form-box,
+body.dark-theme .assignment-card,
+body.dark-theme .submission-form-box {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .assignment-box h4,
+body.dark-theme .assignment-box h5,
+body.dark-theme .assignment-box label,
+body.dark-theme .assignment-box p,
+body.dark-theme .assignment-box span {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .assignment-box input,
+body.dark-theme .assignment-box textarea {
+  background-color: #0f172a !important;
+  border: 1px solid #475569 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .assignment-box input::placeholder,
+body.dark-theme .assignment-box textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.btn--verify-msg {
+  font-size: 0.75rem;
+  background: #ecfdf5;
+  color: #059669 !important;
+  border: 1px solid #10b981;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+body.dark-theme .btn--verify-msg {
+  background-color: #064e3b !important;
+  border: 1px solid #10b981 !important;
+  color: #a7f3d0 !important;
+}
+
+/* 10. Saved Resources Page (/my-saved-resources/) */
+.saved-resources-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.saved-resource-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.saved-resources-box h2 {
+  color: #0f3b8c;
+}
+
+.saved-resources-box p {
+  color: #64748b;
+}
+
+body.dark-theme .saved-resources-box {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .saved-resource-card {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .saved-resources-box h2,
+body.dark-theme .saved-resources-box h4,
+body.dark-theme .saved-resources-box p {
+  color: #f8fafc !important;
 }
