@@ -1163,7 +1163,10 @@ def start_attendance_session(request, room_id):
 
 @login_required
 def projector_view(request, session_id):
-    session = get_object_or_404(AttendanceSession, id=session_id)
+    session = AttendanceSession.objects.filter(id=session_id).first()
+    if not session:
+        messages.info(request, "Bu yoklama oturumu artık mevcut değil (Sunucu güncellenmiş veya oturum kapanmış olabilir).")
+        return redirect('home')
     if session.room.host != request.user and not request.user.is_superuser:
         messages.error(request, "Yetkisiz erişim.")
         return redirect('home')
@@ -1174,14 +1177,18 @@ def projector_view(request, session_id):
 
 @login_required
 def api_projector_token(request, session_id):
-    session = get_object_or_404(AttendanceSession, id=session_id)
+    session = AttendanceSession.objects.filter(id=session_id).first()
+    if not session:
+        return JsonResponse({'error': 'Session not found'}, status=404)
     if not session.is_active:
         return JsonResponse({'error': 'Session inactive'}, status=400)
     return JsonResponse({'token': session.get_totp_token()})
 
 @login_required
 def api_projector_live(request, session_id):
-    session = get_object_or_404(AttendanceSession, id=session_id)
+    session = AttendanceSession.objects.filter(id=session_id).first()
+    if not session:
+        return JsonResponse({'error': 'Session not found'}, status=404)
     records = session.records.all().order_by('-timestamp')
     data = []
     for r in records:
@@ -1195,7 +1202,9 @@ def api_projector_live(request, session_id):
 
 @login_required
 def toggle_ip_check(request, session_id):
-    session = get_object_or_404(AttendanceSession, id=session_id)
+    session = AttendanceSession.objects.filter(id=session_id).first()
+    if not session:
+        return JsonResponse({'error': 'Session not found'}, status=404)
     if session.room.host == request.user or request.user.is_superuser:
         session.require_ip_check = not session.require_ip_check
         session.save()
@@ -1204,7 +1213,9 @@ def toggle_ip_check(request, session_id):
 
 @login_required
 def toggle_qr_check(request, session_id):
-    session = get_object_or_404(AttendanceSession, id=session_id)
+    session = AttendanceSession.objects.filter(id=session_id).first()
+    if not session:
+        return JsonResponse({'error': 'Session not found'}, status=404)
     if session.room.host == request.user or request.user.is_superuser:
         session.allow_qr_check = not session.allow_qr_check
         session.save()
@@ -1213,7 +1224,10 @@ def toggle_qr_check(request, session_id):
 
 @login_required
 def close_attendance_session(request, session_id):
-    session = get_object_or_404(AttendanceSession, id=session_id)
+    session = AttendanceSession.objects.filter(id=session_id).first()
+    if not session:
+        messages.info(request, "Yoklama oturumu artık mevcut değil veya kapatılmış.")
+        return redirect('home')
     if session.room.host == request.user or request.user.is_superuser:
         session.is_active = False
         session.save()
@@ -1230,8 +1244,11 @@ def student_scan(request):
         return render(request, 'base/scan_result.html', {'success': False})
         
     student = request.user
-    session = get_object_or_404(AttendanceSession, id=session_id)
-    
+    session = AttendanceSession.objects.filter(id=session_id).first()
+    if not session:
+        messages.error(request, 'Yoklama oturumu bulunamadı veya sunucu yenilenmesi nedeniyle sona ermiş. Lütfen projektördeki yeni kodu okutun.')
+        return render(request, 'base/scan_result.html', {'success': False})
+        
     # Checks
     if not session.is_active:
         messages.warning(request, 'Bu yoklama oturumu sona ermiş.')
@@ -1280,7 +1297,10 @@ def student_scan(request):
 
 @login_required
 def export_attendance_report(request, session_id):
-    session = get_object_or_404(AttendanceSession, id=session_id)
+    session = AttendanceSession.objects.filter(id=session_id).first()
+    if not session:
+        messages.info(request, "Rapor oluşturulacak yoklama oturumu bulunamadı.")
+        return redirect('home')
     if session.room.host != request.user and not request.user.is_superuser:
         messages.error(request, "Yetkisiz erişim.")
         return redirect('home')
