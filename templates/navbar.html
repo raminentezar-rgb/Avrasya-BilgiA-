@@ -1,48 +1,55 @@
 {% load static %}
-<header class="header header--loggedIn">
-    <div class="container">
-        <a href="{% url 'home' %}" class="header__logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
-            <img src="{% static 'images/avrasya_logo.png' %}" alt="Avrasya University Logo" style="width: 48px; height: 48px; object-fit: contain; background: transparent; border: none; border-radius: 50%;" />
-            <div>
-                <h1 style="margin:0; font-weight:700; color:#0f3b8c; letter-spacing: -0.3px;">Avrasya BilgiAğı</h1>
-                <span style="font-size:0.78rem; color:#d97706; font-weight:600; display:block;">Avrasya Üniversitesi Akademik Paylaşım Platformu</span>
+<header class="header header--loggedIn" style="background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 10px 0; position: sticky; top: 0; z-index: 999; box-shadow: 0 2px 10px rgba(15, 59, 140, 0.04);">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 20px;">
+        <a href="{% url 'home' %}" class="header__logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none; flex-shrink: 0;">
+            <img src="{% static 'images/avrasya_logo.png' %}" alt="Avrasya University Logo" style="width: 44px; height: 44px; object-fit: contain; background: transparent; border: none; border-radius: 50%; flex-shrink: 0;" />
+            <div style="white-space: nowrap;">
+                <h1 style="margin: 0; font-weight: 800; font-size: 1.35rem; color: #0f3b8c; letter-spacing: -0.3px; line-height: 1.2; white-space: nowrap !important;">Avrasya BilgiAğı</h1>
+                <span style="font-size: 0.75rem; color: #d97706; font-weight: 700; display: block; white-space: nowrap !important;">Avrasya Üniversitesi Paylaşım Platformu</span>
             </div>
         </a>
-        <form class="header__search" method="GET" action="{% url 'home' %}">
-            <label>
-                <input name="q" placeholder="Ders kodu, konu veya oda ara... " class="navbar-search-input" />
-            </label>
+        <form class="header__search" method="GET" action="{% url 'home' %}" style="flex: 1 1 220px; max-width: 340px; margin: 0;">
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 50px; padding: 6px 16px; display: flex; align-items: center; gap: 10px; width: 100%; height: 38px;">
+                <input name="q" placeholder="Ders, konu veya oda ara..." style="background: transparent; border: none; outline: none; width: 100%; font-size: 0.88rem; color: #1e293b; padding: 0;" />
+            </div>
         </form>
-        <nav class="header__menu" style="display: flex; align-items: center; gap: 14px;">
+        <nav class="header__menu" style="display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: auto;">
 
             <!-- Dark Mode Theme Toggle Button -->
-            <button id="themeToggleBtn" onclick="toggleTheme()" title="Gece / Gündüz Modu" style="background: #f1f5f9; border: 1px solid #cbd5e1; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.15rem; transition: all 0.2s ease; color: #334155;">
-                <i class="bi bi-moon-stars-fill"></i>
+            <button id="themeToggleBtn" onclick="toggleTheme()" title="Gece / Gündüz Modu" style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 7px 14px; border-radius: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.82rem; font-weight: 700; transition: all 0.2s ease; color: #334155; flex-shrink: 0;">
+                Tema
             </button>
 
+            {% if request.user.is_authenticated %}
+            <!-- Dashboard Link -->
+            <a href="{% url 'dashboard' %}" style="display: inline-flex; align-items: center; gap: 6px; background: #2563eb; color: #ffffff; border: 1px solid #1d4ed8; padding: 7px 15px; border-radius: 50px; font-weight: 700; font-size: 0.84rem; text-decoration: none; white-space: nowrap; box-shadow: 0 3px 10px rgba(37, 99, 235, 0.2); flex-shrink: 0;">
+                Kontrol Paneli
+            </a>
+            {% endif %}
+
             <!-- Direct All Quizzes Link -->
-            <a href="{% url 'quizzes' %}" style="display: inline-flex; align-items: center; gap: 6px; background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 8px 18px; border-radius: 50px; font-weight: 700; font-size: 0.88rem; text-decoration: none; white-space: nowrap; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);">
-                <i class="bi bi-pencil-square"></i> Çevrimiçi Sınavlar
+            <a href="{% url 'quizzes' %}" style="display: inline-flex; align-items: center; gap: 6px; background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 7px 15px; border-radius: 50px; font-weight: 700; font-size: 0.84rem; text-decoration: none; white-space: nowrap; box-shadow: 0 3px 10px rgba(234, 88, 12, 0.2); flex-shrink: 0;">
+                Çevrimiçi Sınavlar
             </a>
 
             <!-- Logged In -->
             {% if request.user.is_authenticated %}
             <!-- Saved Bookmarks Link -->
-            <a href="{% url 'saved-resources' %}" title="Kaydedilen Materyallerim" style="display: flex; align-items: center; justify-content: center; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; width: 40px; height: 40px; border-radius: 50%; text-decoration: none; font-size: 1.15rem;">
-                <i class="bi bi-bookmark-heart-fill"></i>
+            <a href="{% url 'saved-resources' %}" title="Kaydedilen Materyallerim" style="display: flex; align-items: center; justify-content: center; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 7px 14px; border-radius: 50px; text-decoration: none; font-size: 0.82rem; font-weight: 700; flex-shrink: 0;">
+                Materyallerim
             </a>
 
             <!-- Notification Bell Modal Trigger -->
-            <div style="position: relative;">
-                <button onclick="const m=document.getElementById('notifModal'); m.style.display = m.style.display === 'none' ? 'block' : 'none';" title="Bildirimler" style="background: #fff1f2; border: 1px solid #fecdd3; color: #e11d48; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.15rem; display: flex; align-items: center; justify-content: center; position: relative;">
-                    <i class="bi bi-bell-fill"></i>
+            <div style="position: relative; flex-shrink: 0;">
+                <button onclick="const m=document.getElementById('notifModal'); m.style.display = m.style.display === 'none' ? 'block' : 'none';" title="Bildirimler" style="background: #fff1f2; border: 1px solid #fecdd3; color: #e11d48; padding: 7px 14px; border-radius: 50px; cursor: pointer; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; gap: 6px; position: relative;">
+                    Bildirimler
                     {% if request.user.unread_notifications_count > 0 %}
-                    <span style="position: absolute; top: -4px; right: -4px; background: #dc2626; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 20px;">{{ request.user.unread_notifications_count }}</span>
+                    <span style="background: #dc2626; color: #fff; font-size: 0.7rem; font-weight: 800; padding: 1px 6px; border-radius: 20px;">{{ request.user.unread_notifications_count }}</span>
                     {% endif %}
                 </button>
-                <div id="notifModal" class="navbar-modal-box" style="display: none; position: absolute; right: 0; top: 48px; width: 330px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; padding: 14px; max-height: 380px; overflow-y: auto;">
+                <div id="notifModal" class="navbar-modal-box" style="display: none; position: absolute; right: 0; top: 46px; width: 330px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; padding: 14px; max-height: 380px; overflow-y: auto;">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 10px;">
-                        <h5 style="margin: 0; color: #0f3b8c; font-size: 0.95rem;"><i class="bi bi-bell"></i> Bildirimler & Duyurular</h5>
+                        <h5 style="margin: 0; color: #0f3b8c; font-size: 0.95rem;">Bildirimler & Duyurular</h5>
                         {% if request.user.unread_notifications_count > 0 %}
                         <a href="{% url 'clear-notifications' %}" style="font-size: 0.72rem; color: #2563eb; font-weight: 700; text-decoration: none;">Tümünü Okundu Say</a>
                         {% endif %}
@@ -58,14 +65,14 @@
                 </div>
             </div>
 
-            <div class="header__user" style="display: flex; align-items: center; gap: 14px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 50px;">
+            <div class="header__user" style="display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 4px 12px; border-radius: 50px; flex-shrink: 0;">
                 <a href="{% url 'update-user' %}" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
                     <div class="avatar avatar--medium active">
-                        <img src="{{request.user.avatar.url}}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover;" />
+                        <img src="{{request.user.avatar.url}}" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover;" />
                     </div>
                     <div>
-                        <p style="margin: 0; font-weight: 700; color: #0f3b8c; line-height: 1.2; font-size: 0.95rem; white-space: nowrap;">{{request.user.name|default:request.user.username}}</p>
-                        <span style="font-size: 0.75rem; color: #64748b; font-weight: 500; display: block; white-space: nowrap;">{{request.user.get_role_display}}</span>
+                        <p style="margin: 0; font-weight: 700; color: #0f3b8c; line-height: 1.2; font-size: 0.92rem; white-space: nowrap;">{{request.user.name|default:request.user.username}}</p>
+                        <span style="font-size: 0.74rem; color: #64748b; font-weight: 500; display: block; white-space: nowrap;">{{request.user.get_role_display}}</span>
                     </div>
                 </a>
                 <button class="dropdown-button" style="background: transparent; border: none; cursor: pointer; font-weight: 700; color: #0f3b8c; font-size: 0.82rem;">
@@ -75,12 +82,15 @@
             {% else %}
 
             <!-- Not Logged In Sleek Button -->
-            <a href="{% url 'login' %}" style="display: inline-flex; align-items: center; gap: 8px; background: #0f3b8c; color: #ffffff; padding: 10px 22px; border-radius: 50px; font-weight: 700; font-size: 0.95rem; text-decoration: none; box-shadow: 0 4px 12px rgba(15, 59, 140, 0.15); transition: all 0.2s ease; white-space: nowrap;">
+            <a href="{% url 'login' %}" style="display: inline-flex; align-items: center; gap: 8px; background: #0f3b8c; color: #ffffff; padding: 10px 22px; border-radius: 50px; font-weight: 700; font-size: 0.95rem; text-decoration: none; box-shadow: 0 4px 12px rgba(15, 59, 140, 0.15); transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0;">
                 <span>Giriş Yap / Kayıt Ol</span>
             </a>
             {% endif %}
 
             <div class="dropdown-menu">
+                <a href="{% url 'dashboard' %}" class="dropdown-link" style="font-weight: 800; color: #2563eb;">
+                    Kontrol Paneli / Dashboard
+                </a>
                 <a href="{% url 'quizzes' %}" class="dropdown-link" style="font-weight: 700; color: #0f3b8c;">
                     Tüm Sınavlar ve Testler
                 </a>
@@ -92,6 +102,7 @@
                 </a>
             </div>
         </nav>
+    </div>
 </header>
 
 <script>
@@ -101,11 +112,11 @@ function toggleTheme() {
     if (body.classList.contains('dark-theme')) {
         body.classList.remove('dark-theme');
         localStorage.setItem('theme', 'light');
-        if (btn) btn.innerHTML = '<i class="bi bi-moon-stars-fill"></i>';
+        if (btn) btn.innerHTML = 'Tema';
     } else {
         body.classList.add('dark-theme');
         localStorage.setItem('theme', 'dark');
-        if (btn) btn.innerHTML = '<i class="bi bi-sun-fill" style="color: #fbbf24;"></i>';
+        if (btn) btn.innerHTML = 'Tema';
     }
 }
 document.addEventListener('DOMContentLoaded', () => {
@@ -113,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('themeToggleBtn');
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-theme');
-        if (btn) btn.innerHTML = '<i class="bi bi-sun-fill" style="color: #fbbf24;"></i>';
+        if (btn) btn.innerHTML = 'Tema';
     }
 });
 </script>

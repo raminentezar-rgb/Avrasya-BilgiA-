@@ -7,6 +7,7 @@ urlpatterns = [
     path('register/', views.registerPage, name="register"),
 
     path('', views.home, name="home"),
+    path('dashboard/', views.dashboard, name="dashboard"),
     path('room/<str:pk>/', views.room, name="room"),
     path('profile/<str:pk>/', views.userProfile, name="user-profile"),
 
@@ -37,5 +38,22 @@ urlpatterns = [
     path('assignment/<str:pk>/submit/', views.submit_assignment, name="submit-assignment"),
     path('notification/<str:pk>/read/', views.read_notification, name="read-notification"),
     path('notifications/clear/', views.clear_all_notifications, name="clear-notifications"),
+    path('quiz/<str:quiz_id>/add-from-bank/<str:bank_id>/', views.add_from_bank_to_quiz, name="add-from-question-bank"),
+    path('question-bank/', views.question_bank_view, name="question-bank"),
+    path('submission/quiz/<str:submission_id>/grade/', views.grade_quiz_submission, name="grade-quiz-submission"),
+    path('submission/assignment/<str:submission_id>/grade/', views.grade_assignment_submission, name="grade-assignment-submission"),
+    path('room/<str:pk>/gradebook/', views.room_gradebook, name="room-gradebook"),
+    path('room/<str:pk>/gradebook/export/', views.export_room_gradebook, name="export-room-gradebook"),
+
+    # Classroom Attendance System URLs
+    path('attendance/room/<str:room_id>/start/', views.start_attendance_session, name="start-attendance-session"),
+    path('attendance/projector/<str:session_id>/', views.projector_view, name="projector_view"),
+    path('attendance/api/projector/<str:session_id>/token/', views.api_projector_token, name="api_projector_token"),
+    path('attendance/api/projector/<str:session_id>/live/', views.api_projector_live, name="api_projector_live"),
+    path('attendance/api/projector/<str:session_id>/toggle-ip/', views.toggle_ip_check, name="toggle_ip_check"),
+    path('attendance/api/projector/<str:session_id>/toggle-qr/', views.toggle_qr_check, name="toggle_qr_check"),
+    path('attendance/session/<str:session_id>/close/', views.close_attendance_session, name="close_attendance_session"),
+    path('attendance/session/<str:session_id>/export/', views.export_attendance_report, name="export_attendance_report"),
+    path('attendance/scan/', views.student_scan, name="student_scan"),
 ]
 

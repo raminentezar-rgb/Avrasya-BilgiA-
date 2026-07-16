@@ -5,12 +5,12 @@
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 18px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
             <div>
                 <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
-                    <i class="bi bi-bookmark-heart-fill" style="color: #2563eb;"></i> Kişisel Materyal Kütüphanem
+                    Kişisel Materyal Kütüphanem
                 </h2>
                 <p style="margin: 6px 0 0 0; font-size: 0.92rem;">Ders odalarında favorilerinize eklediğiniz ve kaydettiğiniz tüm materyaller</p>
             </div>
             <a href="{% url 'home' %}" class="btn btn--main" style="padding: 10px 22px; border-radius: 50px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
-                <i class="bi bi-arrow-left"></i> Ana Sayfaya Dön
+                Ana Sayfaya Dön
             </a>
         </div>
 
@@ -19,7 +19,7 @@
             <div class="saved-resource-card" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-radius: 12px; flex-wrap: wrap; gap: 12px;">
                 <div>
                     <span style="display: inline-flex; align-items: center; gap: 6px; background: #eff6ff; color: #1e40af; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 6px;">
-                        <i class="bi bi-book-fill"></i> {{ res.room.name }}
+                        {{ res.room.name }}
                     </span>
                     <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700;">{{ res.title }}</h4>
                     {% if res.description %}
@@ -29,24 +29,23 @@
                 <div style="display: flex; gap: 10px; align-items: center;">
                     {% if res.file %}
                     <a href="{{ res.file.url }}" target="_blank" class="btn btn--main" style="padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                        <i class="bi bi-download"></i> Dosyayı İndir / Aç
+                        Dosyayı İndir / Aç
                     </a>
                     {% elif res.link %}
                     <a href="{{ res.link }}" target="_blank" class="btn btn--main" style="padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                        <i class="bi bi-box-arrow-up-right"></i> Bağlantıya Git
+                        Bağlantıya Git
                     </a>
                     {% endif %}
                     <a href="{% url 'toggle-save-resource' res.id %}" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                        <i class="bi bi-trash3-fill"></i> Kaldır
+                        Kaldır
                     </a>
                 </div>
             </div>
             {% empty %}
             <div style="text-align: center; padding: 60px 20px; width: 100%;">
-                <i class="bi bi-bookmark-x" style="font-size: 3rem; color: #94a3b8; display: block; margin-bottom: 12px;"></i>
                 <p style="font-size: 1.15rem; font-weight: 600; margin-bottom: 16px;">Henüz kütüphanenize kaydettiğiniz bir materyal bulunmuyor.</p>
                 <a href="{% url 'home' %}" class="btn btn--main" style="padding: 12px 28px; border-radius: 50px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
-                    <i class="bi bi-search"></i> Ders Odalarını İncele
+                    Ders Odalarını İncele
                 </a>
             </div>
             {% endfor %}

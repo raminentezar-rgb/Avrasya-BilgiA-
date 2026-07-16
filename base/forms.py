@@ -1,6 +1,7 @@
 from django.forms import ModelForm
+from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Room, User, Resource, Quiz, Question
+from .models import Room, User, Resource, Quiz, Question, QuestionBankItem
 
 
 class MyUserCreationForm(UserCreationForm):
@@ -90,24 +91,70 @@ class ResourceForm(ModelForm):
 class QuizForm(ModelForm):
     class Meta:
         model = Quiz
-        fields = ['title', 'description', 'duration_minutes']
+        fields = ['title', 'description', 'duration_minutes', 'start_time', 'end_time']
         labels = {
             'title': 'Sınav / Test Başlığı',
             'description': 'Sınav Açıklaması ve Kurallar',
             'duration_minutes': 'Sınav Süresi (Dakika)',
+            'start_time': 'Başlangıç Tarihi ve Saati (İsteğe Bağlı)',
+            'end_time': 'Bitiş Tarihi ve Saati (İsteğe Bağlı)',
+        }
+        widgets = {
+            'start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
 
 class QuestionForm(ModelForm):
     class Meta:
         model = Question
-        fields = ['text', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_option']
+        fields = ['question_type', 'points', 'text', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_option']
         labels = {
+            'question_type': 'Soru Tipi (Test veya Yazılı)',
+            'points': 'Soru Puanı / Baram',
+            'text': 'Soru Metni',
+            'option_a': 'A Seçeneği (Sadece Test için)',
+            'option_b': 'B Seçeneği (Sadece Test için)',
+            'option_c': 'C Seçeneği (Sadece Test için)',
+            'option_d': 'D Seçeneği (Sadece Test için)',
+            'correct_option': 'Doğru Cevap Seçeneği (Sadece Test için)',
+        }
+        widgets = {
+            'question_type': forms.Select(attrs={'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem; background: #fff;'}),
+            'points': forms.NumberInput(attrs={'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'text': forms.Textarea(attrs={'rows': 3, 'style': 'width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'option_a': forms.TextInput(attrs={'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'option_b': forms.TextInput(attrs={'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'option_c': forms.TextInput(attrs={'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'option_d': forms.TextInput(attrs={'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'correct_option': forms.Select(attrs={'style': 'padding: 10px 18px; border-radius: 8px; border: 2px solid #ea580c; font-weight: bold; font-size: 0.95rem; background: #fff;'}),
+        }
+
+
+class QuestionBankItemForm(ModelForm):
+    class Meta:
+        model = QuestionBankItem
+        fields = ['title', 'question_type', 'points', 'text', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_option']
+        labels = {
+            'title': 'Konu / Kategori Başlığı',
+            'question_type': 'Soru Tipi',
+            'points': 'Varsayılan Puan',
             'text': 'Soru Metni',
             'option_a': 'A Seçeneği',
             'option_b': 'B Seçeneği',
             'option_c': 'C Seçeneği',
             'option_d': 'D Seçeneği',
-            'correct_option': 'Doğru Cevap Seçeneği',
+            'correct_option': 'Doğru Cevap',
+        }
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': 'Örn: Vize, 1. Ünite vb.', 'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'question_type': forms.Select(attrs={'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem; background: #fff;'}),
+            'points': forms.NumberInput(attrs={'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Soruyu buraya yazın...', 'style': 'width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'option_a': forms.TextInput(attrs={'placeholder': 'A şıkkı', 'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'option_b': forms.TextInput(attrs={'placeholder': 'B şıkkı', 'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'option_c': forms.TextInput(attrs={'placeholder': 'C şıkkı', 'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'option_d': forms.TextInput(attrs={'placeholder': 'D şıkkı', 'style': 'width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.95rem;'}),
+            'correct_option': forms.Select(attrs={'style': 'padding: 10px 18px; border-radius: 8px; border: 2px solid #ea580c; font-weight: bold; font-size: 0.95rem; background: #fff;'}),
         }
 

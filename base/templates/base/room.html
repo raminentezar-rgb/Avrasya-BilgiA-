@@ -8,23 +8,26 @@
       <div class="room__top" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 20px;">
         <div class="room__topLeft">
           <a href="{% url 'home' %}" style="font-weight: 700; color: #0f3b8c; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-            <i class="bi bi-arrow-left"></i> Ana Sayfaya Dön
+            Ana Sayfaya Dön
           </a>
           <h3 style="margin-left: 14px;">{{ room.name }}</h3>
         </div>
         <div class="room__topRight" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
           {% if request.user == room.host or request.user.role == 'faculty' %}
+          <a href="{% url 'start-attendance-session' room.id %}" style="background: #10b981; color: #ffffff; border: 1px solid #059669; padding: 8px 16px; border-radius: 8px; font-size: 0.88rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);" title="QR Kod & Wi-Fi IP ile Canlı Sınıf Yoklaması Başlat">
+            <i class="fas fa-qrcode"></i> Yoklama Başlat (QR & IP)
+          </a>
           <button onclick="alert('📋 Canlı Yoklama Kaydı Alındı! Odadaki Aktif Katılımcılar:\n' + Array.from(document.querySelectorAll('.participant p')).map(el => '• ' + el.innerText.trim()).join('\n'));" type="button" style="background: #059669; color: #ffffff; border: 1px solid #047857; padding: 8px 16px; border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-            <i class="bi bi-clipboard2-check-fill"></i> Yoklama Al ({{ participants.count }} Kişi)
+            Hızlı Liste ({{ participants.count }} Kişi)
           </button>
           <a href="{% url 'create-quiz' room.id %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 8px 18px; border-radius: 8px; font-size: 0.88rem; text-decoration: none; font-weight: 700; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25); display: inline-flex; align-items: center; gap: 6px;">
-            <i class="bi bi-plus-circle-fill"></i> Sınav Tasarla / Oluştur
+            Sınav Tasarla / Oluştur
           </a>
           <a href="{% url 'update-room' room.id %}" style="font-weight: 600; color: #1e40af; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-            <i class="bi bi-pencil-square"></i> Odayı Düzenle
+            Odayı Düzenle
           </a>
           <a href="{% url 'delete-room' room.id %}" style="font-weight: 600; color: #dc2626; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-            <i class="bi bi-trash3-fill"></i> Odayı Sil
+            Odayı Sil
           </a>
           {% endif %}
         </div>
@@ -59,7 +62,11 @@
                       <span style="font-size: 0.83rem; color: #9a3412;">Öğretim üyeleri bu odada sınav ve soru tasarımı yapabilir.</span>
                   </div>
                   {% if request.user == room.host or request.user.role == 'faculty' %}
-                  <a href="{% url 'create-quiz' room.id %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 9px 18px; border-radius: 8px; font-size: 0.88rem; text-decoration: none; font-weight: 700; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25);">+ Yeni Sınav Tasarla</a>
+                  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="{% url 'room-gradebook' room.id %}" style="background: #4338ca; color: #ffffff; border: 1px solid #3730a3; padding: 9px 16px; border-radius: 8px; font-size: 0.88rem; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">Ders Not Defteri</a>
+                    <a href="{% url 'question-bank' %}" style="background: #0f3b8c; color: #ffffff; border: 1px solid #1e40af; padding: 9px 16px; border-radius: 8px; font-size: 0.88rem; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">Soru Bankası</a>
+                    <a href="{% url 'create-quiz' room.id %}" style="background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 9px 16px; border-radius: 8px; font-size: 0.88rem; text-decoration: none; font-weight: 700; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25);">+ Yeni Sınav Tasarla</a>
+                  </div>
                   {% endif %}
               </div>
 
@@ -103,13 +110,13 @@
               <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
                   <div>
                       <h4 style="font-size: 1.1rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
-                          <i class="bi bi-stack" style="color: #2563eb;"></i> Ödevler, Projeler ve Son Teslim Tarihleri ({{room.assignments.count}})
+                          Ödevler, Projeler ve Son Teslim Tarihleri ({{room.assignments.count}})
                       </h4>
                       <span style="font-size: 0.83rem;">Öğrenciler belirtilen teslim tarihine kadar dosyalarını ve notlarını yükleyebilir.</span>
                   </div>
                   {% if request.user == room.host or request.user.role == 'faculty' %}
                   <button onclick="const af=document.getElementById('assignmentFormBox'); af.style.display = af.style.display === 'none' ? 'block' : 'none';" type="button" style="background: #2563eb; color: #ffffff; border: 1px solid #1d4ed8; padding: 9px 18px; border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                      <i class="bi bi-plus-lg"></i> Yeni Ödev Tanımla
+                      + Yeni Ödev Tanımla
                   </button>
                   {% endif %}
               </div>
@@ -142,14 +149,89 @@
                       <div>
                           <h5 style="margin: 0; font-size: 1.05rem; font-weight: 700;">{{ ass.title }}</h5>
                           <p style="margin: 4px 0 0 0; font-size: 0.85rem;">{{ ass.description }}</p>
-                          <small style="color: #dc2626; font-weight: 700; display: block; margin-top: 6px;">⏰ Son Teslim: {{ ass.deadline|date:"d M Y H:i" }} | Teslim Eden: {{ ass.submissions.count }} Öğrenci</small>
+                          <small style="color: #dc2626; font-weight: 700; display: block; margin-top: 6px;">Son Teslim: {{ ass.deadline|date:"d M Y H:i" }} | Teslim Eden: {{ ass.submissions.count }} Öğrenci</small>
                       </div>
-                      <div>
+                      <div style="display: flex; gap: 8px;">
+                          {% if request.user == room.host or request.user.role == 'faculty' %}
+                          <button onclick="const g=document.getElementById('assGradeBox_{{ass.id}}'); g.style.display = g.style.display === 'none' ? 'block' : 'none';" type="button" style="background: #6b21a8; color: #ffffff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer;">
+                              Teslimleri Puanla ({{ass.submissions.count}})
+                          </button>
+                          {% else %}
                           <button onclick="const s=document.getElementById('subForm_{{ass.id}}'); s.style.display = s.style.display === 'none' ? 'block' : 'none';" type="button" style="background: #3b82f6; color: #ffffff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer;">
                               Ödev Teslim Et / Gönder
                           </button>
+                          {% endif %}
                       </div>
                   </div>
+
+                  {% if request.user == room.host or request.user.role == 'faculty' %}
+                  <div id="assGradeBox_{{ass.id}}" style="display: none; background: #faf5ff; border: 1px solid #d8b4fe; border-radius: 10px; padding: 16px; margin-top: 8px;">
+                      <h6 style="margin: 0 0 12px 0; color: #6b21a8; font-size: 0.95rem;">Öğrenci Teslimleri ve Değerlendirme Paneli</h6>
+                      {% if ass.submissions.all %}
+                      <div style="display: flex; flex-direction: column; gap: 10px;">
+                          {% for sub in ass.submissions.all %}
+                          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                              <div>
+                                  <strong style="color: #0f3b8c;">@{{ sub.student.username }}</strong> ({{ sub.student.name|default:sub.student.username }})
+                                  <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">Tarih: {{ sub.submitted_at|date:"d M Y H:i" }}</div>
+                                  {% if sub.file %}
+                                  <a href="{{ sub.file.url }}" target="_blank" style="display: inline-block; margin-top: 4px; font-size: 0.82rem; color: #2563eb; font-weight: 700;">Ödev Dosyasını İndir</a>
+                                  {% endif %}
+                                  {% if sub.notes %}
+                                  <div style="font-size: 0.85rem; color: #334155; margin-top: 4px; background: #f1f5f9; padding: 6px; border-radius: 4px;">Not: {{ sub.notes }}</div>
+                                  {% endif %}
+                              </div>
+                              <form action="{% url 'grade-assignment-submission' sub.id %}" method="POST" style="display: flex; gap: 8px; align-items: center; margin: 0; flex-wrap: wrap;">
+                                  {% csrf_token %}
+                                  <div>
+                                      <label style="font-size: 0.75rem; font-weight: 700; display: block;">Not / Harf:</label>
+                                      <input type="text" name="grade" value="{{ sub.grade|default:'' }}" placeholder="Örn: 85 veya A" style="width: 90px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 700; text-align: center;">
+                                  </div>
+                                  <div>
+                                      <label style="font-size: 0.75rem; font-weight: 700; display: block;">Geri Bildirim:</label>
+                                      <input type="text" name="teacher_feedback" value="{{ sub.teacher_feedback|default:'' }}" placeholder="Yorum ekle..." style="width: 180px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                                  </div>
+                                  <button type="submit" style="background: #16a34a; color: #ffffff; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; align-self: flex-end;">Kaydet</button>
+                              </form>
+                          </div>
+                          {% endfor %}
+                      </div>
+                      {% else %}
+                      <p style="color: #64748b; font-size: 0.85rem; margin: 0;">Henüz bu ödeve dosya yükleyen öğrenci bulunmuyor.</p>
+                      {% endif %}
+                  </div>
+                  {% endif %}
+
+                  {% if request.user != room.host and request.user.role != 'faculty' %}
+                      {% for sub in ass.submissions.all %}
+                          {% if sub.student == request.user %}
+                          <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 10px; padding: 14px 18px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.08);">
+                              <div>
+                                  <div style="font-weight: 800; color: #166534; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                                      Ödev Gönderim Durumu: Teslim Edildi ({{ sub.submitted_at|date:"d M Y H:i" }})
+                                  </div>
+                                  {% if sub.file %}
+                                  <a href="{{ sub.file.url }}" target="_blank" style="display: inline-block; margin-top: 6px; font-size: 0.85rem; color: #2563eb; font-weight: 700;">Yüklediğiniz Dosyayı İncele / İndir</a>
+                                  {% endif %}
+                                  {% if sub.notes %}
+                                  <div style="font-size: 0.85rem; color: #475569; margin-top: 6px; background: #ffffff; padding: 6px 10px; border-radius: 6px; border: 1px solid #dcfce7;">Öğrenci Notunuz: {{ sub.notes }}</div>
+                                  {% endif %}
+                              </div>
+                              <div style="background: #ffffff; border: 2px solid #22c55e; padding: 12px 18px; border-radius: 12px; text-align: right; min-width: 220px;">
+                                  <div style="font-size: 0.78rem; color: #64748b; font-weight: 800; text-transform: uppercase;">ÖĞRETMEN DEĞERLENDİRMESİ VE NOTU:</div>
+                                  <div style="font-size: 1.35rem; font-weight: 900; color: #15803d; margin-top: 4px;">
+                                      {% if sub.grade %}{{ sub.grade }} Puan{% else %}<span style="font-size: 0.92rem; color: #ea580c; font-weight: 800;">Değerlendirme Bekliyor</span>{% endif %}
+                                  </div>
+                                  {% if sub.teacher_feedback %}
+                                  <div style="font-size: 0.9rem; color: #0f3b8c; font-weight: 700; margin-top: 6px; background: #eff6ff; padding: 6px 10px; border-radius: 8px; border: 1px solid #bfdbfe; text-align: left;">
+                                      Yorum: {{ sub.teacher_feedback }}
+                                  </div>
+                                  {% endif %}
+                              </div>
+                          </div>
+                          {% endif %}
+                      {% endfor %}
+                  {% endif %}
 
                   <div id="subForm_{{ass.id}}" class="submission-form-box" style="display: none; padding: 14px; border-radius: 8px;">
                       <form action="{% url 'submit-assignment' ass.id %}" method="POST" enctype="multipart/form-data">
@@ -175,7 +257,7 @@
               <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
                   <div>
                       <h4 style="color: #0f3b8c; font-size: 1.15rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 8px;">
-                          <i class="bi bi-folder2-open" style="color: #2563eb;"></i> Ders Materyalleri, Dosyalar & Sesli Anonslar ({{resources.count}})
+                          Ders Materyalleri, Dosyalar & Sesli Anonslar ({{resources.count}})
                       </h4>
                       <span style="font-size: 0.82rem; color: #64748b;">PDF, Word, Excel, Resim, Video ve sesli anonslar</span>
                   </div>
@@ -183,10 +265,10 @@
                   {% if request.user == room.host or request.user.role == 'faculty' or request.user.role == 'teacher' or request.user.is_superuser %}
                   <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                       <button onclick="document.getElementById('resourceFormCard').style.display = document.getElementById('resourceFormCard').style.display === 'none' ? 'block' : 'none'; document.getElementById('voiceRecorderCard').style.display = 'none';" class="btn btn--main" type="button" style="padding: 8px 16px; font-size: 0.85rem; font-weight: 700; border-radius: 50px; display: inline-flex; align-items: center; gap: 6px;">
-                          <i class="bi bi-cloud-arrow-up-fill"></i> Dosya / Materyal Yükle
+                          Dosya / Materyal Yükle
                       </button>
                       <button onclick="document.getElementById('voiceRecorderCard').style.display = document.getElementById('voiceRecorderCard').style.display === 'none' ? 'block' : 'none'; document.getElementById('resourceFormCard').style.display = 'none';" type="button" style="background: #10b981; color: #ffffff; border: 1px solid #059669; padding: 8px 16px; font-size: 0.85rem; font-weight: 700; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); display: inline-flex; align-items: center; gap: 6px;">
-                          <i class="bi bi-mic-fill"></i> Sesli Anons Kaydet
+                          Sesli Anons Kaydet
                       </button>
                   </div>
                   {% endif %}
@@ -416,7 +498,7 @@
                               {% endif %}
                               {% if request.user.is_authenticated %}
                               <a href="{% url 'toggle-save-resource' res.id %}" title="Kütüphaneme Kaydet" style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                                  <i class="bi bi-bookmark-heart-fill"></i> {% if request.user in res.saved_by.all %}Kaydedildi{% else %}Kaydet{% endif %}
+                                  {% if request.user in res.saved_by.all %}Kaydedildi{% else %}Kaydet{% endif %}
                               </a>
                               {% endif %}
                               {% if request.user == res.user or request.user == room.host %}
@@ -447,28 +529,21 @@
                       <span class="thread__date">{{message.created|timesince}} ago</span>
                       {% if request.user == room.host or request.user.role == 'faculty' %}
                       <a href="{% url 'verify-message' message.id %}" class="btn--verify-msg" title="Doğru / Onaylı Cevap olarak işaretle">
-                          {% if message.is_verified_answer %}✅ Onaylı (Kaldır){% else %}✔ Onayla{% endif %}
+                          {% if message.is_verified_answer %}Onaylı (Kaldır){% else %}Onayla{% endif %}
                       </a>
                       {% endif %}
                   </div>
 
                   {% if request.user == message.user %}
-                  <a href="{% url 'delete-message' message.id %}">
-                    <div class="thread__delete">
-                      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-                        <title>remove</title>
-                        <path
-                          d="M27.314 6.019l-1.333-1.333-9.98 9.981-9.981-9.981-1.333 1.333 9.981 9.981-9.981 9.98 1.333 1.333 9.981-9.98 9.98 9.98 1.333-1.333-9.98-9.98 9.98-9.981z">
-                        </path>
-                      </svg>
-                    </div>
+                  <a href="{% url 'delete-message' message.id %}" style="color: #dc2626; font-weight: bold; text-decoration: none; font-size: 0.85rem;">
+                    Sil
                   </a>
                   {% endif %}
                 </div>
                 <div class="thread__details {% if message.is_verified_answer %}thread__details--verified{% endif %}">
                   {% if message.is_verified_answer %}
                   <div class="verified-answer-badge" style="font-size: 0.8rem; font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-                      <span>✅ ÖĞRETİM ÜYESİ ONAYLI DOĞRU CEVAP</span>
+                      <span>ÖĞRETİM ÜYESİ ONAYLI DOĞRU CEVAP</span>
                   </div>
                   {% endif %}
                   {{message.body}}

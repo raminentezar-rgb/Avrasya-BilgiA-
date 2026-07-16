@@ -1,13 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
+from django.utils import timezone
 import json
 import csv
-from .models import Room, Topic, Message, User, Resource, Quiz, Question, QuizSubmission, Notification, Assignment, AssignmentSubmission, DEPARTMENT_CHOICES
-from .forms import RoomForm, UserForm, MyUserCreationForm, ResourceForm, QuizForm, QuestionForm
+import socket
+import pyotp
+from .models import Room, Topic, Message, User, Resource, Quiz, Question, QuizSubmission, QuizSubmissionAnswer, QuestionBankItem, Notification, Assignment, AssignmentSubmission, AttendanceSession, AttendanceRecord, DEPARTMENT_CHOICES
+from .forms import RoomForm, UserForm, MyUserCreationForm, ResourceForm, QuizForm, QuestionForm, QuestionBankItemForm
 from .proliz_obs import ProlizOBSClient
 
 # Create your views here.
@@ -145,6 +148,83 @@ def home(request):
 
 
 @login_required(login_url='login')
+def dashboard(request):
+    user = request.user
+    is_faculty = (user.role == 'faculty' or Room.objects.filter(host=user).exists())
+
+    # --- FACULTY DATA ---
+    hosted_rooms = Room.objects.filter(host=user).order_by('-updated')
+    question_bank_count = QuestionBankItem.objects.filter(creator=user).count()
+    recent_quizzes = Quiz.objects.filter(room__host=user).select_related('room').order_by('-created')[:8]
+    
+    # Pending Quiz essay submissions waiting for grading by this teacher
+    pending_quiz_submissions = QuizSubmission.objects.filter(
+        Q(quiz__room__host=user) | Q(quiz__creator=user), 
+        is_graded=False
+    ).select_related('quiz', 'quiz__room', 'student').order_by('-submitted_at')
+
+    # Pending Assignment submissions waiting for grading by this teacher
+    pending_ass_submissions = AssignmentSubmission.objects.filter(
+        Q(assignment__room__host=user) | Q(assignment__creator=user)
+    ).filter(
+        Q(grade__isnull=True) | Q(grade__exact='')
+    ).select_related('assignment', 'assignment__room', 'student').order_by('-submitted_at')
+
+    # All recent assignment submissions for this teacher (both graded and pending)
+    recent_ass_submissions = AssignmentSubmission.objects.filter(
+        Q(assignment__room__host=user) | Q(assignment__creator=user)
+    ).select_related('assignment', 'assignment__room', 'student').order_by('-submitted_at')[:25]
+
+    # All recent quiz submissions for this teacher (both graded and pending)
+    recent_quiz_submissions = QuizSubmission.objects.filter(
+        Q(quiz__room__host=user) | Q(quiz__creator=user)
+    ).select_related('quiz', 'quiz__room', 'student').order_by('-submitted_at')[:25]
+
+    total_hosted_students = User.objects.filter(participants__host=user).distinct().count()
+
+    # --- STUDENT DATA ---
+    enrolled_rooms = Room.objects.filter(participants=user).order_by('-updated')
+    my_quiz_submissions = QuizSubmission.objects.filter(student=user).select_related('quiz', 'quiz__room').order_by('-submitted_at')
+    my_ass_submissions = AssignmentSubmission.objects.filter(student=user).select_related('assignment', 'assignment__room').order_by('-submitted_at')
+
+    # Active/Upcoming Quizzes across enrolled rooms where student hasn't submitted yet
+    submitted_quiz_ids = my_quiz_submissions.values_list('quiz_id', flat=True)
+    active_quizzes = Quiz.objects.filter(
+        room__participants=user
+    ).exclude(id__in=submitted_quiz_ids).select_related('room', 'creator').distinct().order_by('end_time')
+
+    # Active/Upcoming Assignments across enrolled rooms where student hasn't submitted yet
+    submitted_ass_ids = my_ass_submissions.values_list('assignment_id', flat=True)
+    active_assignments = Assignment.objects.filter(
+        room__participants=user
+    ).exclude(id__in=submitted_ass_ids).select_related('room', 'creator').distinct().order_by('deadline')
+
+    # Student overall stats
+    total_quiz_points_earned = sum(qs.score for qs in my_quiz_submissions)
+    total_quiz_points_possible = sum(qs.total_questions for qs in my_quiz_submissions)
+    avg_score_pct = int((total_quiz_points_earned / total_quiz_points_possible) * 100) if total_quiz_points_possible > 0 else 0
+
+    context = {
+        'is_faculty': is_faculty,
+        'hosted_rooms': hosted_rooms,
+        'question_bank_count': question_bank_count,
+        'recent_quizzes': recent_quizzes,
+        'pending_quiz_submissions': pending_quiz_submissions,
+        'pending_ass_submissions': pending_ass_submissions,
+        'recent_ass_submissions': recent_ass_submissions,
+        'recent_quiz_submissions': recent_quiz_submissions,
+        'total_hosted_students': total_hosted_students,
+        'enrolled_rooms': enrolled_rooms,
+        'my_quiz_submissions': my_quiz_submissions,
+        'my_ass_submissions': my_ass_submissions,
+        'active_quizzes': active_quizzes,
+        'active_assignments': active_assignments,
+        'avg_score_pct': avg_score_pct,
+    }
+    return render(request, 'base/dashboard.html', context)
+
+
+@login_required(login_url='login')
 def room(request, pk):
     room_obj = Room.objects.get(id=pk)
 
@@ -198,6 +278,13 @@ def room(request, pk):
                     body=body_text
                 )
                 room_obj.participants.add(request.user)
+                if room_obj.host and request.user != room_obj.host:
+                    Notification.objects.create(
+                        recipient=room_obj.host,
+                        sender=request.user,
+                        message=f"@{request.user.username} öğrencisi '{room_obj.name}' odasına yeni bir mesaj yazdı: \"{body_text[:35]}...\"",
+                        link=f"/room/{room_obj.id}/"
+                    )
             return redirect('room', pk=room_obj.id)
 
     context = {'room': room_obj, 'room_messages': room_messages,
@@ -321,6 +408,13 @@ def roomMessagesAjax(request, pk):
                 body=body_text
             )
             room_obj.participants.add(request.user)
+            if room_obj.host and request.user != room_obj.host:
+                Notification.objects.create(
+                    recipient=room_obj.host,
+                    sender=request.user,
+                    message=f"@{request.user.username} öğrencisi '{room_obj.name}' odasına yeni bir mesaj yazdı: \"{body_text[:35]}...\"",
+                    link=f"/room/{room_obj.id}/"
+                )
             return JsonResponse({
                 'status': 'ok',
                 'message': {
@@ -485,6 +579,20 @@ def quiz_detail(request, pk):
             q = question_form.save(commit=False)
             q.quiz = quiz
             q.save()
+            # Eğer 'Soru Bankasına da Kaydet' seçeneği işaretlendiyse
+            if request.POST.get('save_to_bank'):
+                QuestionBankItem.objects.create(
+                    creator=request.user,
+                    title=f"{quiz.room.name} - {quiz.title}",
+                    question_type=q.question_type,
+                    text=q.text,
+                    option_a=q.option_a,
+                    option_b=q.option_b,
+                    option_c=q.option_c,
+                    option_d=q.option_d,
+                    correct_option=q.correct_option,
+                    points=q.points
+                )
             messages.success(request, "Soru başarıyla sınav listesine eklendi.")
             return redirect('quiz-detail', pk=quiz.id)
 
@@ -494,29 +602,82 @@ def quiz_detail(request, pk):
             messages.error(request, "Bu sınavı daha önce cevapladınız.")
             return redirect('quiz-detail', pk=quiz.id)
 
-        score = 0
-        total = questions.count()
-        for q in questions:
-            ans = request.POST.get(f'question_{q.id}')
-            if ans and ans == q.correct_option:
-                score += 1
+        total_points = sum(q.points for q in questions) if questions.exists() else 0
+        if total_points == 0:
+            total_points = questions.count()
 
+        cheat_warnings = 0
+        try:
+            cheat_warnings = int(request.POST.get('cheat_warnings', 0))
+        except ValueError:
+            cheat_warnings = 0
+
+        has_essay = any(q.question_type == 'essay' for q in questions)
+        
         submission = QuizSubmission.objects.create(
             quiz=quiz,
             student=request.user,
-            score=score,
-            total_questions=total
+            score=0,
+            total_questions=total_points,
+            cheat_warnings=cheat_warnings,
+            is_graded=not has_essay
         )
-        messages.success(request, f"Sınavı tamamladınız. Sonucunuz: {score} / {total} Doğru.")
+
+        total_awarded = 0
+        for q in questions:
+            if q.question_type == 'multiple_choice':
+                ans = request.POST.get(f'question_{q.id}')
+                awarded = q.points if (ans and ans == q.correct_option) else 0
+                total_awarded += awarded
+                QuizSubmissionAnswer.objects.create(
+                    submission=submission,
+                    question=q,
+                    selected_option=ans,
+                    awarded_points=awarded
+                )
+            else:
+                essay_ans = request.POST.get(f'question_{q.id}', '').strip()
+                QuizSubmissionAnswer.objects.create(
+                    submission=submission,
+                    question=q,
+                    essay_answer=essay_ans,
+                    awarded_points=0
+                )
+
+        submission.score = total_awarded
+        submission.save()
+
+        if quiz.creator and quiz.creator != request.user:
+            Notification.objects.create(
+                recipient=quiz.creator,
+                sender=request.user,
+                message=f"@{request.user.username} öğrencisi '{quiz.title}' sınavını tamamladı! Sonuç/Puan: {total_awarded}/{total_points}",
+                link=f"/grade-submission/{submission.id}/" if has_essay else f"/quiz/{quiz.id}/"
+            )
+        if quiz.room.host and quiz.room.host != request.user and quiz.room.host != quiz.creator:
+            Notification.objects.create(
+                recipient=quiz.room.host,
+                sender=request.user,
+                message=f"@{request.user.username} öğrencisi '{quiz.title}' sınavını tamamladı! Sonuç/Puan: {total_awarded}/{total_points}",
+                link=f"/grade-submission/{submission.id}/" if has_essay else f"/quiz/{quiz.id}/"
+            )
+
+        if has_essay:
+            messages.success(request, f"Sınav cevaplarınız başarıyla gönderildi! Yazılı/klasik sorular öğretim üyesi tarafından değerlendirildikten sonra nihai puanınız güncellenecektir. (Test Puanı: {total_awarded} / {total_points})")
+        else:
+            messages.success(request, f"Sınavı tamamladınız. Sonucunuz: {total_awarded} / {total_points} Puan.")
         return redirect('quiz-detail', pk=quiz.id)
 
     submissions = quiz.submissions.all()
+    question_bank = QuestionBankItem.objects.filter(creator=request.user) if (request.user == quiz.creator or request.user == quiz.room.host) else None
+
     context = {
         'quiz': quiz,
         'questions': questions,
         'question_form': question_form,
         'user_submission': user_submission,
         'submissions': submissions,
+        'question_bank': question_bank,
         'is_creator': (request.user == quiz.creator or request.user == quiz.room.host)
     }
     return render(request, 'base/quiz_detail.html', context)
@@ -671,12 +832,21 @@ def submit_assignment(request, pk):
             sub.notes = notes
             if file:
                 sub.file = file
+            sub.grade = ''
+            sub.teacher_feedback = ''
             sub.save()
         if assignment.creator and assignment.creator != request.user:
             Notification.objects.create(
                 recipient=assignment.creator,
                 sender=request.user,
-                message=f"@{request.user.username} öğrencisi '{assignment.title}' ödevini teslim etti! 📂",
+                message=f"@{request.user.username} öğrencisi '{assignment.title}' ödevini teslim etti!",
+                link=f"/room/{assignment.room.id}/"
+            )
+        if assignment.room.host and assignment.room.host != request.user and assignment.room.host != assignment.creator:
+            Notification.objects.create(
+                recipient=assignment.room.host,
+                sender=request.user,
+                message=f"@{request.user.username} öğrencisi '{assignment.title}' ödevini teslim etti!",
                 link=f"/room/{assignment.room.id}/"
             )
         messages.success(request, "Ödeviniz başarıyla teslim edildi! 🎉")
@@ -699,3 +869,524 @@ def read_notification(request, pk):
 def clear_all_notifications(request):
     request.user.notifications.filter(is_read=False).update(is_read=True)
     return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+
+@login_required(login_url='login')
+def add_from_bank_to_quiz(request, quiz_id, bank_id):
+    quiz = Quiz.objects.get(id=quiz_id)
+    if request.user != quiz.creator and request.user != quiz.room.host:
+        return HttpResponse("Bu işlem için yetkiniz yok.")
+    
+    try:
+        item = QuestionBankItem.objects.get(id=bank_id, creator=request.user)
+        Question.objects.create(
+            quiz=quiz,
+            question_type=item.question_type,
+            text=item.text,
+            option_a=item.option_a or '',
+            option_b=item.option_b or '',
+            option_c=item.option_c or '',
+            option_d=item.option_d or '',
+            correct_option=item.correct_option or 'A',
+            points=item.points
+        )
+        messages.success(request, f"'{item.title}' sorusu bankadan sınavınıza eklendi!")
+    except QuestionBankItem.DoesNotExist:
+        messages.error(request, "Soru bankasında bu öğe bulunamadı.")
+    return redirect('quiz-detail', pk=quiz.id)
+
+
+@login_required(login_url='login')
+def question_bank_view(request):
+    if request.user.role not in ['faculty', 'teacher'] and not request.user.is_superuser:
+        messages.error(request, "Soru bankasına sadece öğretim üyeleri erişebilir.")
+        return redirect('home')
+
+    items = QuestionBankItem.objects.filter(creator=request.user)
+    form = QuestionBankItemForm()
+
+    if request.method == 'POST':
+        if 'delete_bank_item' in request.POST:
+            item_id = request.POST.get('delete_bank_item')
+            QuestionBankItem.objects.filter(id=item_id, creator=request.user).delete()
+            messages.success(request, "Soru bankasından silindi.")
+            return redirect('question-bank')
+        
+        form = QuestionBankItemForm(request.POST)
+        if form.is_valid():
+            bank_item = form.save(commit=False)
+            bank_item.creator = request.user
+            bank_item.save()
+            messages.success(request, "Soru başarıyla kişisel bankanıza eklendi.")
+            return redirect('question-bank')
+
+    context = {'items': items, 'form': form}
+    return render(request, 'base/question_bank.html', context)
+
+
+@login_required(login_url='login')
+def grade_quiz_submission(request, submission_id):
+    submission = QuizSubmission.objects.get(id=submission_id)
+    quiz = submission.quiz
+    if request.user != quiz.creator and request.user != quiz.room.host:
+        return HttpResponse("Değerlendirme yetkiniz bulunmuyor.")
+
+    if request.method == 'POST':
+        for ans in submission.answers.all():
+            if ans.question.question_type == 'essay':
+                pts = request.POST.get(f'points_{ans.id}')
+                comment = request.POST.get(f'comment_{ans.id}', '')
+                if pts is not None:
+                    try:
+                        ans.awarded_points = int(pts)
+                    except ValueError:
+                        pass
+                ans.teacher_comment = comment
+                ans.save()
+
+        total = sum(a.awarded_points for a in submission.answers.all())
+        submission.score = total
+        submission.teacher_feedback = request.POST.get('teacher_feedback', '')
+        submission.is_graded = True
+        submission.save()
+
+        Notification.objects.create(
+            recipient=submission.student,
+            sender=request.user,
+            message=f"'{quiz.title}' sınavınızdaki yazılı sorular puanlandı! Notunuz: {total}/{submission.total_questions}",
+            link=f"/quiz/{quiz.id}/"
+        )
+        messages.success(request, f"Öğrencinin sınav puanı ve değerlendirmesi güncellendi! Toplam: {total}/{submission.total_questions}")
+        return redirect('grade-quiz-submission', submission_id=submission.id)
+
+    context = {
+        'submission': submission,
+        'quiz': quiz,
+        'answers': submission.answers.all()
+    }
+    return render(request, 'base/grade_quiz_submission.html', context)
+
+
+@login_required(login_url='login')
+def grade_assignment_submission(request, submission_id):
+    sub = AssignmentSubmission.objects.get(id=submission_id)
+    room = sub.assignment.room
+    if request.user != sub.assignment.creator and request.user != room.host:
+        return HttpResponse("Ödev notlandırma yetkiniz yok.")
+
+    if request.method == 'POST':
+        grade = request.POST.get('grade', '').strip()
+        feedback = request.POST.get('teacher_feedback', '').strip()
+        sub.grade = grade
+        sub.teacher_feedback = feedback
+        sub.save()
+
+        Notification.objects.create(
+            recipient=sub.student,
+            sender=request.user,
+            message=f"'{sub.assignment.title}' ödevinize öğretim üyesi not ve değerlendirme girdi: {grade}",
+            link=f"/room/{room.id}/"
+        )
+        messages.success(request, f"@{sub.student.username} öğrencisinin ödev notu ('{grade}') ve geri bildirimi kaydedildi.")
+        return redirect('room', pk=room.id)
+
+    return redirect('room', pk=room.id)
+
+
+@login_required(login_url='login')
+def room_gradebook(request, pk):
+    room = Room.objects.get(id=pk)
+    if request.user != room.host and request.user.role != 'faculty' and not request.user.is_superuser:
+        messages.error(request, "Ders not defterine sadece odanın öğretim üyesi erişebilir.")
+        return redirect('room', pk=room.id)
+
+    students = room.participants.all()
+    quizzes = room.quizzes.all()
+    assignments = room.assignments.all()
+
+    gradebook_rows = []
+    for student in students:
+        quiz_scores = []
+        total_quiz_pts = 0
+        max_quiz_pts = 0
+        for q in quizzes:
+            sub = QuizSubmission.objects.filter(quiz=q, student=student).first()
+            if sub:
+                quiz_scores.append({'score': sub.score, 'total': sub.total_questions, 'submitted': True, 'is_graded': sub.is_graded, 'sub_id': sub.id})
+                total_quiz_pts += sub.score
+                max_quiz_pts += sub.total_questions
+            else:
+                quiz_scores.append({'score': '-', 'total': '-', 'submitted': False})
+
+        ass_scores = []
+        for a in assignments:
+            sub = AssignmentSubmission.objects.filter(assignment=a, student=student).first()
+            if sub:
+                ass_scores.append({'grade': sub.grade or 'Not Girilmedi', 'submitted': True, 'sub_id': sub.id, 'file_url': sub.file.url if sub.file else None})
+            else:
+                ass_scores.append({'grade': 'Teslim Edilmedi', 'submitted': False})
+
+        quiz_percent = round((total_quiz_pts / max_quiz_pts) * 100) if max_quiz_pts > 0 else 0
+        gradebook_rows.append({
+            'student': student,
+            'quiz_scores': quiz_scores,
+            'ass_scores': ass_scores,
+            'quiz_percent': quiz_percent
+        })
+
+    context = {
+        'room': room,
+        'quizzes': quizzes,
+        'assignments': assignments,
+        'gradebook_rows': gradebook_rows
+    }
+    return render(request, 'base/room_gradebook.html', context)
+
+
+@login_required(login_url='login')
+def export_room_gradebook(request, pk):
+    room = Room.objects.get(id=pk)
+    if request.user != room.host and request.user.role != 'faculty' and not request.user.is_superuser:
+        return HttpResponse("Yetkisiz erişim.")
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="room_{room.id}_gradebook.csv"'
+    response.write('\ufeff'.encode('utf8')) # BOM for Excel UTF-8 support
+    writer = csv.writer(response, delimiter=';')
+
+    students = room.participants.all()
+    quizzes = room.quizzes.all()
+    assignments = room.assignments.all()
+
+    # Header row
+    headers = ['Öğrenci Adı Soyadı', 'Kullanıcı Adı', 'Bölüm / Fakülte']
+    for q in quizzes:
+        headers.append(f"Sınav: {q.title} (Puan)")
+    for a in assignments:
+        headers.append(f"Ödev: {a.title} (Not)")
+    headers.append("Ortalama Sınav Başarı (%)")
+    writer.writerow(headers)
+
+    for student in students:
+        row = [student.name or student.username, f"@{student.username}", student.department or "-"]
+        total_quiz_pts = 0
+        max_quiz_pts = 0
+        for q in quizzes:
+            sub = QuizSubmission.objects.filter(quiz=q, student=student).first()
+            if sub:
+                row.append(f"{sub.score} / {sub.total_questions}")
+                total_quiz_pts += sub.score
+                max_quiz_pts += sub.total_questions
+            else:
+                row.append("Katılmadı")
+
+        for a in assignments:
+            sub = AssignmentSubmission.objects.filter(assignment=a, student=student).first()
+            if sub:
+                row.append(sub.grade or "Not Girilmedi")
+            else:
+                row.append("Teslim Edilmedi")
+
+        quiz_percent = round((total_quiz_pts / max_quiz_pts) * 100) if max_quiz_pts > 0 else 0
+        row.append(f"%{quiz_percent}")
+        writer.writerow(row)
+
+    return response
+
+
+# ==============================================================================
+# CLASSROOM ATTENDANCE SYSTEM WITH DYNAMIC QR CODE & WI-FI IP CHECK
+# ==============================================================================
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR', '')
+    return ip
+
+def get_local_lan_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return '127.0.0.1'
+
+def is_ip_allowed(session_ip, student_ip):
+    if not session_ip or not student_ip:
+        return True
+    if session_ip == student_ip:
+        return True
+    if session_ip in ('127.0.0.1', '::1', 'localhost') and student_ip in ('127.0.0.1', '::1', 'localhost'):
+        return True
+    t_parts = session_ip.split('.')
+    s_parts = student_ip.split('.')
+    if len(t_parts) == 4 and len(s_parts) == 4:
+        # Same /24 subnet (e.g. university classroom Wi-Fi 192.168.1.X or 10.X.X.X)
+        if t_parts[:3] == s_parts[:3]:
+            return True
+    return False
+
+@login_required
+def start_attendance_session(request, room_id):
+    room = get_object_or_404(Room, id=room_id)
+    # Only room host or superuser can start attendance
+    if room.host != request.user and not request.user.is_superuser:
+        messages.error(request, "Bu ders odasında yoklama başlatma yetkiniz bulunmuyor.")
+        return redirect('room', pk=room.id)
+    
+    # Close existing active sessions for this room
+    AttendanceSession.objects.filter(room=room, is_active=True).update(is_active=False)
+    
+    teacher_ip = get_client_ip(request)
+    if teacher_ip in ('127.0.0.1', '::1', 'localhost'):
+        teacher_ip = get_local_lan_ip()
+        
+    session = AttendanceSession.objects.create(
+        room=room,
+        teacher_ip=teacher_ip,
+        require_ip_check=True
+    )
+    return redirect('projector_view', session_id=session.id)
+
+@login_required
+def projector_view(request, session_id):
+    session = get_object_or_404(AttendanceSession, id=session_id)
+    if session.room.host != request.user and not request.user.is_superuser:
+        messages.error(request, "Yetkisiz erişim.")
+        return redirect('home')
+    
+    server_lan_ip = get_local_lan_ip()
+    context = {'session': session, 'server_lan_ip': server_lan_ip}
+    return render(request, 'base/projector_view.html', context)
+
+@login_required
+def api_projector_token(request, session_id):
+    session = get_object_or_404(AttendanceSession, id=session_id)
+    if not session.is_active:
+        return JsonResponse({'error': 'Session inactive'}, status=400)
+    return JsonResponse({'token': session.get_totp_token()})
+
+@login_required
+def api_projector_live(request, session_id):
+    session = get_object_or_404(AttendanceSession, id=session_id)
+    records = session.records.all().order_by('-timestamp')
+    data = []
+    for r in records:
+        data.append({
+            'student_name': f"{r.student.name}" if r.student.name else r.student.username,
+            'student_no': r.student.student_id or r.student.username,
+            'time': timezone.localtime(r.timestamp).strftime('%H:%M:%S'),
+            'ip': r.client_ip or '-'
+        })
+    return JsonResponse({'records': data, 'count': records.count()})
+
+@login_required
+def toggle_ip_check(request, session_id):
+    session = get_object_or_404(AttendanceSession, id=session_id)
+    if session.room.host == request.user or request.user.is_superuser:
+        session.require_ip_check = not session.require_ip_check
+        session.save()
+        return JsonResponse({'status': True, 'require_ip_check': session.require_ip_check})
+    return JsonResponse({'status': False}, status=403)
+
+@login_required
+def toggle_qr_check(request, session_id):
+    session = get_object_or_404(AttendanceSession, id=session_id)
+    if session.room.host == request.user or request.user.is_superuser:
+        session.allow_qr_check = not session.allow_qr_check
+        session.save()
+        return JsonResponse({'status': True, 'allow_qr_check': session.allow_qr_check})
+    return JsonResponse({'status': False}, status=403)
+
+@login_required
+def close_attendance_session(request, session_id):
+    session = get_object_or_404(AttendanceSession, id=session_id)
+    if session.room.host == request.user or request.user.is_superuser:
+        session.is_active = False
+        session.save()
+        messages.success(request, "Yoklama oturumu başarıyla sonlandırıldı.")
+    return redirect('room', pk=session.room.id)
+
+@login_required
+def student_scan(request):
+    session_id = request.GET.get('session')
+    token = request.GET.get('token')
+    
+    if not session_id or not token:
+        messages.error(request, 'Geçersiz yoklama bağlantısı veya QR kod bilgisi eksik.')
+        return render(request, 'base/scan_result.html', {'success': False})
+        
+    student = request.user
+    session = get_object_or_404(AttendanceSession, id=session_id)
+    
+    # Checks
+    if not session.is_active:
+        messages.warning(request, 'Bu yoklama oturumu sona ermiş.')
+        return render(request, 'base/scan_result.html', {'success': False})
+        
+    if student not in session.room.participants.all() and student != session.room.host:
+        # If not already enrolled, automatically add them or show error
+        messages.error(request, 'Bu ders odasının üyesi/katılımcısı değilsiniz! Lütfen önce odaya katılın.')
+        return render(request, 'base/scan_result.html', {'success': False})
+        
+    if not session.allow_qr_check:
+        messages.error(request, 'Bu oturumda QR Kod ile yoklama kapalıdır. Lütfen Sınıf Wi-Fi Ağına bağlanarak otomatik yoklama verin.')
+        return render(request, 'base/scan_result.html', {'success': False})
+
+    if not session.verify_totp(token):
+        messages.error(request, 'QR kodun süresi dolmuş. Lütfen tahtadaki/projektördeki yeni kodu okutun.')
+        return render(request, 'base/scan_result.html', {'success': False})
+
+    # IP Based Verification
+    student_ip = get_client_ip(request)
+    if session.require_ip_check and session.teacher_ip:
+        if not is_ip_allowed(session.teacher_ip, student_ip):
+            messages.error(request, 'IP Koruması: Bu yoklamaya sadece sınıf içi Wi-Fi ağından (Aynı Ağ/IP) katılabilirsiniz! Lütfen VPN kapatıp sınıf Wi-Fi ağına bağlanın.')
+            return render(request, 'base/scan_result.html', {'success': False})
+        
+    # Record Checkin
+    record, created = AttendanceRecord.objects.get_or_create(
+        session=session,
+        student=student,
+        defaults={'client_ip': student_ip, 'status': 'present'}
+    )
+    if not created:
+        messages.info(request, 'Bu ders için yoklamanız zaten alınmıştı.')
+    else:
+        messages.success(request, f'Başarıyla yoklamanız alındı! ({session.room.name})')
+        
+        # Send notification to professor
+        if session.room.host and session.room.host != student:
+            Notification.objects.create(
+                user=session.room.host,
+                title=f"Sınıf Yoklaması: {student.name or student.username}",
+                message=f"{student.name or student.username} yoklamaya katıldı ({session.room.name}).",
+                link=f"/room/{session.room.id}/"
+            )
+        
+    return render(request, 'base/scan_result.html', {'success': True, 'room_name': session.room.name})
+
+@login_required
+def export_attendance_report(request, session_id):
+    session = get_object_or_404(AttendanceSession, id=session_id)
+    if session.room.host != request.user and not request.user.is_superuser:
+        messages.error(request, "Yetkisiz erişim.")
+        return redirect('home')
+        
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+    
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Yoklama Raporu"
+    
+    # Styling
+    header_fill = PatternFill(start_color="1E3A8A", end_color="1E3A8A", fill_type="solid")
+    header_font = Font(name="Arial", size=11, bold=True, color="FFFFFF")
+    present_fill = PatternFill(start_color="DCFCE7", end_color="DCFCE7", fill_type="solid")
+    absent_fill = PatternFill(start_color="FEE2E2", end_color="FEE2E2", fill_type="solid")
+    present_font = Font(name="Arial", size=10, bold=True, color="166534")
+    absent_font = Font(name="Arial", size=10, bold=True, color="991B1B")
+    thin_border = Border(
+        left=Side(style='thin', color='CBD5E1'),
+        right=Side(style='thin', color='CBD5E1'),
+        top=Side(style='thin', color='CBD5E1'),
+        bottom=Side(style='thin', color='CBD5E1')
+    )
+    
+    # Title rows
+    ws.merge_cells("A1:F1")
+    ws["A1"] = f"AVRASYA BİLGİAĞI - YOKLAMA RAPORU ({session.room.name.upper()})"
+    ws["A1"].font = Font(name="Arial", size=14, bold=True, color="1E3A8A")
+    ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
+    ws.row_dimensions[1].height = 30
+    
+    ws["A2"] = f"Ders / Oda: {session.room.name}"
+    ws["D2"] = f"Tarih: {session.created_at.strftime('%d.%m.%Y %H:%M')}"
+    ws["A3"] = f"Öğretim Üyesi: {session.room.host.name if session.room.host and session.room.host.name else (session.room.host.username if session.room.host else '-')}"
+    ws["D3"] = f"Sınıf IP Adresi: {session.teacher_ip or 'Tanımsız'}"
+    
+    # Table headers
+    headers = ["Sıra", "Öğrenci No / Sicil", "Ad Soyad", "Bölüm / Fakülte", "Yoklama Durumu", "Katılım Saati & IP"]
+    ws.append([]) # Row 4 blank
+    ws.append(headers) # Row 5 headers
+    
+    for col_idx, h in enumerate(headers, 1):
+        cell = ws.cell(row=5, column=col_idx)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+    ws.row_dimensions[5].height = 24
+    
+    # Get all participants of the room
+    participants = session.room.participants.all().exclude(id=session.room.host.id if session.room.host else -1).order_by('username')
+    records_map = {r.student.id: r for r in session.records.all()}
+    
+    row_num = 6
+    present_count = 0
+    absent_count = 0
+    
+    for idx, student in enumerate(participants, 1):
+        record = records_map.get(student.id)
+        is_present = record is not None
+        if is_present:
+            present_count += 1
+            status_str = "VAR (Katıldı)"
+            time_ip_str = f"{timezone.localtime(record.timestamp).strftime('%H:%M:%S')} (IP: {record.client_ip or '-'})"
+        else:
+            absent_count += 1
+            status_str = "YOK (Katılmadı)"
+            time_ip_str = "-"
+            
+        row_data = [
+            idx,
+            student.student_id or student.username,
+            student.name or student.username,
+            student.department or "-",
+            status_str,
+            time_ip_str
+        ]
+        ws.append(row_data)
+        
+        # Formatting row cells
+        for col_idx in range(1, 7):
+            cell = ws.cell(row=row_num, column=col_idx)
+            cell.border = thin_border
+            if col_idx == 5:
+                cell.fill = present_fill if is_present else absent_fill
+                cell.font = present_font if is_present else absent_font
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+            elif col_idx in (1, 2, 6):
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+            else:
+                cell.alignment = Alignment(horizontal="left", vertical="center")
+        ws.row_dimensions[row_num].height = 20
+        row_num += 1
+        
+    # Summary row at bottom
+    ws.append([])
+    ws.append([f"TOPLAM: {len(participants)} Öğrenci | KATILAN (VAR): {present_count} | KATILMAYAN (YOK): {absent_count}"])
+    ws.merge_cells(f"A{row_num+1}:F{row_num+1}")
+    ws.cell(row=row_num+1, column=1).font = Font(name="Arial", size=11, bold=True, color="1E3A8A")
+    
+    # Auto-fit columns safely without MergedCell conflicts
+    from openpyxl.utils import get_column_letter
+    for col_idx in range(1, 7):
+        col_letter = get_column_letter(col_idx)
+        max_len = 15
+        for row_idx in range(5, row_num):
+            cell_val = str(ws.cell(row=row_idx, column=col_idx).value or '')
+            if len(cell_val) > max_len:
+                max_len = len(cell_val)
+        ws.column_dimensions[col_letter].width = max(max_len + 4, 15)
+        
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    filename = f"Yoklama_Raporu_{session.room.name}_{session.created_at.strftime('%Y%m%d_%H%M')}.xlsx"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    wb.save(response)
+    return response

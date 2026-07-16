@@ -1,0 +1,133 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="layout">
+  <div class="container" style="max-width: 1280px; margin: 30px auto; padding: 0 20px; display: block !important; width: 100%;">
+    
+    <!-- Top Header Card -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px 32px; box-shadow: 0 10px 30px rgba(15, 59, 140, 0.05); margin-bottom: 28px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <a href="{% url 'room' room.id %}" style="color: #ea580c; font-weight: 700; font-size: 0.92rem; text-decoration: none; display: inline-block; margin-bottom: 8px;">
+            &larr; {{ room.name }} Odasına Geri Dön
+          </a>
+          <h1 style="margin: 0; font-size: 1.8rem; color: #0f3b8c; font-weight: 800;">Ders Not Defteri ve Öğrenci Başarı Matrisi</h1>
+          <p style="margin: 8px 0 0 0; color: #64748b; font-size: 1rem;">
+            Bu derse katılan tüm öğrencilerin tüm sınav (Quiz) ve ödev (Assignment) sonuçlarını tek bir matris tabloda inceleyebilir ve Excel formatında aktarabilirsiniz.
+          </p>
+        </div>
+        <div>
+          <a href="{% url 'export-room-gradebook' room.id %}" style="background: #16a34a; color: #ffffff; padding: 13px 26px; border-radius: 12px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3); font-size: 1rem;">
+            Not Defterini Excel (CSV) Olarak İndir
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gradebook Matrix Table Card -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; box-shadow: 0 8px 25px rgba(15, 59, 140, 0.05); margin-bottom: 40px;">
+      <div style="border-bottom: 2px solid #f1f5f9; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="margin: 0; font-size: 1.35rem; color: #0f3b8c; font-weight: 800;">
+          Öğrenci Not Tablosu (Toplam {{ gradebook_rows|length }} Öğrenci)
+        </h2>
+      </div>
+
+      {% if gradebook_rows %}
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 900px;">
+          <thead>
+            <tr style="border-bottom: 2px solid #e2e8f0; color: #475569; font-size: 0.92rem; background: #f8fafc;">
+              <th style="padding: 16px 14px; font-weight: 800; color: #0f3b8c; border-right: 1px solid #e2e8f0;">Öğrenci Adı / Kullanıcı Adı</th>
+              <th style="padding: 16px 14px; font-weight: 800; color: #475569; border-right: 1px solid #e2e8f0;">Bölüm</th>
+              
+              <!-- Quiz Columns -->
+              {% for q in quizzes %}
+              <th style="padding: 16px 14px; font-weight: 800; color: #1e40af; border-right: 1px solid #e2e8f0; background: #eff6ff;">
+                Sınav: {{ q.title|truncatechars:20 }}<br>
+                <span style="font-size: 0.78rem; font-weight: 600; color: #3b82f6;">({{ q.points }} Puan)</span>
+              </th>
+              {% endfor %}
+
+              <!-- Assignment Columns -->
+              {% for a in assignments %}
+              <th style="padding: 16px 14px; font-weight: 800; color: #6b21a8; border-right: 1px solid #e2e8f0; background: #faf5ff;">
+                Ödev: {{ a.title|truncatechars:20 }}<br>
+                <span style="font-size: 0.78rem; font-weight: 600; color: #9333ea;">(Teslim / Not)</span>
+              </th>
+              {% endfor %}
+
+              <th style="padding: 16px 14px; font-weight: 800; color: #15803d; text-align: center; background: #f0fdf4;">Genel Sınav Başarısı</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in gradebook_rows %}
+            <tr style="border-bottom: 1px solid #f1f5f9; font-size: 0.96rem; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+              <td style="padding: 18px 14px; font-weight: 700; color: #0f3b8c; border-right: 1px solid #f1f5f9;">
+                <div>{{ row.student.name|default:row.student.username }}</div>
+                <div style="font-size: 0.85rem; color: #64748b; font-weight: 500;">@{{ row.student.username }}</div>
+              </td>
+              <td style="padding: 18px 14px; color: #475569; border-right: 1px solid #f1f5f9;">
+                {{ row.student.department|default:"-" }}
+              </td>
+
+              <!-- Quiz Scores -->
+              {% for qs in row.quiz_scores %}
+              <td style="padding: 18px 14px; border-right: 1px solid #f1f5f9; background: #fffcf8;">
+                {% if qs.submitted %}
+                  <div style="font-weight: 800; font-size: 1.05rem; color: #0f3b8c;">
+                    {{ qs.score }} / {{ qs.total }}
+                  </div>
+                  {% if not qs.is_graded %}
+                  <a href="{% url 'grade-quiz-submission' qs.sub_id %}" style="display: inline-block; background: #fef9c3; color: #854d0e; padding: 2px 8px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; text-decoration: none; margin-top: 4px; border: 1px solid #fde047;">
+                    Puanla
+                  </a>
+                  {% else %}
+                  <a href="{% url 'grade-quiz-submission' qs.sub_id %}" style="display: inline-block; color: #16a34a; font-size: 0.78rem; font-weight: 700; text-decoration: none; margin-top: 4px;">
+                    İncele
+                  </a>
+                  {% endif %}
+                {% else %}
+                  <span style="color: #94a3b8; font-style: italic;">Katılmadı</span>
+                {% endif %}
+              </td>
+              {% endfor %}
+
+              <!-- Assignment Scores -->
+              {% for as_item in row.ass_scores %}
+              <td style="padding: 18px 14px; border-right: 1px solid #f1f5f9;">
+                {% if as_item.submitted %}
+                  <div style="font-weight: 700; color: #6b21a8; font-size: 0.98rem;">
+                    {{ as_item.grade }}
+                  </div>
+                  {% if as_item.file_url %}
+                  <a href="{{ as_item.file_url }}" target="_blank" style="font-size: 0.78rem; color: #2563eb; font-weight: 600; text-decoration: none;">
+                    Dosyayı İndir
+                  </a>
+                  {% endif %}
+                {% else %}
+                  <span style="color: #94a3b8; font-style: italic;">Teslim Yok</span>
+                {% endif %}
+              </td>
+              {% endfor %}
+
+              <!-- Overall % -->
+              <td style="padding: 18px 14px; text-align: center; background: #fafdff;">
+                <span style="background: {% if row.quiz_percent >= 70 %}#dcfce7; color:#15803d;{% elif row.quiz_percent >= 50 %}#fef9c3; color:#854d0e;{% else %}#fee2e2; color:#dc2626;{% endif %} font-weight: 900; font-size: 1.05rem; padding: 6px 14px; border-radius: 20px; display: inline-block;">
+                  %{{ row.quiz_percent }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div style="text-align: center; padding: 48px; color: #64748b; font-size: 1.08rem;">
+        Bu derse kayıtlı öğrenci veya tanımlı sınav/ödev bulunmuyor.
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</main>
+{% endblock %}

@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+import pyotp
+
+
 
 
 DEPARTMENT_CHOICES = [
@@ -270,6 +273,8 @@ class Quiz(models.Model):
     title = models.CharField(max_length=200, verbose_name="Sınav / Test Başlığı")
     description = models.TextField(null=True, blank=True, verbose_name="Sınav Açıklaması ve Kurallar")
     duration_minutes = models.PositiveIntegerField(default=30, verbose_name="Süre (Dakika)")
+    start_time = models.DateTimeField(null=True, blank=True, verbose_name="Başlangıç Tarihi ve Saati")
+    end_time = models.DateTimeField(null=True, blank=True, verbose_name="Bitiş Tarihi ve Saati")
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -287,17 +292,43 @@ class Question(models.Model):
         ('C', 'C Seçeneği'),
         ('D', 'D Seçeneği'),
     ]
+    QUESTION_TYPES = [
+        ('multiple_choice', 'Çoktan Seçmeli (Test)'),
+        ('essay', 'Açık Uçlu / Klasik (Yazılı)'),
+    ]
 
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
+    question_type = models.CharField(max_length=20, choices=QUESTION_TYPES, default='multiple_choice', verbose_name="Soru Tipi")
     text = models.TextField(verbose_name="Soru Metni")
-    option_a = models.CharField(max_length=300, verbose_name="A Seçeneği")
-    option_b = models.CharField(max_length=300, verbose_name="B Seçeneği")
-    option_c = models.CharField(max_length=300, verbose_name="C Seçeneği")
-    option_d = models.CharField(max_length=300, verbose_name="D Seçeneği")
-    correct_option = models.CharField(max_length=1, choices=OPTION_CHOICES, default='A', verbose_name="Doğru Cevap")
+    option_a = models.CharField(max_length=300, null=True, blank=True, verbose_name="A Seçeneği")
+    option_b = models.CharField(max_length=300, null=True, blank=True, verbose_name="B Seçeneği")
+    option_c = models.CharField(max_length=300, null=True, blank=True, verbose_name="C Seçeneği")
+    option_d = models.CharField(max_length=300, null=True, blank=True, verbose_name="D Seçeneği")
+    correct_option = models.CharField(max_length=1, choices=OPTION_CHOICES, default='A', null=True, blank=True, verbose_name="Doğru Cevap")
+    points = models.PositiveIntegerField(default=10, verbose_name="Soru Puanı / Baram")
 
     def __str__(self):
         return self.text[:50]
+
+
+class QuestionBankItem(models.Model):
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='question_bank')
+    title = models.CharField(max_length=150, verbose_name="Konu / Başlık")
+    question_type = models.CharField(max_length=20, choices=Question.QUESTION_TYPES, default='multiple_choice', verbose_name="Soru Tipi")
+    text = models.TextField(verbose_name="Soru Metni")
+    option_a = models.CharField(max_length=300, null=True, blank=True, verbose_name="A Seçeneği")
+    option_b = models.CharField(max_length=300, null=True, blank=True, verbose_name="B Seçeneği")
+    option_c = models.CharField(max_length=300, null=True, blank=True, verbose_name="C Seçeneği")
+    option_d = models.CharField(max_length=300, null=True, blank=True, verbose_name="D Seçeneği")
+    correct_option = models.CharField(max_length=1, choices=Question.OPTION_CHOICES, default='A', null=True, blank=True, verbose_name="Doğru Cevap")
+    points = models.PositiveIntegerField(default=10, verbose_name="Varsayılan Puan")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.title}: {self.text[:40]}"
 
 
 class QuizSubmission(models.Model):
@@ -305,6 +336,9 @@ class QuizSubmission(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     score = models.IntegerField(verbose_name="Puan")
     total_questions = models.IntegerField(verbose_name="Toplam Soru")
+    cheat_warnings = models.PositiveIntegerField(default=0, verbose_name="Sekme Değiştirme / İhlal Sayısı")
+    teacher_feedback = models.TextField(null=True, blank=True, verbose_name="Öğretim Üyesi Değerlendirme Notu")
+    is_graded = models.BooleanField(default=True, verbose_name="Tamamen Puanlandı mı?")
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -313,6 +347,18 @@ class QuizSubmission(models.Model):
 
     def __str__(self):
         return f"{self.student.username} - {self.quiz.title} ({self.score}/{self.total_questions})"
+
+
+class QuizSubmissionAnswer(models.Model):
+    submission = models.ForeignKey(QuizSubmission, on_delete=models.CASCADE, related_name='answers')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    selected_option = models.CharField(max_length=1, null=True, blank=True)
+    essay_answer = models.TextField(null=True, blank=True, verbose_name="Öğrencinin Yazılı Cevabı")
+    awarded_points = models.IntegerField(default=0, verbose_name="Kazanılan Puan")
+    teacher_comment = models.TextField(null=True, blank=True, verbose_name="Soruya Özel Öğretmen Notu")
+
+    def __str__(self):
+        return f"{self.submission.student.username} - Q: {self.question.id}"
 
 
 class Notification(models.Model):
@@ -351,6 +397,7 @@ class AssignmentSubmission(models.Model):
     file = models.FileField(upload_to="assignments/%Y/%m/", null=True, blank=True, verbose_name="Ödev Dosyası")
     notes = models.TextField(null=True, blank=True, verbose_name="Öğrenci Notu")
     grade = models.CharField(max_length=20, null=True, blank=True, verbose_name="Not / Puan")
+    teacher_feedback = models.TextField(null=True, blank=True, verbose_name="Öğretim Üyesi Değerlendirmesi")
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -359,4 +406,49 @@ class AssignmentSubmission(models.Model):
 
     def __str__(self):
         return f"{self.student.username} - {self.assignment.title}"
+
+
+class AttendanceSession(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='attendance_sessions', verbose_name="Ders Odası")
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True, verbose_name="Aktif mi?")
+    secret_key = models.CharField(max_length=32, default=pyotp.random_base32)
+    teacher_ip = models.CharField(max_length=50, blank=True, null=True, verbose_name="Öğretmen / Sınıf IP Adresi")
+    require_ip_check = models.BooleanField(default=True, verbose_name="Wi-Fi IP Otomatik Yoklama")
+    allow_qr_check = models.BooleanField(default=True, verbose_name="QR Kod ile Yoklamaya İzin Ver")
+
+    class Meta:
+        verbose_name = "Yoklama Oturumu"
+        verbose_name_plural = "Yoklama Oturumları"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.room.name} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
+    def get_totp_token(self):
+        """Generates dynamic token for the projector every 15 seconds."""
+        totp = pyotp.TOTP(self.secret_key, interval=15)
+        return totp.now()
+
+    def verify_totp(self, token):
+        """Verifies if the submitted token matches the current 15-second window."""
+        totp = pyotp.TOTP(self.secret_key, interval=15)
+        return totp.verify(token, valid_window=1)
+
+
+class AttendanceRecord(models.Model):
+    session = models.ForeignKey(AttendanceSession, on_delete=models.CASCADE, related_name='records')
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='attendance_records')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, default='present', verbose_name="Durum")
+    client_ip = models.CharField(max_length=50, blank=True, null=True, verbose_name="Öğrenci IP Adresi")
+
+    class Meta:
+        unique_together = ('session', 'student')
+        verbose_name = "Yoklama Kaydı"
+        verbose_name_plural = "Yoklama Kayıtları"
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.student.username} - {self.session.created_at.strftime('%Y-%m-%d')}"
 

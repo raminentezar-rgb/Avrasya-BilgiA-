@@ -1,0 +1,127 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="layout">
+  <div class="container" style="max-width: 980px; margin: 30px auto; padding: 0 20px; display: block !important; width: 100%;">
+    
+    <!-- Top Header Card -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px 32px; box-shadow: 0 10px 30px rgba(15, 59, 140, 0.05); margin-bottom: 28px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <a href="{% url 'quiz-detail' quiz.id %}" style="color: #ea580c; font-weight: 700; font-size: 0.92rem; text-decoration: none; display: inline-block; margin-bottom: 8px;">
+            &larr; {{ quiz.title }} Sınavına Geri Dön
+          </a>
+          <h1 style="margin: 0; font-size: 1.8rem; color: #0f3b8c; font-weight: 800;">Sınav Kağıdı Değerlendirme & Puanlama Paneli</h1>
+          <div style="margin-top: 10px; color: #334155; font-size: 1.05rem;">
+            Öğrenci: <strong style="color: #0f3b8c; font-size: 1.15rem;">{{ submission.student.name|default:submission.student.username }} (@{{ submission.student.username }})</strong> | Bölüm: {{ submission.student.department|default:"-" }}
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 0.88rem; color: #64748b;">Mevcut Toplam Puan</div>
+          <div style="font-size: 2.2rem; font-weight: 900; color: #ea580c;">
+            {{ submission.score }} / {{ submission.total_questions }}
+          </div>
+          {% if submission.cheat_warnings > 0 %}
+          <div style="background: #fee2e2; color: #dc2626; font-weight: 700; padding: 4px 10px; border-radius: 8px; font-size: 0.82rem; margin-top: 6px; border: 1px solid #fca5a5;">
+            {{ submission.cheat_warnings }} Sekme İhlali Tespit Edildi
+          </div>
+          {% else %}
+          <div style="color: #16a34a; font-size: 0.85rem; font-weight: 700; margin-top: 6px;">İhlalsiz Temiz Gönderim</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Grading Form -->
+    <form action="" method="POST" class="form">
+      {% csrf_token %}
+      
+      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; box-shadow: 0 8px 25px rgba(15, 59, 140, 0.05); margin-bottom: 28px;">
+        <div style="border-bottom: 2px solid #f1f5f9; padding-bottom: 16px; margin-bottom: 26px;">
+          <h2 style="margin: 0; font-size: 1.35rem; color: #0f3b8c; font-weight: 800;">Soru ve Cevap Detayları ({{ answers.count }} Soru)</h2>
+          <p style="color: #64748b; font-size: 0.95rem; margin-top: 6px;">
+            Test soruları sistem tarafından otomatik puanlanmıştır. Açık uçlu (yazılı) soruların puanlarını ve geri bildirimlerinizi aşağıdan giriniz:
+          </p>
+        </div>
+
+        {% for ans in answers %}
+        <div style="border: 1px solid #cbd5e1; border-radius: 14px; padding: 26px; margin-bottom: 24px; background: {% if ans.question.question_type == 'essay' %}#fffaf0{% else %}#f8fafc{% endif %}">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <span style="background: {% if ans.question.question_type == 'essay' %}#fef3c7; color: #b45309;{% else %}#dbeafe; color: #1d4ed8;{% endif %} font-weight: 700; font-size: 0.8rem; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 8px;">
+                Soru {{ forloop.counter }} | {{ ans.question.get_question_type_display }} (Max Baram: {{ ans.question.points }} Puan)
+              </span>
+              <div style="font-weight: 700; font-size: 1.15rem; color: #0f3b8c;">
+                {{ ans.question.text }}
+              </div>
+            </div>
+            <div style="font-weight: 800; font-size: 1.15rem; color: {% if ans.awarded_points > 0 %}#16a34a{% else %}#dc2626{% endif %}">
+              {{ ans.awarded_points }} / {{ ans.question.points }} Puan
+            </div>
+          </div>
+
+          {% if ans.question.question_type == 'multiple_choice' %}
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; margin-top: 14px; font-size: 0.98rem;">
+            <div style="margin-bottom: 8px;">
+              <strong>Öğrencinin Seçimi:</strong> 
+              <span style="padding: 4px 10px; border-radius: 6px; font-weight: 700; {% if ans.selected_option == ans.question.correct_option %}background:#dcfce7; color:#15803d;{% else %}background:#fee2e2; color:#dc2626;{% endif %}">
+                {{ ans.selected_option|default:"Boş / Cevaplanmadı" }}
+              </span>
+            </div>
+            <div>
+              <strong style="color: #64748b;">Doğru Cevap Anahtarı:</strong> 
+              <span style="color: #15803d; font-weight: 700;">{{ ans.question.correct_option }} Seçeneği</span>
+            </div>
+          </div>
+          {% else %}
+          <!-- Essay Answer Review and Point Input -->
+          <div style="background: #ffffff; border: 1px solid #fbd38d; border-radius: 12px; padding: 20px; margin-top: 14px;">
+            <label style="display: block; font-weight: 700; color: #9a3412; font-size: 0.92rem; margin-bottom: 8px;">
+              Öğrencinin Yazılı Cevabı:
+            </label>
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px; font-size: 1.02rem; line-height: 1.6; color: #1e293b; white-space: pre-wrap; min-height: 80px;">
+              {{ ans.essay_answer|default:"(Öğrenci bu soruya yazılı cevap girmedi)" }}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 180px 1fr; gap: 20px; margin-top: 20px; align-items: flex-start;">
+              <div>
+                <label style="display: block; font-weight: 700; color: #1e293b; font-size: 0.92rem; margin-bottom: 6px;">
+                  Verilen Puan (Max: {{ ans.question.points }})
+                </label>
+                <input type="number" name="points_{{ ans.id }}" value="{{ ans.awarded_points }}" max="{{ ans.question.points }}" min="0" required style="width: 100%; border: 2px solid #ea580c; border-radius: 8px; padding: 10px 14px; font-weight: 800; font-size: 1.1rem; color: #0f3b8c;">
+              </div>
+              <div>
+                <label style="display: block; font-weight: 700; color: #1e293b; font-size: 0.92rem; margin-bottom: 6px;">
+                  Soruya Özel Öğretmen Geri Bildirimi / Yorumu:
+                </label>
+                <input type="text" name="comment_{{ ans.id }}" value="{{ ans.teacher_comment|default:'' }}" placeholder="Örn: Açıklaman başarılı ancak örnekler yetersiz..." style="width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; font-size: 0.95rem;">
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- General Teacher Feedback & Submit Box -->
+      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; box-shadow: 0 8px 25px rgba(15, 59, 140, 0.05); margin-bottom: 40px;">
+        <h3 style="margin: 0 0 14px 0; color: #0f3b8c; font-size: 1.3rem; font-weight: 800;">Genel Sınav Değerlendirme Notu (Öğrencinin Ekranında Görünür)</h3>
+        <p style="color: #64748b; font-size: 0.92rem; margin-bottom: 14px;">
+          Bu alana yazdığınız genel değerlendirme ve not, öğrenci sınav sonucuna baktığında kendisine bildirimle birlikte gösterilecektir:
+        </p>
+        <textarea name="teacher_feedback" rows="4" placeholder="Örn: Tebrikler, genel olarak konuları çok iyi kavramışsın. Özellikle 3. sorudaki yaklaşımın çok başarılıydı..." style="width: 100%; border: 1px solid #cbd5e1; border-radius: 12px; padding: 16px; font-size: 1rem; font-family: inherit; margin-bottom: 24px;">{{ submission.teacher_feedback|default:'' }}</textarea>
+
+        <div style="display: flex; justify-content: flex-end; gap: 16px;">
+          <a href="{% url 'quiz-detail' quiz.id %}" style="padding: 14px 28px; font-weight: 700; color: #64748b; background: #f1f5f9; border-radius: 10px; text-decoration: none;">
+            İptal
+          </a>
+          <button type="submit" style="padding: 15px 36px; font-size: 1.1rem; font-weight: 800; background: #ea580c; color: #ffffff; border: 1px solid #c2410c; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(234, 88, 12, 0.28);">
+            Puanlamayı ve Değerlendirmeyi Kaydet &rarr;
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</main>
+{% endblock %}

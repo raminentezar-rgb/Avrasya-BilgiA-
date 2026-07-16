@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoklama Sonucu - Avrasya BilgiAğı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .result-card {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid #334155;
+            padding: 2.8rem 2rem;
+            border-radius: 24px;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .icon-circle {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.6rem auto;
+            font-size: 2.6rem;
+        }
+
+        .success .icon-circle {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 2px solid #10b981;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .error .icon-circle {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 2px solid #ef4444;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            margin: 0 0 0.8rem 0;
+            font-weight: 800;
+        }
+
+        .success h1 {
+            color: #34d399;
+        }
+
+        .error h1 {
+            color: #f87171;
+        }
+
+        .msg-text {
+            color: #cbd5e1;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 2.2rem;
+        }
+
+        .room-badge {
+            background: #334155;
+            color: #60a5fa;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 1.6rem;
+            font-size: 0.95rem;
+            border: 1px solid #475569;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #3b82f6;
+            color: white;
+            padding: 0.85rem 1.8rem;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.05rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-home:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="result-card {% if success %}success{% else %}error{% endif %}">
+        {% if success %}
+            <div class="icon-circle">
+                <i class="fas fa-check"></i>
+            </div>
+            <h1>Yoklama Başarılı!</h1>
+            {% if room_name %}
+            <div class="room-badge"><i class="fas fa-chalkboard-teacher"></i> {{ room_name }}</div>
+            {% endif %}
+        </p>
+        {% else %}
+            <div class="icon-circle">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h1>Yoklama Alınamadı!</h1>
+        {% endif %}
+
+        <div class="msg-text">
+            {% if messages %}
+                {% for message in messages %}
+                    <div>{{ message }}</div>
+                {% endfor %}
+            {% else %}
+                {% if success %}
+                    Yoklamanız sistem tarafından başarıyla kaydedilmiştir.
+                {% else %}
+                    Geçersiz QR kod veya ağ bağlantısı hatası.
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <a href="{% url 'home' %}" class="btn-home"><i class="fas fa-home"></i> Ana Sayfaya Dön</a>
+    </div>
+
+</body>
+</html>
