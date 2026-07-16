@@ -55,5 +55,6 @@ urlpatterns = [
     path('attendance/session/<str:session_id>/close/', views.close_attendance_session, name="close_attendance_session"),
     path('attendance/session/<str:session_id>/export/', views.export_attendance_report, name="export_attendance_report"),
     path('attendance/scan/', views.student_scan, name="student_scan"),
+    path('attendance/check-ip/', views.student_ip_checkin, name="student_ip_checkin"),
 ]
 

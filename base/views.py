@@ -212,6 +212,11 @@ def dashboard(request):
     total_quiz_points_possible = sum(qs.total_questions for qs in my_quiz_submissions)
     avg_score_pct = int((total_quiz_points_earned / total_quiz_points_possible) * 100) if total_quiz_points_possible > 0 else 0
 
+    # Active attendance sessions across student's enrolled rooms
+    active_attendance_sessions = AttendanceSession.objects.filter(
+        room__in=enrolled_rooms, is_active=True
+    )
+
     context = {
         'is_faculty': is_faculty,
         'hosted_rooms': hosted_rooms,
@@ -228,6 +233,7 @@ def dashboard(request):
         'active_quizzes': active_quizzes,
         'active_assignments': active_assignments,
         'avg_score_pct': avg_score_pct,
+        'active_attendance_sessions': active_attendance_sessions,
     }
     return render(request, 'base/dashboard.html', context)
 
@@ -295,9 +301,14 @@ def room(request, pk):
                     )
             return redirect('room', pk=room_obj.id)
 
+    active_attendance_session = AttendanceSession.objects.filter(
+        room=room_obj, is_active=True
+    ).first()
+
     context = {'room': room_obj, 'room_messages': room_messages,
                'participants': participants, 'resources': resources,
-               'resource_form': resource_form, 'quizzes': room_obj.quizzes.all()}
+               'resource_form': resource_form, 'quizzes': room_obj.quizzes.all(),
+               'active_attendance_session': active_attendance_session}
     return render(request, 'base/room.html', context)
 
 
@@ -1134,8 +1145,8 @@ def is_ip_allowed(session_ip, student_ip):
     t_parts = session_ip.split('.')
     s_parts = student_ip.split('.')
     if len(t_parts) == 4 and len(s_parts) == 4:
-        # Same /24 subnet (e.g. university classroom Wi-Fi 192.168.1.X or 10.X.X.X)
-        if t_parts[:3] == s_parts[:3]:
+        # Allow /24 exact match or /16 exact match for university classroom Wi-Fi NAT pools and load balancers
+        if t_parts[:3] == s_parts[:3] or t_parts[:2] == s_parts[:2]:
             return True
     return False
 
@@ -1270,8 +1281,8 @@ def student_scan(request):
     student_ip = get_client_ip(request)
     if session.require_ip_check and session.teacher_ip:
         if not is_ip_allowed(session.teacher_ip, student_ip):
-            messages.error(request, 'IP Koruması: Bu yoklamaya sadece sınıf içi Wi-Fi ağından (Aynı Ağ/IP) katılabilirsiniz! Lütfen VPN kapatıp sınıf Wi-Fi ağına bağlanın.')
-            return render(request, 'base/scan_result.html', {'success': False})
+            messages.error(request, f'IP Koruması Hatası: Sınıf Wi-Fi ağından bağlanmamış görünüyorsunuz! (Sizin IP: {student_ip} | Sınıf IP: {session.teacher_ip}). Lütfen VPN / Hücresel veriyi kapatıp sınıf Wi-Fi ağına bağlanın.')
+            return render(request, 'base/scan_result.html', {'success': False, 'error_msg': f'Sizin IP Adresiniz ({student_ip}), Sınıf Wi-Fi Ağı IP Adresi ({session.teacher_ip}) ile eşleşmedi.'})
         
     # Record Checkin
     record, created = AttendanceRecord.objects.get_or_create(
@@ -1293,6 +1304,52 @@ def student_scan(request):
                 link=f"/room/{session.room.id}/"
             )
         
+    return render(request, 'base/scan_result.html', {'success': True, 'room_name': session.room.name})
+
+@login_required
+def student_ip_checkin(request):
+    session_id = request.GET.get('session')
+    if not session_id:
+        messages.error(request, 'Geçersiz yoklama oturumu bilgisi.')
+        return redirect('dashboard')
+        
+    student = request.user
+    session = AttendanceSession.objects.filter(id=session_id).first()
+    if not session or not session.is_active:
+        messages.warning(request, 'Bu yoklama oturumu artık aktif değil veya sona ermiş.')
+        return redirect('dashboard')
+        
+    # Automatically enroll student inside class room
+    if student not in session.room.participants.all() and student != session.room.host:
+        session.room.participants.add(student)
+        
+    # Verify Wi-Fi IP
+    student_ip = get_client_ip(request)
+    if session.require_ip_check and session.teacher_ip:
+        if not is_ip_allowed(session.teacher_ip, student_ip):
+            messages.error(request, f'IP Koruması Hatası: Sınıf Wi-Fi ağından bağlanmamış görünüyorsunuz! (Sizin IP: {student_ip} | Sınıf IP: {session.teacher_ip}). Lütfen VPN / Hücresel veriyi kapatıp sınıf Wi-Fi ağına bağlanın.')
+            return render(request, 'base/scan_result.html', {'success': False, 'error_msg': f'Sizin IP Adresiniz ({student_ip}), Sınıf Wi-Fi Ağı IP Adresi ({session.teacher_ip}) ile eşleşmedi.'})
+            
+    # Record Checkin
+    record, created = AttendanceRecord.objects.get_or_create(
+        session=session,
+        student=student,
+        defaults={'client_ip': student_ip, 'status': 'present'}
+    )
+    if not created:
+        messages.info(request, 'Bu ders için yoklamanız zaten alınmıştı.')
+    else:
+        messages.success(request, f'📡 Wi-Fi IP ile yoklamanız başarıyla alındı! ({session.room.name})')
+        
+        # Send notification to professor
+        if session.room.host and session.room.host != student:
+            Notification.objects.create(
+                recipient=session.room.host,
+                sender=student,
+                message=f"📡 {student.name or student.username} Wi-Fi IP ile yoklamaya katıldı ({session.room.name}).",
+                link=f"/room/{session.room.id}/"
+            )
+            
     return render(request, 'base/scan_result.html', {'success': True, 'room_name': session.room.name})
 
 @login_required
