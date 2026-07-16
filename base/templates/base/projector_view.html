@@ -301,11 +301,15 @@
                 .then(data => {
                     if(data.token) {
                         qrcode.clear();
-                        const fullUrl = scanBaseUrl + data.token;
-                        currentFullScanUrl = fullUrl;
+                        const qrUrl = scanBaseUrl + data.token;
+                        qrcode.makeCode(qrUrl);
+                        
+                        // For local testing in Edge/PC, use exact current browser host (e.g. 127.0.0.1:8000)
+                        const localTestUrl = `${window.location.protocol}//${window.location.host}/attendance/scan/?session=${sessionId}&token=${data.token}`;
+                        currentFullScanUrl = localTestUrl;
                         const box = document.getElementById('testLinkBox');
-                        if (box) box.value = fullUrl;
-                        qrcode.makeCode(fullUrl);
+                        if (box) box.value = localTestUrl;
+                        
                         secondsRemaining = REFRESH_INTERVAL;
                         updateTimerUI();
                     }
