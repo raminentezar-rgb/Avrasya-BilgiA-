@@ -282,6 +282,7 @@
             targetPort = window.location.port ? `:${window.location.port}` : ':8000';
         }
         const scanBaseUrl = `${window.location.protocol}//${targetHost}${targetPort}/attendance/scan/?session=${sessionId}&token=`;
+        let currentFullScanUrl = '';
         
         let qrcode = new QRCode(document.getElementById("qrCode"), {
             width: 340,
@@ -301,12 +302,33 @@
                     if(data.token) {
                         qrcode.clear();
                         const fullUrl = scanBaseUrl + data.token;
+                        currentFullScanUrl = fullUrl;
+                        const box = document.getElementById('testLinkBox');
+                        if (box) box.value = fullUrl;
                         qrcode.makeCode(fullUrl);
                         secondsRemaining = REFRESH_INTERVAL;
                         updateTimerUI();
                     }
                 })
                 .catch(err => console.error("Error fetching token:", err));
+        }
+
+        function copyTestLink() {
+            if (!currentFullScanUrl) {
+                alert('Yoklama linki henüz yüklenmedi, lütfen 1-2 saniye bekleyip tekrar deneyin.');
+                return;
+            }
+            const input = document.getElementById('testLinkBox');
+            if (input) {
+                input.select();
+                input.setSelectionRange(0, 99999);
+            }
+            navigator.clipboard.writeText(currentFullScanUrl).then(() => {
+                alert('📋 Yoklama linki panoya başarıyla kopyalandı!\nŞimdi Microsoft Edge tarayıcınıza gidip yapıştırabilir (Ctrl + V) ve Enter tuşuna basabilirsiniz.');
+            }).catch(err => {
+                // Fallback for clipboard if permission issue occurs
+                prompt("Lütfen aşağıdaki linki kopyalayın (Ctrl + C):", currentFullScanUrl);
+            });
         }
 
         function updateTimerUI() {
