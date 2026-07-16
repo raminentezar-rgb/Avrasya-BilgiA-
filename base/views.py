@@ -1263,9 +1263,9 @@ def student_scan(request):
         # Send notification to professor
         if session.room.host and session.room.host != student:
             Notification.objects.create(
-                user=session.room.host,
-                title=f"Sınıf Yoklaması: {student.name or student.username}",
-                message=f"{student.name or student.username} yoklamaya katıldı ({session.room.name}).",
+                recipient=session.room.host,
+                sender=student,
+                message=f"📋 {student.name or student.username} yoklamaya katıldı ({session.room.name}).",
                 link=f"/room/{session.room.id}/"
             )
         
