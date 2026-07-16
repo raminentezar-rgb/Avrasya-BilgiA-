@@ -236,6 +236,12 @@
         <p style="color: #cbd5e1; font-size: 1.05rem; margin: 0 0 1.2rem 0; text-align: center; max-width: 620px;">
             Dilerseniz ana sayfanızdaki <strong>«📡 Wi-Fi IP ile Şimdi Yoklama Ver»</strong> butonuna tıklayabilir veya aşağıdaki <strong>QR Kodu</strong> okutabilirsiniz.
         </p>
+
+        {% if not session.is_active %}
+        <div style="background: #ef4444; color: white; padding: 14px 24px; border-radius: 14px; font-size: 1.15rem; font-weight: 800; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);">
+            <i class="fas fa-exclamation-triangle"></i> DİKKAT: Bu yoklama oturumu sona ermiş (KAPALI). Yeni yoklama almak için odaya dönüp yeni oturum başlatmalısınız.
+        </div>
+        {% endif %}
         
         <div style="margin-bottom: 1.8rem; font-size: 1rem; color: #cbd5e1; background: rgba(59, 130, 246, 0.15); padding: 8px 20px; border-radius: 20px; border: 1px solid rgba(59, 130, 246, 0.35); display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-wifi" style="color: #60a5fa;"></i> Sınıf Wi-Fi Ağ IP Adresi: <strong style="color: #ffffff;">{{ session.teacher_ip|default:"Otomatik Tanımlandı" }}</strong>
@@ -278,6 +284,8 @@
         const sessionId = {{ session.id }};
         const tokenUrl = `{% url 'api_projector_token' session.id %}`;
         const liveDataUrl = `{% url 'api_projector_live' session.id %}`;
+        const isSessionActive = {{ session.is_active|yesno:"true,false" }};
+        let timerInterval = null;
         let targetHost = window.location.hostname;
         let targetPort = window.location.port ? `:${window.location.port}` : '';
         if (targetHost === '127.0.0.1' || targetHost === 'localhost') {
@@ -298,7 +306,23 @@
         const REFRESH_INTERVAL = 15; // seconds
         let secondsRemaining = REFRESH_INTERVAL;
 
+        function handleInactiveState() {
+            if (timerInterval) clearInterval(timerInterval);
+            document.getElementById('timeRemaining').innerText = '0';
+            document.getElementById('timerProgress').style.width = '0%';
+            const qrBox = document.getElementById('qrCode');
+            if (qrBox) {
+                qrBox.innerHTML = '<div style="color:#ef4444; font-weight:800; font-size:1.15rem; text-align:center; padding-top:110px;"><i class="fas fa-exclamation-circle" style="font-size:3.2rem; margin-bottom:14px;"></i><br>BU OTURUM SONA ERMİŞ<br><span style="font-size:0.9rem; color:#64748b; font-weight:600;">Yeni QR kod üretimi durduruldu</span></div>';
+            }
+            const testBox = document.getElementById('testLinkBox');
+            if (testBox) testBox.value = 'Oturum Sona Ermiş (Kapalı)';
+        }
+
         function refreshToken() {
+            if (!isSessionActive) {
+                handleInactiveState();
+                return;
+            }
             fetch(tokenUrl)
                 .then(response => response.json())
                 .then(data => {
@@ -315,14 +339,19 @@
                         
                         secondsRemaining = REFRESH_INTERVAL;
                         updateTimerUI();
+                    } else {
+                        handleInactiveState();
                     }
                 })
-                .catch(err => console.error("Error fetching token:", err));
+                .catch(err => {
+                    console.error("Error fetching token:", err);
+                    handleInactiveState();
+                });
         }
 
         function copyTestLink() {
             if (!currentFullScanUrl) {
-                alert('Yoklama linki henüz yüklenmedi, lütfen 1-2 saniye bekleyip tekrar deneyin.');
+                alert('Yoklama linki henüz yüklenmedi veya oturum kapalı.');
                 return;
             }
             const input = document.getElementById('testLinkBox');
@@ -333,7 +362,6 @@
             navigator.clipboard.writeText(currentFullScanUrl).then(() => {
                 alert('📋 Yoklama linki panoya başarıyla kopyalandı!\nŞimdi Microsoft Edge tarayıcınıza gidip yapıştırabilir (Ctrl + V) ve Enter tuşuna basabilirsiniz.');
             }).catch(err => {
-                // Fallback for clipboard if permission issue occurs
                 prompt("Lütfen aşağıdaki linki kopyalayın (Ctrl + C):", currentFullScanUrl);
             });
         }
@@ -345,6 +373,7 @@
         }
 
         function countTimer() {
+            if (!isSessionActive) return;
             secondsRemaining--;
             updateTimerUI();
             if(secondsRemaining <= 0) {
@@ -438,11 +467,15 @@
         }
 
         // Initial load
-        refreshToken();
+        if (!isSessionActive) {
+            handleInactiveState();
+        } else {
+            refreshToken();
+            timerInterval = setInterval(countTimer, 1000);
+        }
         fetchLiveAttendance();
 
         // Intervals
-        setInterval(countTimer, 1000);
         setInterval(fetchLiveAttendance, 2500); // Poll list every 2.5s
     </script>
 </body>
