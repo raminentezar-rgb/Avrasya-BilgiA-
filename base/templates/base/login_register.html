@@ -30,6 +30,7 @@
         <form id="formObsLogin" class="form" action="" method="POST">
           {% csrf_token %}
           <input type="hidden" name="login_type" value="student_obs" />
+          {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}" />{% endif %}
 
           <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 8px; margin-bottom: 16px; color: #1e40af; font-size: 0.81rem; line-height: 1.45;">
             <strong>Proliz OBS v2.1 Güvenli Kimlik Doğrulama:</strong> Yalnızca Proliz OBS sisteminde kayıtlı resmi öğrenci numaraları ve şifreleri kabul edilmektedir.<br>
@@ -59,6 +60,7 @@
         <form id="formTeacherLogin" class="form" action="" method="POST" style="display: none;">
           {% csrf_token %}
           <input type="hidden" name="login_type" value="teacher" />
+          {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}" />{% endif %}
 
           <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 12px; border-radius: 8px; margin-bottom: 16px; color: #991b1b; font-size: 0.82rem; line-height: 1.4;">
             <strong>Resmi E-Posta Zorunluluğu:</strong> Akademisyen / Öğretim Üyesi girişlerinde yalnızca resmi Avrasya Üniversitesi kurumsal e-posta adresi (<strong>@avrasya.edu.tr</strong>) kabul edilmektedir.

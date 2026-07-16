@@ -17,7 +17,11 @@ from .proliz_obs import ProlizOBSClient
 
 def loginPage(request):
     page = 'login'
+    next_url = request.POST.get('next') or request.GET.get('next')
+    
     if request.user.is_authenticated:
+        if next_url and next_url.startswith('/'):
+            return redirect(next_url)
         return redirect('home')
 
     if request.method == 'POST':
@@ -44,6 +48,8 @@ def loginPage(request):
                     )
                 login(request, user)
                 messages.success(request, f"Proliz OBS Entegrasyonu ile hoş geldiniz, {user.name} ({user.department})!")
+                if next_url and next_url.startswith('/'):
+                    return redirect(next_url)
                 return redirect('home')
             else:
                 messages.error(request, res.get('error', 'Proliz OBS öğrenci doğrulaması başarısız! Öğrenci Numaranızı kontrol ediniz.'))
@@ -61,6 +67,8 @@ def loginPage(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f"Akademisyen olarak giriş yapıldı: {user.name or user.username}")
+                if next_url and next_url.startswith('/'):
+                    return redirect(next_url)
                 return redirect('home')
             else:
                 messages.error(request, 'E-posta veya şifre hatalı! Lütfen resmi @avrasya.edu.tr bilgilerinizi kontrol ediniz.')
@@ -1230,9 +1238,8 @@ def student_scan(request):
         return render(request, 'base/scan_result.html', {'success': False})
         
     if student not in session.room.participants.all() and student != session.room.host:
-        # If not already enrolled, automatically add them or show error
-        messages.error(request, 'Bu ders odasının üyesi/katılımcısı değilsiniz! Lütfen önce odaya katılın.')
-        return render(request, 'base/scan_result.html', {'success': False})
+        # Automatically enroll student when scanning class QR code
+        session.room.participants.add(student)
         
     if not session.allow_qr_check:
         messages.error(request, 'Bu oturumda QR Kod ile yoklama kapalıdır. Lütfen Sınıf Wi-Fi Ağına bağlanarak otomatik yoklama verin.')
