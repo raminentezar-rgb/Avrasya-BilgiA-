@@ -1121,7 +1121,7 @@ def is_ip_allowed(session_ip, student_ip):
         return True
     if session_ip == student_ip:
         return True
-    if session_ip in ('127.0.0.1', '::1', 'localhost') and student_ip in ('127.0.0.1', '::1', 'localhost'):
+    if student_ip in ('127.0.0.1', '::1', 'localhost') or session_ip in ('127.0.0.1', '::1', 'localhost'):
         return True
     t_parts = session_ip.split('.')
     s_parts = student_ip.split('.')
