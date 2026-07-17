@@ -1,10 +1,12 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<main class="profile-page layout layout--3">
+<main class="profile-page layout {% if request.user.is_superuser %}layout--3{% else %}layout--2{% endif %}">
   <div class="container">
     <!-- Topics Start -->
+    {% if request.user.is_superuser %}
     {% include 'base/topics_component.html' %}
+    {% endif %}
     <!-- Topics End -->
 
     <!-- Room List Start -->

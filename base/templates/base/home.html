@@ -2,11 +2,11 @@
 
 {% block content %}
 
-<main class="layout {% if request.user.role == 'student' %}layout--2{% else %}layout--3{% endif %}">
+<main class="layout {% if request.user.is_superuser %}layout--3{% else %}layout--2{% endif %}">
   <div class="container">
 
     <!-- Topics Start -->
-    {% if request.user.role != 'student' %}
+    {% if request.user.is_superuser %}
     {% include 'base/topics_component.html' %}
     {% endif %}
     <!-- Topics End -->
@@ -27,7 +27,7 @@
 
 
 
-      {% if request.user.role != 'student' %}
+      {% if request.user.is_superuser %}
       <!-- Avrasya Department Filter -->
       <div style="background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 2px 12px rgba(15,59,140,0.06); padding: 14px 20px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
           <span style="color: #0f3b8c; font-weight: 700; font-size: 0.95rem;">Fakülte & Bölüm Filtresi:</span>
