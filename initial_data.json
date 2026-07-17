@@ -1,0 +1,1407 @@
+[
+{
+  "model": "base.user",
+  "pk": 8,
+  "fields": {
+    "password": "pbkdf2_sha256$600000$dsQKQjHqyI92fSu2KNSn3s$LPt+HpzhOReC74P4O/jdDULOH9NdUf4M4TC+fYfgxv0=",
+    "last_login": "2026-07-14T11:22:40.563Z",
+    "is_superuser": true,
+    "username": "ramin",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-07-10T11:29:50.731Z",
+    "name": "ramin ent",
+    "email": "raminentezarprogrammer@gmail.com",
+    "bio": "test",
+    "avatar": "photo_2024-06-10_12-36-06.jpg",
+    "student_id": null,
+    "department": "Bilgisayar Mühendisliği",
+    "role": "student",
+    "github_link": null,
+    "linkedin_link": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "base.user",
+  "pk": 9,
+  "fields": {
+    "password": "pbkdf2_sha256$600000$QgWQEgKDs2yjy68DRzId6f$AziS37ZKIjMRpsJjGKVak8z6RGT0I78DdYASPtzGfLI=",
+    "last_login": "2026-07-16T06:01:55.058Z",
+    "is_superuser": false,
+    "username": "ramin_ent",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-07-10T12:48:15.962Z",
+    "name": "Ramin ENTEZAR NOUHI",
+    "email": "ramin.entezar@avrasya.edu.tr",
+    "bio": "bigi islem",
+    "avatar": "photo_2025-10-13_11-10-29.jpg",
+    "student_id": "1325",
+    "department": "Genel / Diğer",
+    "role": "faculty",
+    "github_link": null,
+    "linkedin_link": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "base.user",
+  "pk": 12,
+  "fields": {
+    "password": "pbkdf2_sha256$600000$LyZCcDlNolE5tkvadvANGT$s98BqZh0RNNdS9K0wBSpWmDVXULURksJur/2aqoC4k4=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "student",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-07-11T06:05:57.750Z",
+    "name": "Ali Yılmaz (Öğrenci)",
+    "email": "student@avrasya.edu.tr",
+    "bio": null,
+    "avatar": "avatar.svg",
+    "student_id": null,
+    "department": "Bilgisayar Mühendisliği",
+    "role": "student",
+    "github_link": null,
+    "linkedin_link": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "base.user",
+  "pk": 13,
+  "fields": {
+    "password": "pbkdf2_sha256$600000$NqQKUzlOwhQnNdLcwmoZM3$NQiNC0G4rRp+7vfXhX6MTo6C0dxYXWkywS9S2SI79SM=",
+    "last_login": "2026-07-17T07:10:06.558Z",
+    "is_superuser": false,
+    "username": "ogr_2024001",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-07-11T06:12:38.767Z",
+    "name": "Ahmet Demir",
+    "email": "2024001@ogrenci.avrasya.edu.tr",
+    "bio": "test",
+    "avatar": "Jaguar-01-01.webp",
+    "student_id": "2024001",
+    "department": "Bilgisayar Mühendisliği",
+    "role": "student",
+    "github_link": null,
+    "linkedin_link": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 20,
+  "fields": {
+    "name": "Radyoterapi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 21,
+  "fields": {
+    "name": "Yazılım Mühendisliği & Bilgisayar"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 22,
+  "fields": {
+    "name": "Veri Bilimi & Yapay Zeka"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 23,
+  "fields": {
+    "name": "Siber Güvenlik & Ağ Teknolojileri"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 24,
+  "fields": {
+    "name": "Sağlık Bilimleri & Tıp"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 25,
+  "fields": {
+    "name": "İşletme & Ekonomi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 26,
+  "fields": {
+    "name": "Adalet"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 27,
+  "fields": {
+    "name": "Aşçılık"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 28,
+  "fields": {
+    "name": "Bilgisayar Programcılığı"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 29,
+  "fields": {
+    "name": "Dış Ticaret"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 30,
+  "fields": {
+    "name": "E-Ticaret ve Pazarlama"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 31,
+  "fields": {
+    "name": "Grafik Tasarımı"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 32,
+  "fields": {
+    "name": "Halkla İlişkiler ve Tanıtım"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 33,
+  "fields": {
+    "name": "Harita ve Kadastro"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 34,
+  "fields": {
+    "name": "İç Mekan Tasarımı"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 35,
+  "fields": {
+    "name": "İnşaat Teknolojisi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 36,
+  "fields": {
+    "name": "Lojistik"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 37,
+  "fields": {
+    "name": "Mimari Restorasyon"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 38,
+  "fields": {
+    "name": "Mahkeme Büro Hizmetleri"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 39,
+  "fields": {
+    "name": "Moda ve Tekstil Tasarımı"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 40,
+  "fields": {
+    "name": "Otomotiv Teknolojisi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 41,
+  "fields": {
+    "name": "Sivil Havacılık ve Kabin Hizmetleri"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 42,
+  "fields": {
+    "name": "Sosyal Güvenlik"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 43,
+  "fields": {
+    "name": "Sosyal Hizmetler (MYO)"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 44,
+  "fields": {
+    "name": "Spor Yönetimi (MYO)"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 45,
+  "fields": {
+    "name": "Web Tasarım ve Kodlama"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 46,
+  "fields": {
+    "name": "Bilişim Güvenliği Teknolojisi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 47,
+  "fields": {
+    "name": "Acil Durum ve Afet Yönetimi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 48,
+  "fields": {
+    "name": "Ağız ve Diş Sağlığı"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 49,
+  "fields": {
+    "name": "Ameliyathane Hizmetleri"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 50,
+  "fields": {
+    "name": "Anestezi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 51,
+  "fields": {
+    "name": "Diyaliz"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 52,
+  "fields": {
+    "name": "Diş Protez Teknolojisi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 53,
+  "fields": {
+    "name": "Elektronörofizyoloji"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 54,
+  "fields": {
+    "name": "Eczane Hizmetleri"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 55,
+  "fields": {
+    "name": "Fizyoterapi (SHMYO)"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 56,
+  "fields": {
+    "name": "Çocuk Gelişimi Programı (SHMYO)"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 57,
+  "fields": {
+    "name": "İlk ve Acil Yardım"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 58,
+  "fields": {
+    "name": "İş Sağlığı ve Güvenliği"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 59,
+  "fields": {
+    "name": "İş ve Uğraşı Terapisi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 60,
+  "fields": {
+    "name": "Odyometri"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 61,
+  "fields": {
+    "name": "Optisyenlik"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 62,
+  "fields": {
+    "name": "Ortopedik Protez ve Ortez"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 63,
+  "fields": {
+    "name": "Patoloji Laboratuvar Teknikleri"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 64,
+  "fields": {
+    "name": "Sağlık Kurumları İşletmeciliği"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 65,
+  "fields": {
+    "name": "Tıbbi Görüntüleme Teknikleri"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 66,
+  "fields": {
+    "name": "Tıbbi Laboratuvar Teknikleri"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 67,
+  "fields": {
+    "name": "Bilgisayar Mühendisliği"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 68,
+  "fields": {
+    "name": "Elektrik-Elektronik Mühendisliği"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 69,
+  "fields": {
+    "name": "Gıda Mühendisliği"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 70,
+  "fields": {
+    "name": "Harita Mühendisliği"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 71,
+  "fields": {
+    "name": "İç Mimarlık"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 72,
+  "fields": {
+    "name": "İnşaat Mühendisliği"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 73,
+  "fields": {
+    "name": "Makine Mühendisliği"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 74,
+  "fields": {
+    "name": "Mimarlık"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 75,
+  "fields": {
+    "name": "Beslenme ve Diyetetik"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 76,
+  "fields": {
+    "name": "Çocuk Gelişimi (SBF)"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 77,
+  "fields": {
+    "name": "Ebelik"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 78,
+  "fields": {
+    "name": "Ergoterapi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 79,
+  "fields": {
+    "name": "Fizyoterapi ve Rehabilitasyon"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 80,
+  "fields": {
+    "name": "Hemşirelik"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 81,
+  "fields": {
+    "name": "Odyoloji"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 82,
+  "fields": {
+    "name": "Sağlık Yönetimi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 83,
+  "fields": {
+    "name": "Sosyal Hizmet (SBF)"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 84,
+  "fields": {
+    "name": "Antrenörlük Eğitimi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 85,
+  "fields": {
+    "name": "Egzersiz ve Spor Bilimleri"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 86,
+  "fields": {
+    "name": "Spor Yöneticiliği"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 87,
+  "fields": {
+    "name": "Rekreasyon"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 88,
+  "fields": {
+    "name": "Yeni Medya ve İletişim"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 89,
+  "fields": {
+    "name": "Görsel İletişim Tasarımı"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 90,
+  "fields": {
+    "name": "İngiliz Dili ve Edebiyatı"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 91,
+  "fields": {
+    "name": "Psikoloji"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 92,
+  "fields": {
+    "name": "Türk Dili ve Edebiyatı"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 93,
+  "fields": {
+    "name": "Moleküler Biyoloji ve Genetik"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 94,
+  "fields": {
+    "name": "Mütercim Tercümanlık"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 95,
+  "fields": {
+    "name": "İşletme"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 96,
+  "fields": {
+    "name": "İşletme (İngilizce)"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 97,
+  "fields": {
+    "name": "Siyaset Bilimi ve Kamu Yönetimi"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 98,
+  "fields": {
+    "name": "Uluslararası İlişkiler"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 99,
+  "fields": {
+    "name": "Maliye"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 100,
+  "fields": {
+    "name": "Gastronomi ve Mutfak Sanatları"
+  }
+},
+{
+  "model": "base.topic",
+  "pk": 101,
+  "fields": {
+    "name": "Yönetim Bilişim Sistemleri"
+  }
+},
+{
+  "model": "base.room",
+  "pk": 28,
+  "fields": {
+    "host": 9,
+    "topic": 67,
+    "name": "ODA 1",
+    "course_code": "A100",
+    "room_type": "course",
+    "description": "",
+    "updated": "2026-07-14T12:33:32.084Z",
+    "created": "2026-07-14T12:33:32.084Z",
+    "participants": [
+      9,
+      13
+    ]
+  }
+},
+{
+  "model": "base.room",
+  "pk": 29,
+  "fields": {
+    "host": 9,
+    "topic": 67,
+    "name": "ODA 2",
+    "course_code": "B350",
+    "room_type": "course",
+    "description": "",
+    "updated": "2026-07-14T12:48:51.807Z",
+    "created": "2026-07-14T12:48:51.807Z",
+    "participants": [
+      9,
+      13
+    ]
+  }
+},
+{
+  "model": "base.message",
+  "pk": 25,
+  "fields": {
+    "user": 13,
+    "room": 28,
+    "body": "merhaba",
+    "is_verified_answer": false,
+    "updated": "2026-07-14T12:34:14.449Z",
+    "created": "2026-07-14T12:34:14.449Z"
+  }
+},
+{
+  "model": "base.message",
+  "pk": 26,
+  "fields": {
+    "user": 9,
+    "room": 28,
+    "body": "merhaba ahmet",
+    "is_verified_answer": false,
+    "updated": "2026-07-14T12:34:38.129Z",
+    "created": "2026-07-14T12:34:38.129Z"
+  }
+},
+{
+  "model": "base.message",
+  "pk": 27,
+  "fields": {
+    "user": 13,
+    "room": 29,
+    "body": "meraba",
+    "is_verified_answer": false,
+    "updated": "2026-07-14T12:49:15.847Z",
+    "created": "2026-07-14T12:49:15.847Z"
+  }
+},
+{
+  "model": "base.message",
+  "pk": 28,
+  "fields": {
+    "user": 9,
+    "room": 29,
+    "body": "meraba amhed. nasıl yardım ede bılırım",
+    "is_verified_answer": false,
+    "updated": "2026-07-14T12:50:08.342Z",
+    "created": "2026-07-14T12:50:08.342Z"
+  }
+},
+{
+  "model": "base.resource",
+  "pk": 5,
+  "fields": {
+    "user": 9,
+    "room": 29,
+    "title": "fıle",
+    "file": "resources/2026/07/gettyimages-1273516682.jpg",
+    "link": null,
+    "description": "",
+    "created": "2026-07-14T12:52:16.574Z",
+    "saved_by": []
+  }
+},
+{
+  "model": "base.resource",
+  "pk": 6,
+  "fields": {
+    "user": 9,
+    "room": 29,
+    "title": "fıle1",
+    "file": "resources/2026/07/Proliz_OBS_Rest_Web_Mali_servis_Dokumantasyonu_V2.1.pdf",
+    "link": null,
+    "description": "",
+    "created": "2026-07-14T12:52:59.109Z",
+    "saved_by": []
+  }
+},
+{
+  "model": "base.quiz",
+  "pk": 9,
+  "fields": {
+    "room": 28,
+    "creator": 9,
+    "title": "sinav 1",
+    "description": "",
+    "duration_minutes": 30,
+    "start_time": null,
+    "end_time": null,
+    "created": "2026-07-14T12:37:04.429Z",
+    "updated": "2026-07-14T12:37:04.429Z"
+  }
+},
+{
+  "model": "base.question",
+  "pk": 8,
+  "fields": {
+    "quiz": 9,
+    "question_type": "essay",
+    "text": "nasil olabilir?",
+    "option_a": null,
+    "option_b": null,
+    "option_c": null,
+    "option_d": null,
+    "correct_option": "A",
+    "points": 10
+  }
+},
+{
+  "model": "base.questionbankitem",
+  "pk": 1,
+  "fields": {
+    "creator": 9,
+    "title": "tashrihi",
+    "question_type": "essay",
+    "text": "bi soroya jevab verin?",
+    "option_a": null,
+    "option_b": null,
+    "option_c": null,
+    "option_d": null,
+    "correct_option": "A",
+    "points": 10,
+    "created_at": "2026-07-14T10:56:08.612Z"
+  }
+},
+{
+  "model": "base.quizsubmission",
+  "pk": 6,
+  "fields": {
+    "quiz": 9,
+    "student": 13,
+    "score": 7,
+    "total_questions": 10,
+    "cheat_warnings": 0,
+    "teacher_feedback": "",
+    "is_graded": true,
+    "submitted_at": "2026-07-14T12:38:00.302Z"
+  }
+},
+{
+  "model": "base.quizsubmissionanswer",
+  "pk": 2,
+  "fields": {
+    "submission": 6,
+    "question": 8,
+    "selected_option": null,
+    "essay_answer": "her zamanki gibi",
+    "awarded_points": 7,
+    "teacher_comment": "açiklama çok yeterlı olmadı"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 1,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'ikinci ders' odasındaki cevabınız Öğretim Üyesi tarafından Doğru Cevap olarak onaylandı! ✅",
+    "link": "/room/26/",
+    "is_read": true,
+    "created_at": "2026-07-13T10:21:00.433Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 2,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'ikinci ders' odasındaki cevabınız Öğretim Üyesi tarafından Doğru Cevap olarak onaylandı! ✅",
+    "link": "/room/26/",
+    "is_read": true,
+    "created_at": "2026-07-13T10:29:42.078Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 3,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'sinav test' sınavınızdaki yazılı sorular puanlandı! Notunuz: 6/10",
+    "link": "/quiz/8/",
+    "is_read": true,
+    "created_at": "2026-07-14T10:59:51.117Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 4,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'ODA 1' odasında yeni çevrimiçi sınav yayınlandı: sinav 1 📝",
+    "link": "/quiz/9/",
+    "is_read": true,
+    "created_at": "2026-07-14T12:37:05.144Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 5,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'sinav 1' sınavınızdaki yazılı sorular puanlandı! Notunuz: 7/10",
+    "link": "/quiz/9/",
+    "is_read": true,
+    "created_at": "2026-07-14T12:38:22.957Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 6,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'sinav 1' sınavınızdaki yazılı sorular puanlandı! Notunuz: 7/10",
+    "link": "/quiz/9/",
+    "is_read": true,
+    "created_at": "2026-07-14T12:46:01.756Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 7,
+  "fields": {
+    "recipient": 9,
+    "sender": 13,
+    "message": "@ogr_2024001 öğrencisi 'ODA 2' odasına yeni bir mesaj yazdı: \"meraba...\"",
+    "link": "/room/29/",
+    "is_read": true,
+    "created_at": "2026-07-14T12:49:16.384Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 8,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'ODA 2' odasında yeni ödev eklendi: odev 1 (Son Teslim: 2026-07-21T15:54)",
+    "link": "/room/29/",
+    "is_read": true,
+    "created_at": "2026-07-14T12:54:10.992Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 9,
+  "fields": {
+    "recipient": 9,
+    "sender": 13,
+    "message": "@ogr_2024001 öğrencisi 'odev 1' ödevini teslim etti!",
+    "link": "/room/29/",
+    "is_read": true,
+    "created_at": "2026-07-14T12:54:47.064Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 10,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'odev 1' ödevinize öğretim üyesi not ve değerlendirme girdi: ",
+    "link": "/room/29/",
+    "is_read": true,
+    "created_at": "2026-07-14T12:55:21.392Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 11,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'odev 1' ödevinize öğretim üyesi not ve değerlendirme girdi: 45",
+    "link": "/room/29/",
+    "is_read": true,
+    "created_at": "2026-07-14T12:55:50.398Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 12,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'odev 1' ödevinize öğretim üyesi not ve değerlendirme girdi: 45",
+    "link": "/room/29/",
+    "is_read": true,
+    "created_at": "2026-07-14T12:56:38.817Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 13,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'odev 1' ödevinize öğretim üyesi not ve değerlendirme girdi: 45",
+    "link": "/room/29/",
+    "is_read": true,
+    "created_at": "2026-07-14T12:57:08.420Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 14,
+  "fields": {
+    "recipient": 9,
+    "sender": 13,
+    "message": "@ogr_2024001 öğrencisi 'odev 1' ödevini teslim etti!",
+    "link": "/room/29/",
+    "is_read": true,
+    "created_at": "2026-07-14T13:01:12.109Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 15,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'odev 1' ödevinize öğretim üyesi not ve değerlendirme girdi: 45",
+    "link": "/room/29/",
+    "is_read": true,
+    "created_at": "2026-07-14T13:04:59.770Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 16,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'odev 1' ödevinize öğretim üyesi not ve değerlendirme girdi: 45",
+    "link": "/room/29/",
+    "is_read": true,
+    "created_at": "2026-07-14T13:05:22.563Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 17,
+  "fields": {
+    "recipient": 13,
+    "sender": 9,
+    "message": "'odev 1' ödevinize öğretim üyesi not ve değerlendirme girdi: 45",
+    "link": "/room/29/",
+    "is_read": true,
+    "created_at": "2026-07-14T13:16:48.342Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 18,
+  "fields": {
+    "recipient": 9,
+    "sender": 13,
+    "message": "📋 Ahmet Demir yoklamaya katıldı (ODA 2).",
+    "link": "/room/29/",
+    "is_read": true,
+    "created_at": "2026-07-16T07:28:09.921Z"
+  }
+},
+{
+  "model": "base.notification",
+  "pk": 19,
+  "fields": {
+    "recipient": 9,
+    "sender": 13,
+    "message": "📡 Ahmet Demir Wi-Fi IP ile yoklamaya katıldı (ODA 2).",
+    "link": "/room/29/",
+    "is_read": false,
+    "created_at": "2026-07-17T07:10:52.711Z"
+  }
+},
+{
+  "model": "base.assignment",
+  "pk": 1,
+  "fields": {
+    "room": 29,
+    "creator": 9,
+    "title": "odev 1",
+    "description": "ders ıchın proje hazırlaın",
+    "deadline": "2026-07-21T15:54:00Z",
+    "created_at": "2026-07-14T12:54:10.553Z"
+  }
+},
+{
+  "model": "base.assignmentsubmission",
+  "pk": 1,
+  "fields": {
+    "assignment": 1,
+    "student": 13,
+    "file": "assignments/2026/07/MAVİ-PALET.png",
+    "notes": "",
+    "grade": "45",
+    "teacher_feedback": "منمنمنمن",
+    "submitted_at": "2026-07-14T12:54:46.966Z"
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 1,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T06:47:58.010Z",
+    "is_active": false,
+    "secret_key": "WFQOIQVLOSFQ7DZX5DEXIYOQCUBYY7IH",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 2,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T06:48:07.927Z",
+    "is_active": false,
+    "secret_key": "KCXDFB6W5E667VXTXVZBZTRH4BKO5Y2C",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 3,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T06:48:27.164Z",
+    "is_active": false,
+    "secret_key": "LHHS7PPDQFIYUKDQV3IJ4LAQV7NWZEX6",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 4,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T06:49:33.234Z",
+    "is_active": false,
+    "secret_key": "2GQL3ZYR7TKUMEGTJUAYO2JUCQCOBVMK",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 5,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T06:50:38.479Z",
+    "is_active": false,
+    "secret_key": "W7QHSZZ2T64R27N72DAXIPYBUZ4OWKSM",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 6,
+  "fields": {
+    "room": 28,
+    "created_at": "2026-07-16T06:51:47.186Z",
+    "is_active": false,
+    "secret_key": "KKCZXAXWUB4FCXGIPXWQV2CBBHCYHMWK",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 7,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T06:58:55.064Z",
+    "is_active": false,
+    "secret_key": "34W6WHCK6VVIDC7QKU5ADWV2BGFQI4HI",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 8,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T07:09:26.482Z",
+    "is_active": false,
+    "secret_key": "AAQDIKYHGQB42NKFPSRZXJAYJ367HVLA",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 9,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T07:14:48.312Z",
+    "is_active": false,
+    "secret_key": "LEBJAD5KYKRA2NKCNYSQPP5HTXHLDPUA",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 10,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T07:23:55.939Z",
+    "is_active": false,
+    "secret_key": "MH34SQFTEYGGAKVFNBOKMVKWJGDKU3JL",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 11,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T07:27:40.321Z",
+    "is_active": false,
+    "secret_key": "UV5O2JQI6U5MO5RJAEY5OAOHNPFLNZOS",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 12,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T10:18:11.861Z",
+    "is_active": false,
+    "secret_key": "LFDLI54ABQPGDQZNSUPM4WSY73AOBYFJ",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 13,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T10:32:18.858Z",
+    "is_active": false,
+    "secret_key": "ZTQRR4BS6P7HAVPPP5QAPIMTP3GXNRJP",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 14,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T10:32:32.180Z",
+    "is_active": false,
+    "secret_key": "VN4N54MTZGAWH542OW4RBGKQCVAYM7WQ",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 15,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-16T10:32:36.953Z",
+    "is_active": false,
+    "secret_key": "2B6WTGCRRE3P432TB6CGBFJ5K2ZDJWXX",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 16,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-17T06:42:41.340Z",
+    "is_active": false,
+    "secret_key": "Q7XVA3HNK2AXHH3YG7AJ4YQCNK2IE5QK",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 17,
+  "fields": {
+    "room": 29,
+    "created_at": "2026-07-17T06:45:59.285Z",
+    "is_active": true,
+    "secret_key": "3RG3ZOTROFOBEZTSJCA5G75FYD4746G4",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancesession",
+  "pk": 18,
+  "fields": {
+    "room": 28,
+    "created_at": "2026-07-17T08:20:00.399Z",
+    "is_active": true,
+    "secret_key": "AK365FE3AADCPWL5T7TYGK4URQRJY4MO",
+    "teacher_ip": "192.168.1.172",
+    "require_ip_check": true,
+    "allow_qr_check": true
+  }
+},
+{
+  "model": "base.attendancerecord",
+  "pk": 1,
+  "fields": {
+    "session": 10,
+    "student": 13,
+    "timestamp": "2026-07-16T07:24:03.909Z",
+    "status": "present",
+    "client_ip": "127.0.0.1"
+  }
+},
+{
+  "model": "base.attendancerecord",
+  "pk": 2,
+  "fields": {
+    "session": 11,
+    "student": 13,
+    "timestamp": "2026-07-16T07:28:09.755Z",
+    "status": "present",
+    "client_ip": "127.0.0.1"
+  }
+},
+{
+  "model": "base.attendancerecord",
+  "pk": 3,
+  "fields": {
+    "session": 17,
+    "student": 9,
+    "timestamp": "2026-07-17T07:08:51.069Z",
+    "status": "present",
+    "client_ip": "127.0.0.1"
+  }
+},
+{
+  "model": "base.attendancerecord",
+  "pk": 4,
+  "fields": {
+    "session": 17,
+    "student": 13,
+    "timestamp": "2026-07-17T07:10:52.292Z",
+    "status": "present",
+    "client_ip": "127.0.0.1"
+  }
+},
+{
+  "model": "base.attendancerecord",
+  "pk": 5,
+  "fields": {
+    "session": 18,
+    "student": 9,
+    "timestamp": "2026-07-17T08:20:24.683Z",
+    "status": "present",
+    "client_ip": "127.0.0.1"
+  }
+}
+]
