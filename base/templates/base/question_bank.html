@@ -6,7 +6,7 @@
     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; box-shadow: 0 10px 30px rgba(15, 59, 140, 0.05); margin-bottom: 28px; width: 100%;">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
         <div>
-          <a href="{% url 'home' %}" style="color: #ea580c; font-weight: 700; font-size: 0.92rem; text-decoration: none; display: inline-block; margin-bottom: 8px;">
+          <a href="{% url 'home' %}" style="color: #0f3b8c; font-weight: 700; font-size: 0.92rem; text-decoration: none; display: inline-block; margin-bottom: 8px;">
             &larr; Ana Sayfaya Geri Dön
           </a>
           <h1 style="margin: 0; font-size: 1.8rem; color: #0f3b8c; font-weight: 800;">Kişisel Soru Bankası Yönetim Paneli</h1>
@@ -69,7 +69,7 @@
             <label style="font-weight: 700; color: #0f3b8c; margin-right: 12px;">Doğru Cevap Seçeneği:</label>
             <span style="display: inline-block;">{{ form.correct_option }}</span>
           </div>
-          <button type="submit" style="padding: 13px 28px; font-weight: 700; font-size: 1rem; background: #ea580c; color: #ffffff; border: 1px solid #c2410c; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(234, 88, 12, 0.28);">
+          <button type="submit" style="padding: 13px 28px; font-weight: 700; font-size: 1rem; background: #0f3b8c; color: #ffffff; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(15, 59, 140, 0.2);">
             + Soru Bankasına Kaydet
           </button>
         </div>
@@ -111,7 +111,7 @@
         <div style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 22px; margin-bottom: 18px; background: #f8fafc;">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
             <div>
-              <span style="background: #e0e7ff; color: #3730a3; font-weight: 700; font-size: 0.82rem; padding: 4px 10px; border-radius: 6px;">
+              <span style="background: #ffffff; border: 1px solid #cbd5e1; color: #0f3b8c; font-weight: 700; font-size: 0.82rem; padding: 4px 10px; border-radius: 6px;">
                 {{ item.title }} | {{ item.get_question_type_display }} ({{ item.points }} Puan)
               </span>
               <div style="font-weight: 700; color: #0f3b8c; font-size: 1.12rem; margin-top: 8px;">
@@ -143,7 +143,7 @@
             </div>
           </div>
           {% else %}
-          <div style="padding: 14px; background: #fffaf0; border: 1px dashed #f6ad55; border-radius: 8px; color: #9a3412; font-size: 0.92rem;">
+          <div style="padding: 14px; background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 8px; color: #64748b; font-size: 0.92rem;">
             Açık Uçlu / Klasik Soru
           </div>
           {% endif %}

@@ -52,7 +52,7 @@
       <div class="roomList__header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(15, 59, 140, 0.04);">
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
           <h2 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: #0f3b8c; letter-spacing: -0.3px; text-transform: none;">Çalışma & Ders Odaları</h2>
-          <span style="background: #eff6ff; color: #1e40af; font-size: 0.78rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; border: 1px solid #bfdbfe; white-space: nowrap;">{{room_count}} Oda Aktif</span>
+          <span style="background: #f8fafc; color: #0f3b8c; font-size: 0.78rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; border: 1px solid #cbd5e1; white-space: nowrap;">{{room_count}} Oda Aktif</span>
         </div>
 
         {% if request.user.role == 'faculty' or request.user.role == 'teacher' or request.user.is_superuser %}

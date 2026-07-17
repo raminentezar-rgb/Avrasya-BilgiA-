@@ -3,3 +3,6 @@ __pycache__/
 *.pyo
 *$py.class
 AVRASYA-TURN-KE_repo/
+*.xlsx
+staticfiles/
+static/files/

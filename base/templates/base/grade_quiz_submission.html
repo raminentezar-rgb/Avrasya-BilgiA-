@@ -8,7 +8,7 @@
     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px 32px; box-shadow: 0 10px 30px rgba(15, 59, 140, 0.05); margin-bottom: 28px;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
         <div>
-          <a href="{% url 'quiz-detail' quiz.id %}" style="color: #ea580c; font-weight: 700; font-size: 0.92rem; text-decoration: none; display: inline-block; margin-bottom: 8px;">
+          <a href="{% url 'quiz-detail' quiz.id %}" style="color: #0f3b8c; font-weight: 700; font-size: 0.92rem; text-decoration: none; display: inline-block; margin-bottom: 8px;">
             &larr; {{ quiz.title }} Sınavına Geri Dön
           </a>
           <h1 style="margin: 0; font-size: 1.8rem; color: #0f3b8c; font-weight: 800;">Sınav Kağıdı Değerlendirme & Puanlama Paneli</h1>
@@ -18,7 +18,7 @@
         </div>
         <div style="text-align: right;">
           <div style="font-size: 0.88rem; color: #64748b;">Mevcut Toplam Puan</div>
-          <div style="font-size: 2.2rem; font-weight: 900; color: #ea580c;">
+          <div style="font-size: 2.2rem; font-weight: 900; color: #0f3b8c;">
             {{ submission.score }} / {{ submission.total_questions }}
           </div>
           {% if submission.cheat_warnings > 0 %}
@@ -26,7 +26,7 @@
             {{ submission.cheat_warnings }} Sekme İhlali Tespit Edildi
           </div>
           {% else %}
-          <div style="color: #16a34a; font-size: 0.85rem; font-weight: 700; margin-top: 6px;">İhlalsiz Temiz Gönderim</div>
+          <div style="color: #0f3b8c; font-size: 0.85rem; font-weight: 700; margin-top: 6px;">İhlalsiz Temiz Gönderim</div>
           {% endif %}
         </div>
       </div>
@@ -55,7 +55,7 @@
                 {{ ans.question.text }}
               </div>
             </div>
-            <div style="font-weight: 800; font-size: 1.15rem; color: {% if ans.awarded_points > 0 %}#16a34a{% else %}#dc2626{% endif %}">
+            <div style="font-weight: 800; font-size: 1.15rem; color: {% if ans.awarded_points > 0 %}#0f3b8c{% else %}#dc2626{% endif %}">
               {{ ans.awarded_points }} / {{ ans.question.points }} Puan
             </div>
           </div>
@@ -88,7 +88,7 @@
                 <label style="display: block; font-weight: 700; color: #1e293b; font-size: 0.92rem; margin-bottom: 6px;">
                   Verilen Puan (Max: {{ ans.question.points }})
                 </label>
-                <input type="number" name="points_{{ ans.id }}" value="{{ ans.awarded_points }}" max="{{ ans.question.points }}" min="0" required style="width: 100%; border: 2px solid #ea580c; border-radius: 8px; padding: 10px 14px; font-weight: 800; font-size: 1.1rem; color: #0f3b8c;">
+                <input type="number" name="points_{{ ans.id }}" value="{{ ans.awarded_points }}" max="{{ ans.question.points }}" min="0" required style="width: 100%; border: 2px solid #0f3b8c; border-radius: 8px; padding: 10px 14px; font-weight: 800; font-size: 1.1rem; color: #0f3b8c;">
               </div>
               <div>
                 <label style="display: block; font-weight: 700; color: #1e293b; font-size: 0.92rem; margin-bottom: 6px;">
@@ -115,7 +115,7 @@
           <a href="{% url 'quiz-detail' quiz.id %}" style="padding: 14px 28px; font-weight: 700; color: #64748b; background: #f1f5f9; border-radius: 10px; text-decoration: none;">
             İptal
           </a>
-          <button type="submit" style="padding: 15px 36px; font-size: 1.1rem; font-weight: 800; background: #ea580c; color: #ffffff; border: 1px solid #c2410c; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(234, 88, 12, 0.28);">
+          <button type="submit" style="padding: 15px 36px; font-size: 1.1rem; font-weight: 800; background: #0f3b8c; color: #ffffff; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(15, 59, 140, 0.2);">
             Puanlamayı ve Değerlendirmeyi Kaydet &rarr;
           </button>
         </div>

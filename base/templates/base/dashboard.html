@@ -71,7 +71,7 @@
       <!-- Action Button at Bottom of Sidebar (Like 'Add Project' button in the template image!) -->
       <div style="padding-top: 20px;">
         {% if is_faculty %}
-        <a href="{% url 'create-room' %}" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #2563eb; color: #ffffff; padding: 14px 20px; border-radius: 14px; font-weight: 800; text-decoration: none; font-size: 0.95rem; box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3); transition: transform 0.2s ease;">
+        <a href="{% url 'create-room' %}" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #0f3b8c; color: #ffffff; padding: 14px 20px; border-radius: 14px; font-weight: 800; text-decoration: none; font-size: 0.95rem; box-shadow: 0 6px 20px rgba(15, 59, 140, 0.25); transition: transform 0.2s ease;">
           + Yeni Ders Odası Aç
         </a>
         {% else %}
@@ -89,7 +89,7 @@
       <div class="dashboard-top-banner">
         <div>
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-            <span style="background: {% if is_faculty %}#e0e7ff; color: #3730a3;{% else %}#dcfce7; color: #15803d;{% endif %} padding: 4px 14px; border-radius: 20px; font-weight: 800; font-size: 0.84rem; display: inline-flex; align-items: center; gap: 6px;">
+            <span style="background: #f8fafc; border: 1px solid #cbd5e1; color: #0f3b8c; padding: 4px 14px; border-radius: 20px; font-weight: 800; font-size: 0.84rem; display: inline-flex; align-items: center; gap: 6px;">
               {% if is_faculty %}Öğretim Üyesi / Akademisyen Paneli{% else %}Öğrenci Akademik Paneli{% endif %}
             </span>
             <span style="color: #64748b; font-size: 0.9rem; font-weight: 700;">{{ request.user.department|default:"Genel / Diğer" }}</span>
@@ -103,14 +103,14 @@
         </div>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
           {% if is_faculty %}
-          <a href="{% url 'question-bank' %}" style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 10px 18px; border-radius: 12px; font-weight: 700; text-decoration: none; font-size: 0.9rem;">
+          <a href="{% url 'question-bank' %}" style="background: #ffffff; border: 1px solid #cbd5e1; color: #0f3b8c; padding: 10px 18px; border-radius: 12px; font-weight: 700; text-decoration: none; font-size: 0.9rem;">
             Soru Bankasına Git
           </a>
-          <a href="{% url 'create-quiz-general' %}" style="background: #ea580c; color: #ffffff; padding: 10px 18px; border-radius: 12px; font-weight: 800; text-decoration: none; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);">
+          <a href="{% url 'create-quiz-general' %}" style="background: #d97706; color: #ffffff; padding: 10px 18px; border-radius: 12px; font-weight: 800; text-decoration: none; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);">
             Hızlı Sınav Tasarla
           </a>
           {% else %}
-          <a href="{% url 'quizzes' %}" style="background: #2563eb; color: #ffffff; padding: 10px 18px; border-radius: 12px; font-weight: 800; text-decoration: none; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+          <a href="{% url 'quizzes' %}" style="background: #0f3b8c; color: #ffffff; padding: 10px 18px; border-radius: 12px; font-weight: 800; text-decoration: none; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(15, 59, 140, 0.2);">
             Tüm Sınavları Gör
           </a>
           {% endif %}
@@ -130,7 +130,7 @@
             <div class="stat-number">{{ hosted_rooms.count }}</div>
             <div class="stat-label">Yönetilen Ders Odaları</div>
           </div>
-          <div style="margin-top: 14px; font-size: 0.82rem; color: #2563eb; font-weight: 700;">Aktif Çalışma Odalarınız &rarr;</div>
+          <div style="margin-top: 14px; font-size: 0.82rem; color: #0f3b8c; font-weight: 700;">Aktif Çalışma Odalarınız &rarr;</div>
         </div>
 
         <div class="dashboard-stat-card stat-card-emerald">
@@ -139,7 +139,7 @@
             <div class="stat-number">{{ question_bank_count }}</div>
             <div class="stat-label">Soru Bankası Mevcudu</div>
           </div>
-          <div style="margin-top: 14px; font-size: 0.82rem; color: #16a34a; font-weight: 700;">Hazır Soru Havuzu &rarr;</div>
+          <div style="margin-top: 14px; font-size: 0.82rem; color: #0f3b8c; font-weight: 700;">Hazır Soru Havuzu &rarr;</div>
         </div>
 
         <div class="dashboard-stat-card stat-card-amber">
@@ -157,23 +157,62 @@
             <div class="stat-number">{{ pending_ass_submissions.count }}</div>
             <div class="stat-label">Bekleyen Ödev Teslimi</div>
           </div>
-          <div style="margin-top: 14px; font-size: 0.82rem; color: #9333ea; font-weight: 700;">İnceleme Bekleyenler &rarr;</div>
+          <div style="margin-top: 14px; font-size: 0.82rem; color: #d97706; font-weight: 700;">İnceleme Bekleyenler &rarr;</div>
         </div>
+      </div>
+
+      <!-- Excel Bulk Student & Grade/Attendance Management Card (Proliz OBS Alternative) -->
+      <div class="dashboard-table-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #0f3b8c; border-radius: 14px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 59, 140, 0.05); margin-bottom: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+          <div>
+            <h2 style="margin: 0 0 6px 0; font-size: 1.3rem; color: #0f3b8c; font-weight: 900; display: flex; align-items: center; gap: 10px;">
+              <i class="fas fa-file-excel" style="color: #d97706;"></i> Excel ile Toplu Öğrenci Ekleme & Not/Yoklama Aktarım Paneli (Proliz OBS Alternatifi)
+            </h2>
+            <p style="margin: 0; color: #64748b; font-size: 0.94rem; line-height: 1.5;">
+              Proliz OBS sistemine bağlı kalmadan üniversite öğrencilerini topluca sisteme kaydedebilir, derslerinize üye yapabilir ve başlangıç not/yoklama verilerini tek seferde aktarabilirsiniz.
+            </p>
+          </div>
+          <div>
+            <a href="{% url 'download-student-template' %}" style="background: #0f3b8c; color: #ffffff; padding: 11px 20px; border-radius: 10px; font-weight: 800; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(15, 59, 140, 0.2);">
+              <i class="fas fa-download"></i> Örnek Şablonu İndir (.xlsx)
+            </a>
+          </div>
+        </div>
+
+        <form action="{% url 'bulk-import-students-general' %}" method="POST" enctype="multipart/form-data" style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+          {% csrf_token %}
+          <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 280px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: #fffaf0; border: 1px solid #fbd38d; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #d97706;">
+              <i class="fas fa-upload"></i>
+            </div>
+            <div>
+              <label style="display: block; font-weight: 800; color: #0f3b8c; font-size: 0.95rem; margin-bottom: 4px;">
+                Doldurulan Excel Şablonunu Yükleyin
+              </label>
+              <input type="file" name="excel_file" accept=".xlsx,.xls,.csv" required style="font-size: 0.88rem; color: #334155;">
+            </div>
+          </div>
+          <div>
+            <button type="submit" style="background: #d97706; color: #ffffff; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 800; font-size: 0.92rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);">
+              <i class="fas fa-check-circle"></i> Yükle ve Öğrencileri Kaydet &rarr;
+            </button>
+          </div>
+        </form>
       </div>
 
       <!-- Priority Grading Inbox Table Card -->
       <div class="dashboard-table-card">
         <div class="dashboard-table-header">
-          <h2 style="margin: 0; font-size: 1.3rem; color: #b91c1c; font-weight: 900; display: flex; align-items: center; gap: 10px;">
+          <h2 style="margin: 0; font-size: 1.3rem; color: #0f3b8c; font-weight: 900; display: flex; align-items: center; gap: 10px;">
             Öncelikli Değerlendirme Kutusu (Bekleyen Yazılı ve Ödevler)
           </h2>
-          <span style="background: #fee2e2; color: #991b1b; font-weight: 800; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem;">
+          <span style="background: #f8fafc; border: 1px solid #cbd5e1; color: #0f3b8c; font-weight: 800; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem;">
             Toplam {{ pending_quiz_submissions.count|add:pending_ass_submissions.count }} Bekleyen Gönderim
           </span>
         </div>
 
         {% if pending_quiz_submissions or pending_ass_submissions %}
-        <div style="overflow-x: auto;">
+        <div class="dashboard-table-responsive" style="overflow-x: auto;">
           <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 800px;">
             <thead>
               <tr style="border-bottom: 2px solid #e2e8f0; background: #f8fafc; color: #475569; font-size: 0.92rem;">
@@ -201,7 +240,7 @@
                 <td style="padding: 16px 14px; font-weight: 700; color: #1e40af;">{{ qs.quiz.title }}</td>
                 <td style="padding: 16px 14px; color: #64748b; font-size: 0.88rem;">{{ qs.submitted_at|date:"d M Y H:i" }}</td>
                 <td style="padding: 16px 14px;">
-                  <a href="{% url 'grade-quiz-submission' qs.id %}" style="background: #ea580c; color: #ffffff; padding: 8px 16px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                  <a href="{% url 'grade-quiz-submission' qs.id %}" style="background: #0f3b8c; color: #ffffff; padding: 8px 16px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
                     Puanla / Değerlendir
                   </a>
                 </td>
@@ -245,13 +284,13 @@
           <h2 style="margin: 0; font-size: 1.3rem; color: #0f3b8c; font-weight: 900; display: flex; align-items: center; gap: 10px;">
             Yönettiğiniz Ders Odaları ve Not Defterleri ({{ hosted_rooms.count }} Oda)
           </h2>
-          <a href="{% url 'create-room' %}" style="color: #ea580c; font-weight: 800; text-decoration: none; font-size: 0.92rem;">
+          <a href="{% url 'create-room' %}" style="color: #0f3b8c; font-weight: 800; text-decoration: none; font-size: 0.92rem;">
             Yeni Oda Oluştur &rarr;
           </a>
         </div>
 
         {% if hosted_rooms %}
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 20px;">
+        <div class="dashboard-grid-cards" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 20px;">
           {% for hr in hosted_rooms %}
           <div style="border: 1px solid #cbd5e1; border-radius: 16px; padding: 22px; background: #fafcff; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 8px 25px rgba(15, 59, 140, 0.1)'" onmouseout="this.style.boxShadow='none'">
             <div>
@@ -269,16 +308,16 @@
               </p>
             </div>
             <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
-              <a href="{% url 'start-attendance-session' hr.id %}" style="background: #10b981; color: #ffffff; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 0.84rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;" title="QR Kod & Wi-Fi IP ile Canlı Sınıf Yoklaması Başlat">
+              <a href="{% url 'start-attendance-session' hr.id %}" style="background: #0f3b8c; color: #ffffff; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 0.84rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;" title="QR Kod & Wi-Fi IP ile Canlı Sınıf Yoklaması Başlat">
                 <i class="fas fa-qrcode"></i> Yoklama Başlat
               </a>
-              <a href="{% url 'room-gradebook' hr.id %}" style="background: #2563eb; color: #ffffff; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 0.84rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+              <a href="{% url 'room-gradebook' hr.id %}" style="background: #ffffff; color: #0f3b8c; border: 1px solid #cbd5e1; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 0.84rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                 Not Defteri
               </a>
-              <a href="{% url 'create-quiz' hr.id %}" style="background: #ea580c; color: #ffffff; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 0.84rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+              <a href="{% url 'create-quiz' hr.id %}" style="background: #d97706; color: #ffffff; padding: 8px 14px; border-radius: 8px; font-weight: 800; font-size: 0.84rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                 Sınav Ekle
               </a>
-              <a href="{% url 'room' hr.id %}" style="color: #475569; font-weight: 700; font-size: 0.85rem; text-decoration: none;">
+              <a href="{% url 'room' hr.id %}" style="color: #0f3b8c; font-weight: 800; font-size: 0.85rem; text-decoration: none;">
                 Giriş &rarr;
               </a>
             </div>
@@ -304,7 +343,7 @@
         </div>
 
         {% if recent_quiz_submissions or recent_ass_submissions %}
-        <div style="overflow-x: auto;">
+        <div class="dashboard-table-responsive" style="overflow-x: auto;">
           <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 800px;">
             <thead>
               <tr style="border-bottom: 2px solid #e2e8f0; background: #f8fafc; color: #475569; font-size: 0.92rem;">
@@ -377,7 +416,7 @@
                   {% endif %}
                 </td>
                 <td style="padding: 16px 14px;">
-                  <a href="{% url 'grade-quiz-submission' qs.id %}" style="background: #ea580c; color: #ffffff; padding: 8px 16px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                  <a href="{% url 'grade-quiz-submission' qs.id %}" style="background: #0f3b8c; color: #ffffff; padding: 8px 16px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
                     Detay / Değerlendir
                   </a>
                 </td>
@@ -396,10 +435,10 @@
       {% else %} <!-- IF STUDENT -->
 
       {% if active_attendance_sessions %}
-      <div style="background: linear-gradient(135deg, #065f46 0%, #10b981 100%); color: white; padding: 20px 24px; border-radius: 14px; margin-bottom: 24px; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35); border: 2px solid rgba(255,255,255,0.2);">
+      <div style="background: linear-gradient(135deg, #0f3b8c 0%, #1e3a8a 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px; box-shadow: 0 8px 25px rgba(15, 59, 140, 0.25); border: 1px solid rgba(255,255,255,0.2);">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
           <div style="display: flex; align-items: center; gap: 14px;">
-            <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.6rem;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
               🔴
             </div>
             <div>
@@ -410,7 +449,7 @@
         </div>
         <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
           {% for as_sess in active_attendance_sessions %}
-          <a href="{% url 'student_ip_checkin' %}?session={{ as_sess.id }}" style="background: white; color: #065f46; padding: 12px 22px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+          <a href="{% url 'student_ip_checkin' %}?session={{ as_sess.id }}" style="background: #ffffff; color: #0f3b8c; padding: 12px 22px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
             📡 {{ as_sess.room.name }} - Wi-Fi IP ile Şimdi Yoklama Ver
           </a>
           {% endfor %}
@@ -426,7 +465,7 @@
             <div class="stat-number">{{ enrolled_rooms.count }}</div>
             <div class="stat-label">Katılınan Ders Odaları</div>
           </div>
-          <div style="margin-top: 14px; font-size: 0.82rem; color: #2563eb; font-weight: 700;">Üye Olduğunuz Odalar &rarr;</div>
+          <div style="margin-top: 14px; font-size: 0.82rem; color: #0f3b8c; font-weight: 700;">Üye Olduğunuz Odalar &rarr;</div>
         </div>
 
         <div class="dashboard-stat-card stat-card-amber">
@@ -444,16 +483,16 @@
             <div class="stat-number">{{ my_ass_submissions.count }}</div>
             <div class="stat-label">Teslim Edilen Ödevler</div>
           </div>
-          <div style="margin-top: 14px; font-size: 0.82rem; color: #9333ea; font-weight: 700;">Gönderilen Ödev Dosyaları &rarr;</div>
+          <div style="margin-top: 14px; font-size: 0.82rem; color: #0f3b8c; font-weight: 700;">Gönderilen Ödev Dosyaları &rarr;</div>
         </div>
 
-        <div class="dashboard-stat-card stat-card-emerald">
+        <div class="dashboard-stat-card stat-card-blue">
           <div>
             <div class="stat-icon-wrapper">BAŞARI</div>
-            <div class="stat-number">%{{ avg_score_pct }}</div>
-            <div class="stat-label">Genel Sınav Başarısı</div>
+            <div class="stat-number">{{ avg_score|default:"-" }}{% if avg_score %}%{% endif %}</div>
+            <div class="stat-label">Genel Başarı Oranı</div>
           </div>
-          <div style="margin-top: 14px; font-size: 0.82rem; color: #16a34a; font-weight: 700;">Ortalama Başarı Oranınız &rarr;</div>
+          <div style="margin-top: 14px; font-size: 0.82rem; color: #0f3b8c; font-weight: 700;">Ortalama Başarı Oranınız &rarr;</div>
         </div>
       </div>
 
@@ -469,7 +508,7 @@
         </div>
 
         {% if active_quizzes or active_assignments %}
-        <div style="overflow-x: auto;">
+        <div class="dashboard-table-responsive" style="overflow-x: auto;">
           <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 750px;">
             <thead>
               <tr style="border-bottom: 2px solid #e2e8f0; background: #f8fafc; color: #475569; font-size: 0.92rem;">
@@ -485,7 +524,7 @@
               {% for aq in active_quizzes %}
               <tr style="border-bottom: 1px solid #f1f5f9; font-size: 0.95rem;">
                 <td style="padding: 16px 14px;">
-                  <span style="background: #eff6ff; color: #2563eb; font-weight: 800; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 6px;">
+                  <span style="background: #f8fafc; border: 1px solid #cbd5e1; color: #0f3b8c; font-weight: 800; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 6px;">
                     Online Sınav / Quiz
                   </span>
                 </td>
@@ -494,7 +533,7 @@
                 <td style="padding: 16px 14px; color: #dc2626; font-weight: 700;">{{ aq.end_time|date:"d M Y H:i"|default:"Belirtilmedi" }}</td>
                 <td style="padding: 16px 14px; color: #64748b;">{{ aq.duration_minutes }} Dakika</td>
                 <td style="padding: 16px 14px;">
-                  <a href="{% url 'quiz-detail' aq.id %}" style="background: #16a34a; color: #ffffff; padding: 8px 16px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                  <a href="{% url 'quiz-detail' aq.id %}" style="background: #0f3b8c; color: #ffffff; padding: 8px 16px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
                     Sınava Gir
                   </a>
                 </td>
@@ -513,7 +552,7 @@
                 <td style="padding: 16px 14px; color: #dc2626; font-weight: 700;">{{ aa.deadline|date:"d M Y H:i" }}</td>
                 <td style="padding: 16px 14px; color: #64748b;">Dosya Yükleme</td>
                 <td style="padding: 16px 14px;">
-                  <a href="{% url 'room' aa.room.id %}" style="background: #3b82f6; color: #ffffff; padding: 8px 16px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                  <a href="{% url 'room' aa.room.id %}" style="background: #0f3b8c; color: #ffffff; padding: 8px 16px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
                     Ödev Gönder
                   </a>
                 </td>
@@ -535,13 +574,13 @@
           <h2 style="margin: 0; font-size: 1.3rem; color: #0f3b8c; font-weight: 900; display: flex; align-items: center; gap: 10px;">
             Geçmiş Sınav ve Ödev Sonuçlarım & Aldığım Notlar
           </h2>
-          <span style="background: #f0fdf4; color: #16a34a; font-weight: 800; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem;">
+          <span style="background: #f8fafc; border: 1px solid #cbd5e1; color: #0f3b8c; font-weight: 800; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem;">
             Puan ve Geri Bildirimler
           </span>
         </div>
 
         {% if my_quiz_submissions or my_ass_submissions %}
-        <div style="overflow-x: auto;">
+        <div class="dashboard-table-responsive" style="overflow-x: auto;">
           <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 800px;">
             <thead>
               <tr style="border-bottom: 2px solid #e2e8f0; background: #f8fafc; color: #475569; font-size: 0.92rem;">
@@ -602,7 +641,7 @@
                   <a href="{% url 'quiz-detail' mqs.quiz.id %}" style="text-decoration: none; color: inherit;">{{ mqs.quiz.title }}</a>
                 </td>
                 <td style="padding: 16px 14px; font-weight: 600; color: #475569;">{{ mqs.quiz.room.name }}</td>
-                <td style="padding: 16px 14px; font-weight: 900; font-size: 1.05rem; color: #ea580c;">
+                <td style="padding: 16px 14px; font-weight: 900; font-size: 1.05rem; color: #d97706;">
                   {{ mqs.score }} / {{ mqs.total_questions }}
                 </td>
                 <td style="padding: 16px 14px;">
@@ -642,13 +681,13 @@
           <h2 style="margin: 0; font-size: 1.3rem; color: #0f3b8c; font-weight: 900; display: flex; align-items: center; gap: 10px;">
             Üye Olduğunuz / Katıldığınız Çalışma Odaları ({{ enrolled_rooms.count }} Oda)
           </h2>
-          <a href="{% url 'home' %}" style="color: #2563eb; font-weight: 800; text-decoration: none; font-size: 0.92rem;">
+          <a href="{% url 'home' %}" style="color: #0f3b8c; font-weight: 800; text-decoration: none; font-size: 0.92rem;">
             Yeni Oda Keşfet &rarr;
           </a>
         </div>
 
         {% if enrolled_rooms %}
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px;">
+        <div class="dashboard-grid-cards" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px;">
           {% for er in enrolled_rooms %}
           <div style="border: 1px solid #e2e8f0; border-radius: 16px; padding: 22px; background: #f8fafc; display: flex; flex-direction: column; justify-content: space-between;">
             <div>

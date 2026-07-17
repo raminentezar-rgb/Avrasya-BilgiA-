@@ -1474,3 +1474,211 @@ def export_attendance_report(request, session_id):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     wb.save(response)
     return response
+
+
+def download_student_template(request):
+    """
+    Excel ile Toplu Öğrenci Kaydı, Not ve Yoklama Şablonunu dinamik olarak veya dosyadan indirir.
+    """
+    import io
+    from generate_template import generate_student_excel_template
+    
+    output = io.BytesIO()
+    wb_path = generate_student_excel_template()
+    with open(wb_path, 'rb') as f:
+        output.write(f.read())
+    output.seek(0)
+    
+    response = HttpResponse(output.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="Avrasya_Ogrenci_ve_Not_Sablonu.xlsx"'
+    return response
+
+
+@login_required(login_url='login')
+def bulk_import_students(request, room_id=None):
+    """
+    Öğretim üyeleri tarafından yüklenen Excel veya CSV dosyasını işleyerek:
+    1. Öğrenci hesaplarını (User - student) veritabanında oluşturur veya günceller (Proliz API'ye gerek kalmaz)
+    2. Seçili odaya (Room) öğrencileri topluca kaydeder
+    3. Opsiyonel olarak Başlangıç Notu ve Yoklama sayısını işler.
+    """
+    if request.method != 'POST':
+        return redirect('home')
+
+    room = None
+    if room_id:
+        room = get_object_or_404(Room, id=room_id)
+        if request.user != room.host and request.user.role != 'faculty' and not request.user.is_superuser:
+            messages.error(request, "Bu odaya toplu öğrenci ve not ekleme yetkiniz bulunmamaktadır.")
+            return redirect('room', pk=room.id)
+    elif request.user.role != 'faculty' and not request.user.is_superuser:
+        messages.error(request, "Toplu öğrenci ve not ekleme işlemi için öğretim üyesi yetkisi gerekir.")
+        return redirect('dashboard')
+
+    excel_file = request.FILES.get('excel_file')
+    if not excel_file:
+        messages.error(request, "Lütfen yüklemek için bir Excel (.xlsx/.xls) veya CSV dosyası seçiniz!")
+        return redirect('room', pk=room.id) if room else redirect('dashboard')
+
+    filename = excel_file.name.lower()
+    created_count = 0
+    updated_count = 0
+    enrolled_count = 0
+    graded_count = 0
+    attendance_recorded_count = 0
+
+    try:
+        rows = []
+        if filename.endswith('.csv'):
+            import csv
+            decoded_file = excel_file.read().decode('utf-8-sig').splitlines()
+            reader = csv.reader(decoded_file, delimiter=';')
+            rows = list(reader)
+            if rows and len(rows[0]) <= 1:
+                reader = csv.reader(decoded_file, delimiter=',')
+                rows = list(reader)
+        else:
+            import openpyxl
+            wb = openpyxl.load_workbook(excel_file, data_only=True)
+            ws = wb.active
+            for r in ws.iter_rows(values_only=True):
+                if any(r):
+                    rows.append([str(c).strip() if c is not None else '' for c in r])
+
+        # Filter out header/info rows
+        data_rows = []
+        for r in rows:
+            if not r or not r[0]:
+                continue
+            first_val = str(r[0]).strip().lower()
+            if any(kw in first_val for kw in ['avrasya', 'öğrenci no', 'ogrenci no', 'öğrenci numarası', 'not:', 'toplam', 'zorunlu']):
+                continue
+            data_rows.append(r)
+
+        if not data_rows:
+            messages.warning(request, "Yüklenen dosyada geçerli öğrenci veri satırı bulunamadı! Lütfen şablonu kontrol ediniz.")
+            return redirect('room', pk=room.id) if room else redirect('dashboard')
+
+        from django.db import transaction
+        with transaction.atomic():
+            for idx, row in enumerate(data_rows, start=1):
+                if len(row) < 2 or not row[0].strip() or not row[1].strip():
+                    continue
+                student_id = str(row[0]).strip()
+                full_name = str(row[1]).strip()
+                email = str(row[2]).strip() if len(row) > 2 and row[2].strip() else f"{student_id}@ogrenci.avrasya.edu.tr"
+                department = str(row[3]).strip() if len(row) > 3 and row[3].strip() else 'Bilgisayar Mühendisliği'
+                password = str(row[4]).strip() if len(row) > 4 and row[4].strip() else 'Avrasya2026!'
+
+                initial_grade = None
+                if len(row) > 5 and row[5].strip():
+                    try:
+                        initial_grade = float(row[5].strip().replace(',', '.'))
+                    except ValueError:
+                        pass
+
+                attendance_count = None
+                if len(row) > 6 and row[6].strip():
+                    try:
+                        attendance_count = int(float(row[6].strip()))
+                    except ValueError:
+                        pass
+
+                user = User.objects.filter(Q(student_id=student_id) | Q(email=email)).first()
+                if not user:
+                    username_base = f"ogr_{student_id}"
+                    if User.objects.filter(username=username_base).exists():
+                        username_base = f"ogr_{student_id}_{idx}"
+                    user = User.objects.create_user(
+                        username=username_base,
+                        email=email,
+                        password=password,
+                        name=full_name,
+                        student_id=student_id,
+                        department=department,
+                        role='student'
+                    )
+                    created_count += 1
+                else:
+                    changed = False
+                    if not user.name or user.name == user.username:
+                        user.name = full_name
+                        changed = True
+                    if not user.student_id:
+                        user.student_id = student_id
+                        changed = True
+                    if department and department != 'Bilgisayar Mühendisliği':
+                        user.department = department
+                        changed = True
+                    if changed:
+                        user.save()
+                        updated_count += 1
+
+                # Enroll in Room if room provided
+                if room:
+                    if user not in room.participants.all():
+                        room.participants.add(user)
+                        enrolled_count += 1
+
+                    # Process grade if provided
+                    if initial_grade is not None:
+                        quiz, _ = Quiz.objects.get_or_create(
+                            room=room,
+                            title=f"Excel Aktarılan Notlar ({room.name})",
+                            defaults={
+                                'description': 'Excel şablonundan toplu yüklenen başlangıç/ara sınav notları',
+                                'creator': request.user,
+                                'is_active': False
+                            }
+                        )
+                        sub, sub_created = QuizSubmission.objects.get_or_create(
+                            quiz=quiz,
+                            student=user,
+                            defaults={
+                                'score': initial_grade,
+                                'total_questions': 100,
+                                'is_graded': True,
+                                'teacher_feedback': f"Excel ile toplu yüklendi (Başlangıç Puanı: {initial_grade})"
+                            }
+                        )
+                        if not sub_created:
+                            sub.score = initial_grade
+                            sub.is_graded = True
+                            sub.teacher_feedback = f"Excel ile güncellendi (Başlangıç Puanı: {initial_grade})"
+                            sub.save()
+                        graded_count += 1
+
+                    # Process historical attendance count if provided
+                    if attendance_count is not None and attendance_count > 0:
+                        session, _ = AttendanceSession.objects.get_or_create(
+                            room=room,
+                            is_active=False,
+                            defaults={'teacher_ip': '127.0.0.1'}
+                        )
+                        rec, rec_created = AttendanceRecord.objects.get_or_create(
+                            session=session,
+                            student=user,
+                            defaults={
+                                'status': 'present',
+                                'client_ip': f"Excel_Aktarimi ({attendance_count} Katilim)"
+                            }
+                        )
+                        if not rec_created and not rec.client_ip.startswith('Excel_Aktarimi'):
+                            rec.client_ip = f"Excel_Aktarimi ({attendance_count} Katilim)"
+                            rec.save()
+                        attendance_recorded_count += 1
+
+        msg = f"Excel İşlemi Tamamlandı: {created_count} yeni öğrenci hesabı oluşturuldu, {updated_count} hesap güncellendi."
+        if room:
+            msg += f" {enrolled_count} öğrenci '{room.name}' odasına eklendi."
+            if graded_count > 0:
+                msg += f" {graded_count} öğrencinin notu Not Defterine ('Excel Aktarılan Notlar') işlendi."
+            if attendance_recorded_count > 0:
+                msg += f" {attendance_recorded_count} öğrencinin yoklama kaydı aktarıldı."
+        messages.success(request, msg)
+
+    except Exception as e:
+        messages.error(request, f"Excel dosyası işlenirken bir hata oluştu: {str(e)}")
+
+    return redirect('room', pk=room.id) if room else redirect('dashboard')
+

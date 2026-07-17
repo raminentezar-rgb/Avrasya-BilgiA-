@@ -1,11 +1,11 @@
 {% for room in rooms %}
-<div class="roomListRoom" style="border-left: 4px solid #71c6dd;">
+<div class="roomListRoom" style="border-left: 4px solid #0f3b8c; transition: border-color 0.2s;" onmouseover="this.style.borderLeftColor='#d97706'" onmouseout="this.style.borderLeftColor='#0f3b8c'">
     <div class="roomListRoom__header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
         <a href="{% url 'user-profile' room.host.id %}" class="roomListRoom__author">
             <div class="avatar avatar--small">
                 <img src="{{room.host.avatar.url}}" />
             </div>
-            <span>@{{room.host.username}} <small style="color: #8eb4f7;">({{room.host.department}})</small></span>
+            <span>@{{room.host.username}} <small style="color: #64748b;">({{room.host.department}})</small></span>
         </a>
         <div class="roomListRoom__actions">
             <span>{{room.created|timesince}} ago</span>
@@ -14,7 +14,7 @@
     <div class="roomListRoom__content">
         <a href="{% url 'room' room.id %}">
             {% if room.course_code %}
-            <span style="background: #3b82f6; color: #fff; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; margin-right: 6px; font-weight: bold;">{{room.course_code}}</span>
+            <span style="background: #0f3b8c; color: #fff; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; margin-right: 6px; font-weight: bold;">{{room.course_code}}</span>
             {% endif %}
             {{room.name}}
         </a>
@@ -25,7 +25,7 @@
                 {{room.participants.all.count}} Katılımcı
             </a>
             {% if room.quizzes.count %}
-            <a href="{% url 'room' room.id %}" style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 3px 10px; border-radius: 20px; font-weight: 700; font-size: 0.78rem; text-decoration: none;">
+            <a href="{% url 'room' room.id %}" style="background: #f8fafc; border: 1px solid #cbd5e1; color: #d97706; padding: 3px 10px; border-radius: 20px; font-weight: 700; font-size: 0.78rem; text-decoration: none;">
                 {{ room.quizzes.count }} Aktif Sınav
             </a>
             {% endif %}

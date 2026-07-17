@@ -16,42 +16,42 @@
         <nav class="header__menu" style="display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: auto;">
 
             <!-- Dark Mode Theme Toggle Button -->
-            <button id="themeToggleBtn" onclick="toggleTheme()" title="Gece / Gündüz Modu" style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 7px 14px; border-radius: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.82rem; font-weight: 700; transition: all 0.2s ease; color: #334155; flex-shrink: 0;">
+            <button id="themeToggleBtn" onclick="toggleTheme()" title="Gece / Gündüz Modu" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 7px 14px; border-radius: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.82rem; font-weight: 700; transition: all 0.2s ease; color: #0f3b8c; flex-shrink: 0;">
                 Tema
             </button>
 
             {% if request.user.is_authenticated %}
             <!-- Dashboard Link -->
-            <a href="{% url 'dashboard' %}" style="display: inline-flex; align-items: center; gap: 6px; background: #2563eb; color: #ffffff; border: 1px solid #1d4ed8; padding: 7px 15px; border-radius: 50px; font-weight: 700; font-size: 0.84rem; text-decoration: none; white-space: nowrap; box-shadow: 0 3px 10px rgba(37, 99, 235, 0.2); flex-shrink: 0;">
+            <a href="{% url 'dashboard' %}" style="display: inline-flex; align-items: center; gap: 6px; background: #0f3b8c; color: #ffffff; border: 1px solid #0f3b8c; padding: 7px 16px; border-radius: 50px; font-weight: 700; font-size: 0.84rem; text-decoration: none; white-space: nowrap; box-shadow: 0 3px 10px rgba(15, 59, 140, 0.15); flex-shrink: 0;">
                 Kontrol Paneli
             </a>
             {% endif %}
 
             <!-- Direct All Quizzes Link -->
-            <a href="{% url 'quizzes' %}" style="display: inline-flex; align-items: center; gap: 6px; background: #ea580c; color: #ffffff; border: 1px solid #c2410c; padding: 7px 15px; border-radius: 50px; font-weight: 700; font-size: 0.84rem; text-decoration: none; white-space: nowrap; box-shadow: 0 3px 10px rgba(234, 88, 12, 0.2); flex-shrink: 0;">
+            <a href="{% url 'quizzes' %}" style="display: inline-flex; align-items: center; gap: 6px; background: #d97706; color: #ffffff; border: 1px solid #b45309; padding: 7px 16px; border-radius: 50px; font-weight: 700; font-size: 0.84rem; text-decoration: none; white-space: nowrap; box-shadow: 0 3px 10px rgba(217, 119, 6, 0.15); flex-shrink: 0;">
                 Çevrimiçi Sınavlar
             </a>
 
             <!-- Logged In -->
             {% if request.user.is_authenticated %}
             <!-- Saved Bookmarks Link -->
-            <a href="{% url 'saved-resources' %}" title="Kaydedilen Materyallerim" style="display: flex; align-items: center; justify-content: center; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 7px 14px; border-radius: 50px; text-decoration: none; font-size: 0.82rem; font-weight: 700; flex-shrink: 0;">
+            <a href="{% url 'saved-resources' %}" title="Kaydedilen Materyallerim" style="display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f3b8c; padding: 7px 15px; border-radius: 50px; text-decoration: none; font-size: 0.82rem; font-weight: 700; flex-shrink: 0;">
                 Materyallerim
             </a>
 
             <!-- Notification Bell Modal Trigger -->
             <div style="position: relative; flex-shrink: 0;">
-                <button onclick="const m=document.getElementById('notifModal'); m.style.display = m.style.display === 'none' ? 'block' : 'none';" title="Bildirimler" style="background: #fff1f2; border: 1px solid #fecdd3; color: #e11d48; padding: 7px 14px; border-radius: 50px; cursor: pointer; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; gap: 6px; position: relative;">
+                <button onclick="const m=document.getElementById('notifModal'); m.style.display = m.style.display === 'none' ? 'block' : 'none';" title="Bildirimler" style="background: #f8fafc; border: 1px solid #cbd5e1; color: #0f3b8c; padding: 7px 15px; border-radius: 50px; cursor: pointer; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; gap: 6px; position: relative;">
                     Bildirimler
                     {% if request.user.unread_notifications_count > 0 %}
-                    <span style="background: #dc2626; color: #fff; font-size: 0.7rem; font-weight: 800; padding: 1px 6px; border-radius: 20px;">{{ request.user.unread_notifications_count }}</span>
+                    <span style="background: #d97706; color: #fff; font-size: 0.7rem; font-weight: 800; padding: 1px 6px; border-radius: 20px;">{{ request.user.unread_notifications_count }}</span>
                     {% endif %}
                 </button>
                 <div id="notifModal" class="navbar-modal-box" style="display: none; position: absolute; right: 0; top: 46px; width: 330px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; padding: 14px; max-height: 380px; overflow-y: auto;">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 10px;">
                         <h5 style="margin: 0; color: #0f3b8c; font-size: 0.95rem;">Bildirimler & Duyurular</h5>
                         {% if request.user.unread_notifications_count > 0 %}
-                        <a href="{% url 'clear-notifications' %}" style="font-size: 0.72rem; color: #2563eb; font-weight: 700; text-decoration: none;">Tümünü Okundu Say</a>
+                        <a href="{% url 'clear-notifications' %}" style="font-size: 0.72rem; color: #0f3b8c; font-weight: 700; text-decoration: none;">Tümünü Okundu Say</a>
                         {% endif %}
                     </div>
                     {% for n in request.user.unread_notifications|slice:":10" %}
@@ -65,7 +65,7 @@
                 </div>
             </div>
 
-            <div class="header__user" style="display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 4px 12px; border-radius: 50px; flex-shrink: 0;">
+            <div class="header__user" style="display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #cbd5e1; padding: 4px 12px; border-radius: 50px; flex-shrink: 0;">
                 <a href="{% url 'update-user' %}" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
                     <div class="avatar avatar--medium active">
                         <img src="{{request.user.avatar.url}}" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover;" />

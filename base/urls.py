@@ -56,5 +56,10 @@ urlpatterns = [
     path('attendance/session/<str:session_id>/export/', views.export_attendance_report, name="export_attendance_report"),
     path('attendance/scan/', views.student_scan, name="student_scan"),
     path('attendance/check-ip/', views.student_ip_checkin, name="student_ip_checkin"),
+
+    # Excel Bulk Student & Grade/Attendance Import/Export URLs
+    path('student-template/download/', views.download_student_template, name="download-student-template"),
+    path('bulk-import/students/<str:room_id>/', views.bulk_import_students, name="bulk-import-students-room"),
+    path('bulk-import/students/', views.bulk_import_students, name="bulk-import-students-general"),
 ]
 

@@ -2129,6 +2129,168 @@ body.dark-theme .saved-resources-box p {
   .dashboard-top-banner h1 {
     font-size: 1.45rem !important;
   }
+
+  /* ==========================================================================
+     MASTER MOBILE RESPONSIVE SHIELD & LAYOUT TRANSFORMATION (<= 992px)
+     Enforces 100% viewport containment, zero horizontal scroll, and vertical stacking
+     ========================================================================== */
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box !important;
+  }
+
+  /* Every major layout container must strictly fit inside the mobile viewport */
+  .container, .layout, .layout__box, .dashboard-wrapper, .dashboard-main, 
+  .dashboard-table-card, .dashboard-stats-grid, .dashboard-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .dashboard-wrapper {
+    padding: 0 10px !important;
+    gap: 16px !important;
+  }
+
+  .dashboard-table-card {
+    padding: 16px 12px !important;
+    border-radius: 16px !important;
+    overflow-x: hidden !important;
+  }
+
+  .dashboard-main {
+    overflow-x: hidden !important;
+  }
+
+  /* Transform ALL multi-column grids (hosted rooms, question bank, stats) to 1 vertical column */
+  .dashboard-stats-grid,
+  .dashboard-grid-cards,
+  .dashboard-table-card > div[style*="grid"],
+  div[style*="minmax(310px"],
+  div[style*="minmax(300px"],
+  div[style*="minmax(230px"],
+  div[style*="grid-template-columns"] {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    gap: 16px !important;
+  }
+
+  /* Every card and grid item on mobile must take full 100% width and wrap text */
+  .dashboard-stat-card,
+  .dashboard-table-card > div > div,
+  div[style*="border: 1px solid #cbd5e1"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Tables must scroll horizontally cleanly within their responsive wrapper WITHOUT stretching the card or page */
+  table {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  div[style*="overflow-x: auto"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    display: block !important;
+  }
+
+  /* Active Attendance Banner & Top Banner Mobile Transformation */
+  .dashboard-top-banner,
+  div[style*="background: linear-gradient(135deg, #065f46"] {
+    padding: 16px 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .dashboard-top-banner h1,
+  div[style*="background: linear-gradient(135deg, #065f46"] h4 {
+    font-size: 1.25rem !important;
+    word-wrap: break-word !important;
+    line-height: 1.3 !important;
+  }
+
+  .dashboard-top-banner p,
+  div[style*="background: linear-gradient(135deg, #065f46"] p {
+    font-size: 0.88rem !important;
+    word-wrap: break-word !important;
+    max-width: 100% !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Buttons inside active banner and room cards */
+  div[style*="background: linear-gradient(135deg, #065f46"] a,
+  .dashboard-table-card a {
+    word-wrap: break-word !important;
+    white-space: normal !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+
+  /* Header & Navbar Mobile Optimization */
+  .header {
+    padding: 10px 0 !important;
+  }
+
+  .header > .container {
+    padding: 6px 10px !important;
+    gap: 10px !important;
+  }
+
+  .header__logo {
+    max-width: 60% !important;
+  }
+
+  .header__logo h1 {
+    font-size: 1.15rem !important;
+  }
+
+  .header__search {
+    order: 3 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+    margin: 6px 0 !important;
+  }
+
+  .header__menu {
+    order: 4 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    padding: 6px 2px 10px 2px !important;
+    margin: 0 !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .header__user {
+    padding: 4px 10px !important;
+  }
 }
 
 .dashboard-sidebar {
@@ -2312,24 +2474,18 @@ body.dark-theme .dashboard-top-banner {
   box-shadow: 0 16px 35px rgba(0, 0, 0, 0.08);
 }
 
-.stat-card-blue {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border-color: #bfdbfe;
-}
-
-.stat-card-purple {
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-  border-color: #e9d5ff;
-}
-
-.stat-card-amber {
-  background: linear-gradient(135deg, #fffcf8 0%, #fef3c7 100%);
-  border-color: #fde68a;
-}
-
+.stat-card-blue,
+.stat-card-purple,
+.stat-card-amber,
 .stat-card-emerald {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border-color: #bbf7d0;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-top: 4px solid #0f3b8c;
+}
+
+.stat-card-amber,
+.stat-card-purple {
+  border-top: 4px solid #d97706;
 }
 
 body.dark-theme .stat-card-blue,
@@ -2338,6 +2494,12 @@ body.dark-theme .stat-card-amber,
 body.dark-theme .stat-card-emerald {
   background: #1e293b !important;
   border-color: #334155 !important;
+  border-top: 4px solid #38bdf8 !important;
+}
+
+body.dark-theme .stat-card-amber,
+body.dark-theme .stat-card-purple {
+  border-top: 4px solid #fbbf24 !important;
 }
 
 .stat-icon-wrapper {
@@ -2353,10 +2515,10 @@ body.dark-theme .stat-card-emerald {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
-.stat-card-blue .stat-icon-wrapper { background: #2563eb; color: #ffffff; }
-.stat-card-purple .stat-icon-wrapper { background: #9333ea; color: #ffffff; }
-.stat-card-amber .stat-icon-wrapper { background: #ea580c; color: #ffffff; }
-.stat-card-emerald .stat-icon-wrapper { background: #16a34a; color: #ffffff; }
+.stat-card-blue .stat-icon-wrapper,
+.stat-card-emerald .stat-icon-wrapper { background: #0f3b8c; color: #ffffff; }
+.stat-card-purple .stat-icon-wrapper,
+.stat-card-amber .stat-icon-wrapper { background: #d97706; color: #ffffff; }
 
 .stat-number {
   font-size: 2.3rem;
@@ -2365,10 +2527,10 @@ body.dark-theme .stat-card-emerald {
   margin-bottom: 6px;
 }
 
-.stat-card-blue .stat-number { color: #1e40af; }
-.stat-card-purple .stat-number { color: #6b21a8; }
+.stat-card-blue .stat-number,
+.stat-card-emerald .stat-number { color: #0f3b8c; }
+.stat-card-purple .stat-number,
 .stat-card-amber .stat-number { color: #b45309; }
-.stat-card-emerald .stat-number { color: #15803d; }
 body.dark-theme .stat-number { color: #f8fafc !important; }
 
 .stat-label {
