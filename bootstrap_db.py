@@ -64,6 +64,15 @@ def bootstrap():
         )
         print("Fallback superuser 'admin' created successfully with password 'admin1234'.")
 
+    # Clean up any rooms with null host by assigning them to superuser ramin or admin
+    from base.models import Room
+    null_rooms = Room.objects.filter(host__isnull=True)
+    if null_rooms.exists():
+        fallback_host = ramin or admin or User.objects.first()
+        if fallback_host:
+            null_rooms.update(host=fallback_host)
+            print(f"Assigned {null_rooms.count()} rooms with missing host to {fallback_host.username}")
+
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'studybud.settings')
     django.setup()

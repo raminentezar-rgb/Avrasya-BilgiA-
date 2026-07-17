@@ -1,12 +1,20 @@
 {% for room in rooms %}
 <div class="roomListRoom" style="border-left: 4px solid #0f3b8c; transition: border-color 0.2s;" onmouseover="this.style.borderLeftColor='#d97706'" onmouseout="this.style.borderLeftColor='#0f3b8c'">
     <div class="roomListRoom__header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        {% if room.host %}
         <a href="{% url 'user-profile' room.host.id %}" class="roomListRoom__author">
             <div class="avatar avatar--small">
+                {% if room.host.avatar %}
                 <img src="{{room.host.avatar.url}}" />
+                {% endif %}
             </div>
             <span>@{{room.host.username}} <small style="color: #64748b;">({{room.host.department}})</small></span>
         </a>
+        {% else %}
+        <div class="roomListRoom__author">
+            <span>@Sistem Odası</span>
+        </div>
+        {% endif %}
         <div class="roomListRoom__actions">
             <span>{{room.created|timesince}} ago</span>
         </div>

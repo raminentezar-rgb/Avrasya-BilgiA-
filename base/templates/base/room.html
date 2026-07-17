@@ -66,12 +66,20 @@
             </div>
             <div class="room__hosted">
               <p>Hosted By</p>
+              {% if room.host %}
               <a href="{% url 'user-profile' room.host.id %}" class="room__author">
                 <div class="avatar avatar--small">
+                  {% if room.host.avatar %}
                   <img src="{{room.host.avatar.url}}" />
+                  {% endif %}
                 </div>
                 <span>@{{room.host.username}}</span>
               </a>
+              {% else %}
+              <div class="room__author">
+                <span>@Sistem Odası</span>
+              </div>
+              {% endif %}
             </div>
             <span class="room__topics">{{room.topic}}</span>
             {% if room.course_code %}
