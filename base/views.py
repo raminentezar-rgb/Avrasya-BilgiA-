@@ -90,8 +90,15 @@ def registerPage(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.username.lower()
-            if user.role == 'teacher' and not user.email.lower().strip().endswith('@avrasya.edu.tr'):
+            email_clean = user.email.lower().strip() if user.email else ''
+            if user.role in ['teacher', 'faculty'] and not email_clean.endswith('@avrasya.edu.tr'):
                 messages.error(request, 'Akademisyen / Öğretim Üyesi kaydı için yalnızca resmi Avrasya Üniversitesi e-posta adresi (@avrasya.edu.tr) kullanılmalıdır!')
+                return render(request, 'base/login_register.html', {'form': form})
+            elif user.role == 'student' and not (email_clean.endswith('@avrasya.edu.tr') or email_clean.endswith('@ogrenci.avrasya.edu.tr')):
+                messages.error(request, 'Öğrenci kaydı için yalnızca resmi Avrasya Üniversitesi e-posta adresi (örn: öğrenciadı@avrasya.edu.tr veya @ogrenci.avrasya.edu.tr) kullanılmalıdır. Farklı format kabul edilmez!')
+                return render(request, 'base/login_register.html', {'form': form})
+            elif not (email_clean.endswith('@avrasya.edu.tr') or email_clean.endswith('@ogrenci.avrasya.edu.tr')):
+                messages.error(request, 'Platform kaydı için yalnızca resmi Avrasya Üniversitesi e-posta adresi kullanılmalıdır!')
                 return render(request, 'base/login_register.html', {'form': form})
             user.save()
             login(request, user)

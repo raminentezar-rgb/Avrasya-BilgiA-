@@ -20,18 +20,34 @@ class MyUserCreationForm(UserCreationForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         role = self.data.get('role') or self.cleaned_data.get('role')
-        if role == 'teacher' and email:
-            if not email.lower().strip().endswith('@avrasya.edu.tr'):
-                self.add_error('email', 'Akademisyen / Öğretim Üyesi kaydı için yalnızca resmi Avrasya Üniversitesi e-posta adresi (@avrasya.edu.tr) kullanılmalıdır!')
+        if email:
+            email_clean = email.lower().strip()
+            if role in ['teacher', 'faculty']:
+                if not email_clean.endswith('@avrasya.edu.tr'):
+                    self.add_error('email', 'Akademisyen / Öğretim Üyesi kaydı için yalnızca resmi Avrasya Üniversitesi e-posta adresi (@avrasya.edu.tr) kullanılmalıdır!')
+            elif role == 'student':
+                if not (email_clean.endswith('@avrasya.edu.tr') or email_clean.endswith('@ogrenci.avrasya.edu.tr')):
+                    self.add_error('email', 'Öğrenci kaydı için yalnızca resmi Avrasya Üniversitesi e-posta adresi (örn: ad.soyad@avrasya.edu.tr veya @ogrenci.avrasya.edu.tr) kullanılmalıdır. Farklı format kabul edilmez!')
+            else:
+                if not (email_clean.endswith('@avrasya.edu.tr') or email_clean.endswith('@ogrenci.avrasya.edu.tr')):
+                    self.add_error('email', 'Platform kaydı için yalnızca resmi Avrasya Üniversitesi e-posta adresi (@avrasya.edu.tr veya @ogrenci.avrasya.edu.tr) kullanılmalıdır!')
         return email
 
     def clean(self):
         cleaned_data = super().clean()
         role = cleaned_data.get('role') or self.data.get('role')
         email = cleaned_data.get('email')
-        if role == 'teacher' and email:
-            if not email.lower().strip().endswith('@avrasya.edu.tr'):
-                self.add_error('email', 'Akademisyen / Öğretim Üyesi kaydı için yalnızca resmi Avrasya Üniversitesi e-posta adresi (@avrasya.edu.tr) kullanılmalıdır!')
+        if email:
+            email_clean = email.lower().strip()
+            if role in ['teacher', 'faculty']:
+                if not email_clean.endswith('@avrasya.edu.tr'):
+                    self.add_error('email', 'Akademisyen / Öğretim Üyesi kaydı için yalnızca resmi Avrasya Üniversitesi e-posta adresi (@avrasya.edu.tr) kullanılmalıdır!')
+            elif role == 'student':
+                if not (email_clean.endswith('@avrasya.edu.tr') or email_clean.endswith('@ogrenci.avrasya.edu.tr')):
+                    self.add_error('email', 'Öğrenci kaydı için yalnızca resmi Avrasya Üniversitesi e-posta adresi (örn: ad.soyad@avrasya.edu.tr veya @ogrenci.avrasya.edu.tr) kullanılmalıdır. Farklı format kabul edilmez!')
+            else:
+                if not (email_clean.endswith('@avrasya.edu.tr') or email_clean.endswith('@ogrenci.avrasya.edu.tr')):
+                    self.add_error('email', 'Platform kaydı için yalnızca resmi Avrasya Üniversitesi e-posta adresi (@avrasya.edu.tr veya @ogrenci.avrasya.edu.tr) kullanılmalıdır!')
         return cleaned_data
 
 
