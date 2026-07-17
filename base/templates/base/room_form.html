@@ -22,6 +22,11 @@
           {% csrf_token %}
 
           <div class="form__group">
+            {% if not request.user.is_superuser and request.user.department and request.user.department != 'Genel / Diğer' %}
+            <label for="room_topic">Bölüm / Akademik Konu <span style="color: #d97706; font-size: 0.85rem;">(Kayıtlı Bölümünüze Sabitlenmiştir)</span></label>
+            <input required type="text" value="{{request.user.department}}" name="topic" readonly style="background: rgba(30, 41, 59, 0.7); border: 1px solid #475569; color: #cbd5e1; cursor: not-allowed;" title="Yalnızca kayıtlı olduğunuz bölümde oda oluşturabilirsiniz." />
+            <small style="color: #94a3b8; display: block; margin-top: 6px;"><i class="fas fa-lock" style="color: #d97706;"></i> Sistem kuralı gereği, yalnızca kayıtlı olduğunuz <strong>{{request.user.department}}</strong> bölümü için çalışma ve ders odası açabilirsiniz.</small>
+            {% else %}
             <label for="room_topic">Bölüm / Akademik Konu Seçin veya Yazın</label>
             <input required type="text" value="{{room.topic.name}}" name="topic" list="topic-list" placeholder="Bölüm veya konu adı girin..." />
             <datalist id="topic-list">
@@ -31,6 +36,7 @@
                 {% endfor %}
               </select>
             </datalist>
+            {% endif %}
           </div>
 
 

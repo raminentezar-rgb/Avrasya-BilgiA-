@@ -126,9 +126,9 @@ def home(request):
             Q(course_code__icontains=dept)
         ).distinct()
 
-    # Öğrenciler SADECE kendi bölümlerine ait odaları, konuları ve materyalleri görebilir
+    # Öğrenciler ve Öğretim Üyeleri (sistem yöneticileri hariç) SADECE kendi bölümlerine ait odaları, konuları ve materyalleri görebilir
     topics = Topic.objects.all()
-    if request.user.role == 'student' and request.user.department:
+    if not request.user.is_superuser and request.user.department and request.user.department != 'Genel / Diğer':
         dept = request.user.department
         dept_keywords = [w for w in dept.split() if len(w) > 3 and w not in ['Mühendisliği', 'Fakültesi', 'Bölümü', 'Programı', 'Teknolojisi', 'Hizmetleri']]
         query = Q(host__department=dept) | Q(topic__name__iexact=dept)
@@ -136,7 +136,7 @@ def home(request):
             query |= Q(topic__name__icontains=kw) | Q(name__icontains=kw) | Q(course_code__icontains=kw)
         rooms = rooms.filter(query).distinct()
 
-        # Sol menüdeki konuları da öğrencinin görebildiği odaların konuları veya kendi bölümüyle sınırla
+        # Sol menüdeki konuları da kullanıcının görebildiği odaların konuları veya kendi bölümüyle sınırla
         topics = Topic.objects.filter(
             Q(room__in=rooms) | Q(name__iexact=dept)
         ).distinct()
@@ -145,7 +145,7 @@ def home(request):
 
     room_messages_query = Message.objects.filter(
         Q(room__topic__name__icontains=q))
-    if request.user.role == 'student' and request.user.department:
+    if not request.user.is_superuser and request.user.department and request.user.department != 'Genel / Diğer':
         room_messages_query = room_messages_query.filter(room__in=rooms).distinct()
     room_messages = room_messages_query[0:5]
 
@@ -242,11 +242,12 @@ def dashboard(request):
 def room(request, pk):
     room_obj = Room.objects.get(id=pk)
 
-    # Öğrencilerin diğer bölüm odalarına yetkisiz erişimini engelle
-    if request.user.role == 'student' and request.user.department:
-        if room_obj.host and room_obj.host.department not in [request.user.department, 'Genel / Diğer']:
-            if request.user not in room_obj.participants.all():
-                messages.error(request, f"Güvenlik Kısıtlaması: Bu oda '{room_obj.host.department}' bölümüne aittir. Sadece kendi bölümünüze ({request.user.department}) ait çalışma odalarına erişebilirsiniz.")
+    # Öğretim Üyeleri ve Öğrencilerin diğer bölüm odalarına yetkisiz erişimini engelle
+    if not request.user.is_superuser and request.user.department and request.user.department != 'Genel / Diğer':
+        room_dept = room_obj.topic.name if room_obj.topic else (room_obj.host.department if room_obj.host else '')
+        if room_dept and room_dept not in [request.user.department, 'Genel / Diğer'] and (not room_obj.host or room_obj.host.department not in [request.user.department, 'Genel / Diğer']):
+            if request.user != room_obj.host and request.user not in room_obj.participants.all():
+                messages.error(request, f"Güvenlik Kısıtlaması: Bu oda '{room_dept}' bölümüne aittir. Sadece kendi bölümünüze ({request.user.department}) ait çalışma odalarını görüntüleyebilir veya erişebilirsiniz.")
                 return redirect('home')
 
     room_messages = room_obj.message_set.all()
@@ -318,6 +319,15 @@ def userProfile(request, pk):
     rooms = user.room_set.all()
     room_messages = user.message_set.all()
     topics = Topic.objects.all()
+    if not request.user.is_superuser and request.user.department and request.user.department != 'Genel / Diğer':
+        dept = request.user.department
+        dept_keywords = [w for w in dept.split() if len(w) > 3 and w not in ['Mühendisliği', 'Fakültesi', 'Bölümü', 'Programı', 'Teknolojisi', 'Hizmetleri']]
+        query = Q(host__department=dept) | Q(topic__name__iexact=dept)
+        for kw in dept_keywords:
+            query |= Q(topic__name__icontains=kw) | Q(name__icontains=kw) | Q(course_code__icontains=kw)
+        rooms = rooms.filter(query).distinct()
+        room_messages = room_messages.filter(room__in=rooms).distinct()
+        topics = topics.filter(Q(room__in=rooms) | Q(name__iexact=dept)).distinct()
     context = {'user': user, 'rooms': rooms,
                'room_messages': room_messages, 'topics': topics}
     return render(request, 'base/profile.html', context)
@@ -331,7 +341,10 @@ def createRoom(request):
     form = RoomForm()
     topics = Topic.objects.all()
     if request.method == 'POST':
-        topic_name = request.POST.get('topic')
+        if not request.user.is_superuser and request.user.department and request.user.department != 'Genel / Diğer':
+            topic_name = request.user.department
+        else:
+            topic_name = request.POST.get('topic', 'Genel / Diğer')
         topic, created = Topic.objects.get_or_create(name=topic_name)
 
         Room.objects.create(
@@ -353,11 +366,14 @@ def updateRoom(request, pk):
     room = Room.objects.get(id=pk)
     form = RoomForm(instance=room)
     topics = Topic.objects.all()
-    if request.user != room.host:
+    if request.user != room.host and not request.user.is_superuser:
         return HttpResponse('Your are not allowed here!!')
 
     if request.method == 'POST':
-        topic_name = request.POST.get('topic')
+        if not request.user.is_superuser and request.user.department and request.user.department != 'Genel / Diğer':
+            topic_name = request.user.department
+        else:
+            topic_name = request.POST.get('topic', 'Genel / Diğer')
         topic, created = Topic.objects.get_or_create(name=topic_name)
         room.name = request.POST.get('name')
         room.course_code = request.POST.get('course_code', '')
@@ -481,10 +497,10 @@ def updateUser(request):
 def topicsPage(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
     topics = Topic.objects.filter(name__icontains=q)
-    if request.user.role == 'student' and request.user.department:
+    if not request.user.is_superuser and request.user.department and request.user.department != 'Genel / Diğer':
         dept = request.user.department
         dept_keywords = [w for w in dept.split() if len(w) > 3 and w not in ['Mühendisliği', 'Fakültesi', 'Bölümü', 'Programı', 'Teknolojisi', 'Hizmetleri']]
-        query = Q(name__iexact=dept)
+        query = Q(name__iexact=dept) | Q(room__host__department=dept)
         for kw in dept_keywords:
             query |= Q(name__icontains=kw)
         topics = topics.filter(query).distinct()
@@ -494,7 +510,7 @@ def topicsPage(request):
 @login_required(login_url='login')
 def activityPage(request):
     room_messages = Message.objects.all()
-    if request.user.role == 'student' and request.user.department:
+    if not request.user.is_superuser and request.user.department and request.user.department != 'Genel / Diğer':
         dept = request.user.department
         dept_keywords = [w for w in dept.split() if len(w) > 3 and w not in ['Mühendisliği', 'Fakültesi', 'Bölümü', 'Programı', 'Teknolojisi', 'Hizmetleri']]
         query = Q(room__host__department=dept) | Q(room__topic__name__iexact=dept)
@@ -569,6 +585,8 @@ def create_quiz_general(request):
         return redirect('quiz-detail', pk=quiz.id)
 
     rooms = Room.objects.all()
+    if not request.user.is_superuser and request.user.department and request.user.department != 'Genel / Diğer':
+        rooms = rooms.filter(Q(host=request.user) | Q(topic__name__iexact=request.user.department) | Q(host__department=request.user.department)).distinct()
     form = QuizForm()
     return render(request, 'base/quiz_form_general.html', {'rooms': rooms, 'form': form})
 
@@ -577,12 +595,13 @@ def create_quiz_general(request):
 def quiz_detail(request, pk):
     quiz = Quiz.objects.get(id=pk)
 
-    # Öğrencilerin diğer bölüm sınavlarına yetkisiz erişimini engelle
-    if request.user.role == 'student' and request.user.department:
+    # Öğretim Üyeleri ve Öğrencilerin diğer bölüm sınavlarına yetkisiz erişimini engelle
+    if not request.user.is_superuser and request.user.department and request.user.department != 'Genel / Diğer':
         room_obj = quiz.room
-        if room_obj.host and room_obj.host.department not in [request.user.department, 'Genel / Diğer']:
-            if request.user not in room_obj.participants.all():
-                messages.error(request, f"Güvenlik Kısıtlaması: Bu sınav '{room_obj.host.department}' bölümüne aittir. Sadece kendi bölümünüze ({request.user.department}) ait sınavlara erişebilirsiniz.")
+        room_dept = room_obj.topic.name if room_obj.topic else (room_obj.host.department if room_obj.host else '')
+        if room_dept and room_dept not in [request.user.department, 'Genel / Diğer'] and (not room_obj.host or room_obj.host.department not in [request.user.department, 'Genel / Diğer']):
+            if request.user != quiz.creator and request.user != room_obj.host and request.user not in room_obj.participants.all():
+                messages.error(request, f"Güvenlik Kısıtlaması: Bu sınav '{room_dept}' bölümüne aittir. Sadece kendi bölümünüze ({request.user.department}) ait sınavları görüntüleyebilir veya erişebilirsiniz.")
                 return redirect('home')
 
     questions = quiz.questions.all()
@@ -729,7 +748,7 @@ def delete_question(request, pk):
 @login_required(login_url='login')
 def quizzesPage(request):
     quizzes = Quiz.objects.all()
-    if request.user.role == 'student' and request.user.department:
+    if not request.user.is_superuser and request.user.department and request.user.department != 'Genel / Diğer':
         dept = request.user.department
         dept_keywords = [w for w in dept.split() if len(w) > 3 and w not in ['Mühendisliği', 'Fakültesi', 'Bölümü', 'Programı', 'Teknolojisi', 'Hizmetleri']]
         query = Q(room__host__department=dept) | Q(room__topic__name__iexact=dept)
