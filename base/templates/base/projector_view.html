@@ -22,17 +22,22 @@
         }
 
         .main-qr-area {
-            flex: 2.2;
+            flex: 2.3;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
-            padding: 2rem;
+            padding: 1.5rem 2rem;
             position: relative;
+            overflow-y: auto;
+            height: 100%;
+            box-sizing: border-box;
         }
 
         .side-panel {
             flex: 1;
+            min-width: 330px;
+            max-width: 420px;
             background-color: #1e293b;
             border-left: 2px solid #334155;
             display: flex;
@@ -42,39 +47,40 @@
         }
 
         .header {
-            padding: 2rem;
+            padding: 1.5rem 1.8rem;
             border-bottom: 2px solid #334155;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
+            background: linear-gradient(135deg, #0f3b8c, #1e293b);
         }
 
         .header h2 {
             margin: 0;
-            color: #60a5fa;
-            font-size: 1.7rem;
+            color: #ffffff;
+            font-size: 1.5rem;
             font-weight: 800;
         }
 
         .header p {
-            margin: 0.5rem 0 0 0;
-            color: #94a3b8;
-            font-size: 1.05rem;
+            margin: 0.4rem 0 0 0;
+            color: #cbd5e1;
+            font-size: 0.95rem;
         }
 
         .students-list {
             flex: 1;
             overflow-y: auto;
-            padding: 1.5rem;
+            padding: 1.2rem 1.5rem;
         }
 
         .student-item {
             background: #334155;
-            padding: 1.1rem 1.4rem;
+            padding: 1rem 1.2rem;
             border-radius: 12px;
-            margin-bottom: 0.9rem;
+            margin-bottom: 0.8rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border: 1px solid #475569;
+            border-left: 4px solid #d97706;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -86,72 +92,29 @@
 
         .student-name {
             font-weight: 700;
-            font-size: 1.12rem;
+            font-size: 1.05rem;
             color: #f8fafc;
         }
 
         .student-time {
-            color: #10b981;
-            font-size: 0.92rem;
+            color: #d97706;
+            font-size: 0.88rem;
             font-weight: 800;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .qr-container {
-            background: white;
-            padding: 2.2rem;
-            border-radius: 24px;
-            box-shadow: 0 0 45px rgba(59, 130, 246, 0.25);
-            transition: transform 0.2s, opacity 0.3s;
-        }
-        
-        .qr-placeholder {
-            width: 340px;
-            height: 340px;
-        }
-
-        #qrCode img {
-            width: 340px !important;
-            height: 340px !important;
-        }
-
-        .timer-bar {
-            width: 340px;
-            height: 10px;
-            background: #334155;
-            border-radius: 6px;
-            margin-top: 2rem;
-            overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .timer-progress {
-            height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #60a5fa);
-            width: 100%;
-            transition: width linear 1s;
-        }
-
-        .status-text {
-            margin-top: 1.2rem;
-            font-size: 1.3rem;
-            color: #94a3b8;
-            font-weight: 600;
-        }
-
         .top-toolbar {
-            position: absolute;
-            top: 1.8rem;
-            left: 1.8rem;
-            right: 1.8rem;
+            width: 100%;
+            max-width: 960px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 10;
             flex-wrap: wrap;
             gap: 12px;
+            margin-bottom: 1.2rem;
+            z-index: 10;
         }
 
         .toolbar-left, .toolbar-right {
@@ -165,10 +128,10 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 0.65rem 1.2rem;
+            padding: 0.65rem 1.1rem;
             border-radius: 10px;
             font-weight: 700;
-            font-size: 0.92rem;
+            font-size: 0.88rem;
             text-decoration: none;
             transition: all 0.2s ease;
             cursor: pointer;
@@ -177,23 +140,25 @@
         }
 
         .btn-exit {
-            background: #ef4444;
+            background: #0f3b8c;
             color: white;
+            border-color: #1e40af;
+            box-shadow: 0 4px 12px rgba(15, 59, 140, 0.25);
         }
         .btn-exit:hover {
-            background: #dc2626;
+            background: #1e40af;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
 
         .btn-export {
-            background: #10b981;
+            background: #d97706;
             color: white;
+            border-color: #b45309;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
         }
         .btn-export:hover {
-            background: #059669;
+            background: #b45309;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .btn-toggle {
@@ -201,6 +166,163 @@
         }
         .btn-toggle:hover {
             transform: translateY(-2px);
+        }
+
+        .main-qr-area h1 {
+            margin: 0.2rem 0 0.5rem 0;
+            font-size: 1.9rem;
+            text-align: center;
+            font-weight: 800;
+            line-height: 1.3;
+            color: #ffffff;
+        }
+
+        .subtitle-text {
+            color: #cbd5e1;
+            font-size: 0.98rem;
+            margin: 0 0 1.2rem 0;
+            text-align: center;
+            max-width: 620px;
+            line-height: 1.4;
+        }
+
+        .qr-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 22px;
+            box-shadow: 0 0 40px rgba(15, 59, 140, 0.35);
+            transition: transform 0.2s, opacity 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0.5rem 0;
+        }
+        
+        .qr-placeholder {
+            width: 280px;
+            height: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #qrCode img, #qrCode canvas {
+            width: 280px !important;
+            height: 280px !important;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .timer-bar {
+            width: 280px;
+            height: 8px;
+            background: #334155;
+            border-radius: 6px;
+            margin-top: 1.2rem;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .timer-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #0f3b8c, #d97706);
+            width: 100%;
+            transition: width linear 1s;
+        }
+
+        .status-text {
+            margin-top: 0.9rem;
+            font-size: 1.15rem;
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+
+        .url-box-container {
+            margin-top: 1.2rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(30, 41, 59, 0.85);
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px dashed #d97706;
+        }
+
+        /* Responsive adaptations for 10-inch laptops and smaller viewports */
+        @media (max-height: 768px), (max-width: 1250px) {
+            .main-qr-area {
+                padding: 1rem 1.2rem;
+            }
+            .top-toolbar {
+                margin-bottom: 0.8rem;
+                gap: 8px;
+            }
+            .btn-action {
+                padding: 0.5rem 0.85rem;
+                font-size: 0.82rem;
+            }
+            .main-qr-area h1 {
+                font-size: 1.45rem;
+                margin-bottom: 0.3rem;
+            }
+            .subtitle-text {
+                font-size: 0.84rem;
+                margin-bottom: 0.6rem;
+            }
+            .qr-container {
+                padding: 1rem;
+                border-radius: 16px;
+            }
+            .qr-placeholder {
+                width: 210px;
+                height: 210px;
+            }
+            #qrCode img, #qrCode canvas {
+                width: 210px !important;
+                height: 210px !important;
+            }
+            .timer-bar {
+                width: 210px;
+                margin-top: 0.8rem;
+            }
+            .status-text {
+                margin-top: 0.6rem;
+                font-size: 1rem;
+            }
+            .url-box-container {
+                margin-top: 0.8rem;
+                padding: 6px 12px;
+            }
+            #testLinkBox {
+                width: 190px !important;
+            }
+            .side-panel {
+                min-width: 280px;
+                max-width: 320px;
+            }
+        }
+
+        @media (max-width: 950px) {
+            body {
+                flex-direction: column;
+                height: auto;
+                overflow-y: auto;
+            }
+            .main-qr-area {
+                flex: none;
+                width: 100%;
+                min-height: 85vh;
+            }
+            .side-panel {
+                flex: none;
+                width: 100%;
+                max-width: 100%;
+                border-left: none;
+                border-top: 2px solid #334155;
+                min-height: 400px;
+            }
         }
     </style>
 </head>
@@ -218,33 +340,33 @@
             </div>
             
             <div class="toolbar-right">
-                <button id="toggleIpBtn" onclick="toggleIpCheck()" class="btn-action btn-toggle" style="background: {% if session.require_ip_check %}rgba(16, 185, 129, 0.18){% else %}rgba(239, 68, 68, 0.18){% endif %}; border-color: {% if session.require_ip_check %}#10b981{% else %}#ef4444{% endif %}; color: {% if session.require_ip_check %}#dcfce7{% else %}#fee2e2{% endif %};">
-                    <i class="fas fa-wifi" id="ipIcon" style="color: {% if session.require_ip_check %}#10b981{% else %}#ef4444{% endif %};"></i>
+                <button id="toggleIpBtn" onclick="toggleIpCheck()" class="btn-action btn-toggle" style="background: {% if session.require_ip_check %}#0f3b8c{% else %}rgba(239, 68, 68, 0.18){% endif %}; border-color: {% if session.require_ip_check %}#1e40af{% else %}#ef4444{% endif %}; color: {% if session.require_ip_check %}#ffffff{% else %}#fee2e2{% endif %};">
+                    <i class="fas fa-wifi" id="ipIcon" style="color: {% if session.require_ip_check %}#d97706{% else %}#ef4444{% endif %};"></i>
                     <span id="ipText">Wi-Fi IP Koruma: {% if session.require_ip_check %}AKTİF{% else %}KAPALI{% endif %}</span>
                 </button>
 
-                <button id="toggleQrBtn" onclick="toggleQrCheck()" class="btn-action btn-toggle" style="background: {% if session.allow_qr_check %}rgba(59, 130, 246, 0.18){% else %}rgba(239, 68, 68, 0.18){% endif %}; border-color: {% if session.allow_qr_check %}#3b82f6{% else %}#ef4444{% endif %}; color: {% if session.allow_qr_check %}#dbeafe{% else %}#fee2e2{% endif %};">
-                    <i class="fas fa-qrcode" id="qrIcon" style="color: {% if session.allow_qr_check %}#3b82f6{% else %}#ef4444{% endif %};"></i>
+                <button id="toggleQrBtn" onclick="toggleQrCheck()" class="btn-action btn-toggle" style="background: {% if session.allow_qr_check %}#0f3b8c{% else %}rgba(239, 68, 68, 0.18){% endif %}; border-color: {% if session.allow_qr_check %}#1e40af{% else %}#ef4444{% endif %}; color: {% if session.allow_qr_check %}#ffffff{% else %}#fee2e2{% endif %};">
+                    <i class="fas fa-qrcode" id="qrIcon" style="color: {% if session.allow_qr_check %}#d97706{% else %}#ef4444{% endif %};"></i>
                     <span id="qrText">QR Kod Yoklama: {% if session.allow_qr_check %}AKTİF{% else %}KAPALI{% endif %}</span>
                 </button>
             </div>
         </div>
         
-        <h1 style="margin-bottom: 0.6rem; margin-top: 3.2rem; font-size: 2.2rem; text-align: center; font-weight: 800; line-height: 1.3;">
-            QR Kodu Okutarak veya <br><span style="color:#10b981;">Wi-Fi IP Butonuyla</span> Yoklamaya Katılın
+        <h1>
+            QR Kodu Okutarak veya <br><span style="color:#d97706;">Wi-Fi IP Butonuyla</span> Yoklamaya Katılın
         </h1>
-        <p style="color: #cbd5e1; font-size: 1.05rem; margin: 0 0 1.2rem 0; text-align: center; max-width: 620px;">
+        <p class="subtitle-text">
             Dilerseniz ana sayfanızdaki <strong>«📡 Wi-Fi IP ile Şimdi Yoklama Ver»</strong> butonuna tıklayabilir veya aşağıdaki <strong>QR Kodu</strong> okutabilirsiniz.
         </p>
 
         {% if not session.is_active %}
-        <div style="background: #ef4444; color: white; padding: 14px 24px; border-radius: 14px; font-size: 1.15rem; font-weight: 800; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);">
+        <div style="background: #ef4444; color: white; padding: 12px 20px; border-radius: 12px; font-size: 1.05rem; font-weight: 800; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);">
             <i class="fas fa-exclamation-triangle"></i> DİKKAT: Bu yoklama oturumu sona ermiş (KAPALI). Yeni yoklama almak için odaya dönüp yeni oturum başlatmalısınız.
         </div>
         {% endif %}
         
-        <div style="margin-bottom: 1.8rem; font-size: 1rem; color: #cbd5e1; background: rgba(59, 130, 246, 0.15); padding: 8px 20px; border-radius: 20px; border: 1px solid rgba(59, 130, 246, 0.35); display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-wifi" style="color: #60a5fa;"></i> Sınıf Wi-Fi Ağ IP Adresi: <strong style="color: #ffffff;">{{ session.teacher_ip|default:"Otomatik Tanımlandı" }}</strong>
+        <div style="margin-bottom: 1.2rem; font-size: 0.95rem; color: #cbd5e1; background: rgba(15, 59, 140, 0.25); padding: 8px 18px; border-radius: 20px; border: 1px solid rgba(217, 119, 6, 0.45); display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-wifi" style="color: #d97706;"></i> Sınıf Wi-Fi Ağ IP Adresi: <strong style="color: #ffffff;">{{ session.teacher_ip|default:"Otomatik Tanımlandı" }}</strong>
         </div>
         
         <div class="qr-container" id="qrContainer" style="opacity: {% if session.allow_qr_check %}1{% else %}0.25{% endif %};">
@@ -256,10 +378,10 @@
         </div>
         <div class="status-text">Barkod <span id="timeRemaining" style="color:#d97706; font-weight:800;">15</span> saniye içinde yenileniyor...</div>
         
-        <div style="margin-top: 1.5rem; display: flex; align-items: center; gap: 8px; background: rgba(30, 41, 59, 0.8); padding: 8px 16px; border-radius: 12px; border: 1px dashed #475569;">
+        <div class="url-box-container">
             <span style="font-size: 0.85rem; color: #cbd5e1;"><i class="fas fa-link" style="color: #d97706;"></i> Öğrenci Yoklama Giriş Bağlantısı / URL:</span>
-            <input type="text" id="testLinkBox" readonly style="background: #0f172a; border: 1px solid #334155; color: #f8fafc; padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; width: 280px;" value="Yükleniyor...">
-            <button onclick="copyTestLink()" style="background: #0f3b8c; color: white; border: 1px solid #1e3a8a; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(15, 59, 140, 0.3);">
+            <input type="text" id="testLinkBox" readonly style="background: #0f172a; border: 1px solid #334155; color: #f8fafc; padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; width: 260px;" value="Yükleniyor...">
+            <button onclick="copyTestLink()" style="background: #0f3b8c; color: white; border: 1px solid #1e40af; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(15, 59, 140, 0.3);">
                 <i class="fas fa-copy"></i> Bağlantıyı Kopyala
             </button>
         </div>
@@ -425,10 +547,10 @@
                     const text = document.getElementById('ipText');
                     const icon = document.getElementById('ipIcon');
                     if (data.require_ip_check) {
-                        btn.style.background = 'rgba(16, 185, 129, 0.18)';
-                        btn.style.borderColor = '#10b981';
-                        btn.style.color = '#dcfce7';
-                        icon.style.color = '#10b981';
+                        btn.style.background = '#0f3b8c';
+                        btn.style.borderColor = '#1e40af';
+                        btn.style.color = '#ffffff';
+                        icon.style.color = '#d97706';
                         text.innerText = 'Wi-Fi IP Koruma: AKTİF';
                     } else {
                         btn.style.background = 'rgba(239, 68, 68, 0.18)';
@@ -449,10 +571,10 @@
                     const icon = document.getElementById('qrIcon');
                     const qrBox = document.getElementById('qrContainer');
                     if (data.allow_qr_check) {
-                        btn.style.background = 'rgba(59, 130, 246, 0.18)';
-                        btn.style.borderColor = '#3b82f6';
-                        btn.style.color = '#dbeafe';
-                        icon.style.color = '#3b82f6';
+                        btn.style.background = '#0f3b8c';
+                        btn.style.borderColor = '#1e40af';
+                        btn.style.color = '#ffffff';
+                        icon.style.color = '#d97706';
                         text.innerText = 'QR Kod Yoklama: AKTİF';
                         qrBox.style.opacity = '1';
                     } else {
