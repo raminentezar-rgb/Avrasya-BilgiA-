@@ -1184,8 +1184,19 @@ def start_attendance_session(request, room_id):
         messages.error(request, "Bu ders odasında yoklama başlatma yetkiniz bulunmuyor.")
         return redirect('room', pk=room.id)
     
-    # Close existing active sessions for this room
-    AttendanceSession.objects.filter(room=room, is_active=True).update(is_active=False)
+    # Prevent opening a new attendance session until Yoklamayi Bitir is clicked
+    if not request.user.is_superuser:
+        active_session = AttendanceSession.objects.filter(room__host=request.user, is_active=True).first()
+    else:
+        active_session = AttendanceSession.objects.filter(room=room, is_active=True).first()
+        
+    if active_session:
+        messages.warning(
+            request,
+            f"'{active_session.room.name}' odasında halen açık/aktif bir yoklama oturumunuz bulunmaktadır! "
+            "Yeni bir yoklama listesi açabilmek için öncelikle mevcut ekrandan 'Yoklamayı Bitir (Odaya Dön)' butonuna basmalısınız."
+        )
+        return redirect('projector_view', session_id=active_session.id)
     
     teacher_ip = get_client_ip(request)
     if teacher_ip in ('127.0.0.1', '::1', 'localhost'):

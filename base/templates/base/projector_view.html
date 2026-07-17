@@ -150,6 +150,17 @@
             transform: translateY(-2px);
         }
 
+        .btn-home {
+            background: #334155;
+            color: white;
+            border-color: #475569;
+            box-shadow: 0 4px 12px rgba(51, 65, 85, 0.25);
+        }
+        .btn-home:hover {
+            background: #475569;
+            transform: translateY(-2px);
+        }
+
         .btn-export {
             background: #d97706;
             color: white;
@@ -331,6 +342,9 @@
     <div class="main-qr-area">
         <div class="top-toolbar">
             <div class="toolbar-left">
+                <a href="{% url 'home' %}" class="btn-action btn-home">
+                    <i class="fas fa-home"></i> Ana Sayfaya Dön
+                </a>
                 <a href="{% url 'close_attendance_session' session.id %}" class="btn-action btn-exit">
                     <i class="fas fa-times-circle"></i> Yoklamayı Bitir (Odaya Dön)
                 </a>
