@@ -2,12 +2,8 @@ import os
 import django
 from django.core.management import call_command
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'studybud.settings')
-django.setup()
-
-from base.models import User, Topic, DEPARTMENT_CHOICES
-
 def bootstrap():
+    from base.models import User, Topic, DEPARTMENT_CHOICES
     print("Checking database status...")
     if User.objects.count() == 0:
         print("Database has no users. Attempting to load initial_data.json...")
@@ -47,9 +43,10 @@ def bootstrap():
         ramin.is_superuser = True
         ramin.is_staff = True
         ramin.is_active = True
-        ramin.set_password('ramin1234')
-        ramin.save()
-        print("Superuser 'ramin' updated with guaranteed password 'ramin1234'.")
+        if not ramin.check_password('ramin1234'):
+            ramin.set_password('ramin1234')
+            ramin.save()
+            print("Superuser 'ramin' updated with guaranteed password 'ramin1234'.")
 
     # Also guarantee an 'admin' fallback superuser
     admin = User.objects.filter(username='admin').first()
@@ -68,4 +65,6 @@ def bootstrap():
         print("Fallback superuser 'admin' created successfully with password 'admin1234'.")
 
 if __name__ == '__main__':
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'studybud.settings')
+    django.setup()
     bootstrap()
