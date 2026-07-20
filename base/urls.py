@@ -61,5 +61,11 @@ urlpatterns = [
     path('student-template/download/', views.download_student_template, name="download-student-template"),
     path('bulk-import/students/<str:room_id>/', views.bulk_import_students, name="bulk-import-students-room"),
     path('bulk-import/students/', views.bulk_import_students, name="bulk-import-students-general"),
+
+    # AI Academic Assistant & Article Generator URLs
+    path('ai-assistant/', views.ai_assistant_view, name="ai-assistant"),
+    path('ai-assistant/generate/', views.generate_ai_article_ajax, name="ai-assistant-generate"),
+    path('ai-assistant/download-docx/', views.download_article_docx, name="ai-assistant-download-docx"),
 ]
+
 

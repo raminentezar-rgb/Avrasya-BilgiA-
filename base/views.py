@@ -1719,3 +1719,115 @@ def bulk_import_students(request, room_id=None):
 
     return redirect('room', pk=room.id) if room else redirect('dashboard')
 
+
+@login_required(login_url='login')
+def ai_assistant_view(request):
+    """
+    Renders the ultra-modern AI Academic Assistant dashboard where students and faculty
+    can request custom academic articles, essays, and literature summaries.
+    """
+    rooms = Room.objects.filter(Q(host=request.user) | Q(participants=request.user)).distinct()
+    return render(request, 'base/ai_assistant.html', {'rooms': rooms})
+
+
+@login_required(login_url='login')
+def generate_ai_article_ajax(request):
+    """
+    AJAX endpoint that takes topic, language, and level, and returns the AI generated article.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Sadece POST istekleri kabul edilir.'}, status=405)
+    
+    topic = request.POST.get('topic', '').strip()
+    language = request.POST.get('language', 'tr').strip()
+    academic_level = request.POST.get('academic_level', 'lisans').strip()
+
+    if not topic:
+        return JsonResponse({'status': 'error', 'message': 'Lütfen bir konu / başlık giriniz.'}, status=400)
+
+    try:
+        from base.ai_service import generate_academic_article
+        article_text, model_used = generate_academic_article(topic, language, academic_level)
+        return JsonResponse({
+            'status': 'success',
+            'article': article_text,
+            'model': model_used
+        })
+    except Exception as e:
+        logger.error(f"AI Article Generation Error: {e}", exc_info=True)
+        return JsonResponse({'status': 'error', 'message': f'Makale üretilirken bir hata oluştu: {str(e)}'}, status=500)
+
+
+@login_required(login_url='login')
+def download_article_docx(request):
+    """
+    Generates and downloads a Word (.docx) document from the generated AI article content.
+    """
+    if request.method != 'POST':
+        return HttpResponse("Geçersiz istek türü.", status=405)
+
+    title = request.POST.get('title', 'Avrasya_AI_Makale').strip() or 'Avrasya_AI_Makale'
+    content = request.POST.get('content', '').strip()
+
+    if not content:
+        return HttpResponse("İndirilecek makale içeriği bulunamadı.", status=400)
+
+    import io
+    import docx
+    from docx.shared import Pt, Inches, RGBColor
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+    doc = docx.Document()
+    
+    # Title styling
+    title_para = doc.add_paragraph()
+    title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    title_run = title_para.add_run(title)
+    title_run.font.name = 'Calibri'
+    title_run.font.size = Pt(18)
+    title_run.font.bold = True
+    title_run.font.color.rgb = RGBColor(15, 59, 140)  # Avrasya Blue
+
+    doc.add_paragraph()  # Space
+
+    # Parse markdown-like headings and paragraphs cleanly into Word document
+    lines = content.split('\n')
+    for line in lines:
+        line_str = line.strip()
+        if not line_str:
+            continue
+        if line_str.startswith('# '):
+            p = doc.add_heading(line_str[2:].replace('**', ''), level=1)
+            p.runs[0].font.color.rgb = RGBColor(15, 59, 140)
+        elif line_str.startswith('## '):
+            p = doc.add_heading(line_str[3:].replace('**', ''), level=2)
+            p.runs[0].font.color.rgb = RGBColor(30, 41, 59)
+        elif line_str.startswith('### '):
+            p = doc.add_heading(line_str[4:].replace('**', ''), level=3)
+        elif line_str.startswith('- ') or line_str.startswith('* '):
+            p = doc.add_paragraph(style='List Bullet')
+            clean_item = line_str[2:]
+            p.add_run(clean_item)
+        elif line_str == '---':
+            doc.add_paragraph('_________________________________________________________________________________')
+        else:
+            p = doc.add_paragraph()
+            p.add_run(line_str)
+
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+
+    # Sanitize filename
+    import re
+    safe_title = re.sub(r'[^a-zA-Z0-9_\- ]', '', title).replace(' ', '_')[:40]
+    filename = f"{safe_title}.docx"
+
+    response = HttpResponse(
+        buffer.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
+
+
