@@ -355,7 +355,7 @@
             
             <div class="toolbar-right">
                 <button id="toggleIpBtn" onclick="toggleIpCheck()" class="btn-action btn-toggle" style="background: {% if session.require_ip_check %}#0f3b8c{% else %}rgba(239, 68, 68, 0.18){% endif %}; border-color: {% if session.require_ip_check %}#1e40af{% else %}#ef4444{% endif %}; color: {% if session.require_ip_check %}#ffffff{% else %}#fee2e2{% endif %};">
-                    <i class="fas fa-wifi" id="ipIcon" style="color: {% if session.require_ip_check %}#d97706{% else %}#ef4444{% endif %};"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" id="ipIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; flex-shrink: 0; color: {% if session.require_ip_check %}#d97706{% else %}#ef4444{% endif %};"><path d="M12 3C6.95 3 2.3 4.88 -0.04 8.04l2.12 2.12C4.04 7.49 7.82 6 12 6s7.96 1.49 9.92 4.16l2.12-2.12C21.7 4.88 17.05 3 12 3zm0 5C8.31 8 4.9 9.19 2.08 11.16l2.12 2.12C6.37 11.83 9.07 11 12 11s5.63.83 7.8 2.28l2.12-2.12C19.1 9.19 15.69 8 12 8zm0 5c-1.85 0-3.57.64-4.94 1.7l2.12 2.12C10.02 16.32 10.98 16 12 16s1.98.32 2.82.82l2.12-2.12C15.57 13.64 13.85 13 12 13zm0 5a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>
                     <span id="ipText">Wi-Fi IP Koruma: {% if session.require_ip_check %}AKTİF{% else %}KAPALI{% endif %}</span>
                 </button>
 
@@ -370,7 +370,7 @@
             QR Kodu Okutarak veya <br><span style="color:#d97706;">Wi-Fi IP Butonuyla</span> Yoklamaya Katılın
         </h1>
         <p class="subtitle-text">
-            Dilerseniz ana sayfanızdaki <strong>«<i class="fas fa-wifi"></i> Wi-Fi IP ile Şimdi Yoklama Ver»</strong> butonuna tıklayabilir veya aşağıdaki <strong>QR Kodu</strong> okutabilirsiniz.
+            Dilerseniz ana sayfanızdaki <strong>«<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: -3px;"><path d="M12 3C6.95 3 2.3 4.88 -0.04 8.04l2.12 2.12C4.04 7.49 7.82 6 12 6s7.96 1.49 9.92 4.16l2.12-2.12C21.7 4.88 17.05 3 12 3zm0 5C8.31 8 4.9 9.19 2.08 11.16l2.12 2.12C6.37 11.83 9.07 11 12 11s5.63.83 7.8 2.28l2.12-2.12C19.1 9.19 15.69 8 12 8zm0 5c-1.85 0-3.57.64-4.94 1.7l2.12 2.12C10.02 16.32 10.98 16 12 16s1.98.32 2.82.82l2.12-2.12C15.57 13.64 13.85 13 12 13zm0 5a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg> Wi-Fi IP ile Şimdi Yoklama Ver»</strong> butonuna tıklayabilir veya aşağıdaki <strong>QR Kodu</strong> okutabilirsiniz.
         </p>
 
         {% if not session.is_active %}
@@ -380,7 +380,7 @@
         {% endif %}
         
         <div style="margin-bottom: 1.2rem; font-size: 0.95rem; color: #cbd5e1; background: rgba(15, 59, 140, 0.25); padding: 8px 18px; border-radius: 20px; border: 1px solid rgba(217, 119, 6, 0.45); display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-wifi" style="color: #d97706;"></i> Sınıf Wi-Fi Ağ IP Adresi: <strong style="color: #ffffff;">{{ session.teacher_ip|default:"Otomatik Tanımlandı" }}</strong>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; flex-shrink: 0; color: #d97706;"><path d="M12 3C6.95 3 2.3 4.88 -0.04 8.04l2.12 2.12C4.04 7.49 7.82 6 12 6s7.96 1.49 9.92 4.16l2.12-2.12C21.7 4.88 17.05 3 12 3zm0 5C8.31 8 4.9 9.19 2.08 11.16l2.12 2.12C6.37 11.83 9.07 11 12 11s5.63.83 7.8 2.28l2.12-2.12C19.1 9.19 15.69 8 12 8zm0 5c-1.85 0-3.57.64-4.94 1.7l2.12 2.12C10.02 16.32 10.98 16 12 16s1.98.32 2.82.82l2.12-2.12C15.57 13.64 13.85 13 12 13zm0 5a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg> Sınıf Wi-Fi Ağ IP Adresi: <strong style="color: #ffffff;">{{ session.teacher_ip|default:"Otomatik Tanımlandı" }}</strong>
         </div>
         
         <div class="qr-container" id="qrContainer" style="opacity: {% if session.allow_qr_check %}1{% else %}0.25{% endif %};">
