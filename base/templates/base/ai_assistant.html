@@ -281,13 +281,13 @@ body.dark-theme .article-content h3, body.dark-theme .article-content h4 { color
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
             <div>
                 <h1 class="ai-banner__title">
-                    <i class="bi bi-stars"></i> Avrasya AI Akademik Asistan ve Makale Üretici
+                    Avrasya AI Akademik Asistan ve Makale Üretici
                 </h1>
                 <p class="ai-banner__subtitle">
                     Öğrenciler ve esatizeler için özel tasarlanmış derin yapay zeka motoru. İstediğiniz herhangi bir konuda kapsamlı, bilimsel olarak doğru, literatüre uygun ve pratik örnekler içeren akademik makaleyi saniyeler içinde oluşturun.
                 </p>
             </div>
-            <span class="badge-ai"><i class="fas fa-bolt"></i> G4F & Akademik Motor</span>
+            <span class="badge-ai">G4F & Akademik Motor</span>
         </div>
     </div>
 
@@ -297,7 +297,7 @@ body.dark-theme .article-content h3, body.dark-theme .article-content h4 { color
             {% csrf_token %}
             <div class="form-group">
                 <label class="form-label">
-                    <i class="fas fa-heading" style="color: #6d28d9;"></i> Makale Konusu veya Araştırma Başlığı:
+                    Makale Konusu veya Araştırma Başlığı:
                 </label>
                 <input type="text" id="topicInput" name="topic" class="form-input" 
                        placeholder="Örn: Radyoterapi ve Kanser Tedavisindeki Rolü, Yapay Zekanın Tıbbi Tanılardaki Geleceği, Siber Güvenlikte Kriptografi..." required>
@@ -306,28 +306,28 @@ body.dark-theme .article-content h3, body.dark-theme .article-content h4 { color
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 1.8rem;">
                 <div>
                     <label class="form-label">
-                        <i class="fas fa-language" style="color: #2563eb;"></i> Makale Dili:
+                        Makale Dili:
                     </label>
                     <select id="langSelect" name="language" class="form-select">
-                        <option value="tr" selected>🇹🇷 Türkçe (Turkish)</option>
-                        <option value="en">🇬🇧 İngilizce (English)</option>
-                        <option value="de">🇩🇪 Almanca (German)</option>
+                        <option value="tr" selected>Türkçe (Turkish)</option>
+                        <option value="en">İngilizce (English)</option>
+                        <option value="de">Almanca (German)</option>
                     </select>
                 </div>
                 <div>
                     <label class="form-label">
-                        <i class="fas fa-graduation-cap" style="color: #059669;"></i> Akademik Seviye & Format:
+                        Akademik Seviye & Format:
                     </label>
                     <select id="levelSelect" name="academic_level" class="form-select">
-                        <option value="lisans" selected>🎓 Lisans / Kapsamlı Akademik Makale</option>
-                        <option value="yüksek_lisans">🔬 Yüksek Lisans / Derinlemesine Araştırma & Kritik Analiz</option>
-                        <option value="ozet">📝 Kısa Akademik Özet & Literatür Değerlendirmesi</option>
+                        <option value="lisans" selected>Lisans / Kapsamlı Akademik Makale</option>
+                        <option value="yüksek_lisans">Yüksek Lisans / Derinlemesine Araştırma & Kritik Analiz</option>
+                        <option value="ozet">Kısa Akademik Özet & Literatür Değerlendirmesi</option>
                     </select>
                 </div>
             </div>
 
             <button type="submit" class="btn-ai-submit" id="submitBtn">
-                <i class="bi bi-stars" style="font-size: 1.2rem;"></i> Yapay Zeka ile Makaleyi Hazırla
+                Yapay Zeka ile Makaleyi Hazırla
             </button>
         </form>
     </div>
@@ -346,7 +346,7 @@ body.dark-theme .article-content h3, body.dark-theme .article-content h4 { color
         <div class="result-header">
             <div>
                 <h2 style="margin: 0; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-check-circle" style="color: #10b981;"></i> Oluşturulan Akademik Makale
+                    Oluşturulan Akademik Makale
                 </h2>
                 <small style="color: #64748b;" id="modelUsedText"></small>
             </div>
