@@ -15,7 +15,7 @@
         <div class="room__topRight" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
           {% if request.user == room.host or request.user.role == 'faculty' %}
           <a href="{% url 'start-attendance-session' room.id %}" style="background: #0f3b8c; color: #ffffff; border: 1px solid #0f3b8c; padding: 8px 16px; border-radius: 8px; font-size: 0.88rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(15, 59, 140, 0.2);" title="QR Kod & Wi-Fi IP ile Canlı Sınıf Yoklaması Başlat">
-            <i class="fas fa-qrcode"></i> Yoklama Başlat (QR & IP)
+            <i class="fas fa-wifi"></i> Yoklama Aç (Wi-Fi & QR)
           </a>
           <button onclick="alert('📋 Canlı Yoklama Kaydı Alındı! Odadaki Aktif Katılımcılar:\n' + Array.from(document.querySelectorAll('.participant p')).map(el => '• ' + el.innerText.trim()).join('\n'));" type="button" style="background: #ffffff; color: #0f3b8c; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
             Hızlı Liste ({{ participants.count }} Kişi)
@@ -51,7 +51,7 @@
           </a>
           {% else %}
           <a href="{% url 'student_ip_checkin' %}?session={{ active_attendance_session.id }}" style="background: #ffffff; color: #0f3b8c; padding: 12px 22px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-            📡 Wi-Fi IP ile Şimdi Yoklama Ver
+            <i class="fas fa-wifi" style="color: #0f3b8c; font-size: 1.15rem;"></i> Wi-Fi IP ile Şimdi Yoklama Ver
           </a>
           {% endif %}
         </div>
