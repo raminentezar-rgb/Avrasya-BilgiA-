@@ -1792,27 +1792,33 @@ def download_article_docx(request):
 
     # Parse markdown-like headings and paragraphs cleanly into Word document
     lines = content.split('\n')
+    import re
     for line in lines:
         line_str = line.strip()
         if not line_str:
             continue
-        if line_str.startswith('# '):
-            p = doc.add_heading(line_str[2:].replace('**', ''), level=1)
-            p.runs[0].font.color.rgb = RGBColor(15, 59, 140)
-        elif line_str.startswith('## '):
-            p = doc.add_heading(line_str[3:].replace('**', ''), level=2)
-            p.runs[0].font.color.rgb = RGBColor(30, 41, 59)
-        elif line_str.startswith('### '):
-            p = doc.add_heading(line_str[4:].replace('**', ''), level=3)
+        
+        # Check for headings (#, ##, ###, ####)
+        heading_match = re.match(r'^(#{1,6})\s*(?:\*\*)?(.*?)(?:\*\*)?\s*$', line_str)
+        if heading_match:
+            level = len(heading_match.group(1))
+            clean_text = heading_match.group(2).replace('**', '').replace('*', '').strip()
+            p = doc.add_heading(clean_text, level=min(level, 3))
+            if level == 1:
+                p.runs[0].font.color.rgb = RGBColor(15, 59, 140)
+            elif level == 2:
+                p.runs[0].font.color.rgb = RGBColor(30, 41, 59)
         elif line_str.startswith('- ') or line_str.startswith('* '):
             p = doc.add_paragraph(style='List Bullet')
-            clean_item = line_str[2:]
+            clean_item = line_str[2:].replace('**', '').replace('*', '').strip()
             p.add_run(clean_item)
         elif line_str == '---':
             doc.add_paragraph('_________________________________________________________________________________')
         else:
             p = doc.add_paragraph()
-            p.add_run(line_str)
+            # Strip markdown ** and * from normal paragraphs or format cleanly
+            clean_p = line_str.replace('**', '').replace('__', '').replace('*', '')
+            p.add_run(clean_p)
 
     buffer = io.BytesIO()
     doc.save(buffer)

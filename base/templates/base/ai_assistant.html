@@ -238,25 +238,31 @@ body.dark-theme .btn-tool--docx {
 
 /* Article Markdown Output Box */
 .article-content {
-    line-height: 1.8;
+    line-height: 1.85;
     font-size: 1.05rem;
     color: #1e293b;
-    padding: 1rem 0;
-    white-space: pre-wrap;
+    padding: 1.2rem 0;
+    white-space: normal;
 }
 
 body.dark-theme .article-content {
     color: #f8fafc !important;
 }
 
-.article-content h1 { font-size: 1.7rem; color: #0f3b8c; margin: 1.5rem 0 1rem; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+.article-content p { margin-bottom: 1.2rem; line-height: 1.85; }
+.article-content ul, .article-content ol { margin: 0 0 1.2rem 1.8rem; padding: 0; }
+.article-content li { margin-bottom: 0.5rem; line-height: 1.7; }
+.article-content strong, .article-content b { color: #0f3b8c; font-weight: 800; }
+body.dark-theme .article-content strong, body.dark-theme .article-content b { color: #93c5fd !important; }
+
+.article-content h1 { font-size: 1.75rem; color: #0f3b8c; margin: 1.8rem 0 1rem; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
 body.dark-theme .article-content h1 { color: #60a5fa !important; border-color: #334155 !important; }
 
-.article-content h2 { font-size: 1.4rem; color: #1e40af; margin: 1.3rem 0 0.8rem; font-weight: 700; }
+.article-content h2 { font-size: 1.45rem; color: #1e40af; margin: 1.5rem 0 0.8rem; font-weight: 800; }
 body.dark-theme .article-content h2 { color: #93c5fd !important; }
 
-.article-content h3 { font-size: 1.15rem; color: #334155; margin: 1.1rem 0 0.6rem; font-weight: 700; }
-body.dark-theme .article-content h3 { color: #cbd5e1 !important; }
+.article-content h3, .article-content h4 { font-size: 1.2rem; color: #334155; margin: 1.2rem 0 0.6rem; font-weight: 700; }
+body.dark-theme .article-content h3, body.dark-theme .article-content h4 { color: #cbd5e1 !important; }
 
 .badge-ai {
     background: rgba(255,255,255,0.2);
@@ -275,7 +281,7 @@ body.dark-theme .article-content h3 { color: #cbd5e1 !important; }
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
             <div>
                 <h1 class="ai-banner__title">
-                    <i class="fas fa-brain"></i> Avrasya AI Akademik Asistan ve Makale Üretici
+                    <i class="bi bi-stars"></i> Avrasya AI Akademik Asistan ve Makale Üretici
                 </h1>
                 <p class="ai-banner__subtitle">
                     Öğrenciler ve esatizeler için özel tasarlanmış derin yapay zeka motoru. İstediğiniz herhangi bir konuda kapsamlı, bilimsel olarak doğru, literatüre uygun ve pratik örnekler içeren akademik makaleyi saniyeler içinde oluşturun.
@@ -367,9 +373,26 @@ body.dark-theme .article-content h3 { color: #cbd5e1 !important; }
     </div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
 let currentGeneratedText = "";
 let currentTopicTitle = "";
+
+function renderMarkdownFallback(text) {
+    if (!text) return "";
+    return text
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/^####\s*(?:\*\*)?(.*?)(?:\*\*)?\s*$/gm, '<h4>$1</h4>')
+        .replace(/^###\s*(?:\*\*)?(.*?)(?:\*\*)?\s*$/gm, '<h3>$1</h3>')
+        .replace(/^##\s*(?:\*\*)?(.*?)(?:\*\*)?\s*$/gm, '<h2>$1</h2>')
+        .replace(/^#\s*(?:\*\*)?(.*?)(?:\*\*)?\s*$/gm, '<h1>$1</h1>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/__(.*?)__/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/^\s*[\-\*]\s+(.*)$/gm, '<li style="margin-left: 20px;">$1</li>')
+        .replace(/\n\n+/g, '</p><p>')
+        .replace(/\n/g, '<br/>');
+}
 
 document.getElementById('aiArticleForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -403,7 +426,15 @@ document.getElementById('aiArticleForm').addEventListener('submit', async functi
 
         if(data.status === 'success') {
             currentGeneratedText = data.article;
-            document.getElementById('articleOutput').innerText = currentGeneratedText;
+            
+            // Parse and render Markdown to clean HTML (No raw # or ** asterisks!)
+            const outputElem = document.getElementById('articleOutput');
+            if (typeof marked !== 'undefined' && marked.parse) {
+                outputElem.innerHTML = marked.parse(currentGeneratedText);
+            } else {
+                outputElem.innerHTML = '<p>' + renderMarkdownFallback(currentGeneratedText) + '</p>';
+            }
+
             document.getElementById('modelUsedText').innerText = 'Üretici Motor: ' + (data.model || 'Avrasya AI Engine');
             
             // Set hidden inputs for docx download
@@ -429,8 +460,14 @@ document.getElementById('aiArticleForm').addEventListener('submit', async functi
 
 function copyToClipboard() {
     if(!currentGeneratedText) return;
-    navigator.clipboard.writeText(currentGeneratedText).then(() => {
-        alert("Makale metmi başarıyla panoya kopyalandı!");
+    // Strip markdown symbols (#, **, *) when copying to clipboard so text is super clean!
+    const cleanText = currentGeneratedText
+        .replace(/^#{1,6}\s*(?:\*\*)?(.*?)(?:\*\*)?\s*$/gm, '$1')
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1');
+
+    navigator.clipboard.writeText(cleanText).then(() => {
+        alert("Makale metni başarıyla panoya kopyalandı!");
     }).catch(err => {
         console.error("Copy failed", err);
     });
@@ -438,7 +475,12 @@ function copyToClipboard() {
 
 function downloadTxtFile() {
     if(!currentGeneratedText) return;
-    const blob = new Blob([currentGeneratedText], { type: 'text/plain;charset=utf-8' });
+    const cleanText = currentGeneratedText
+        .replace(/^#{1,6}\s*(?:\*\*)?(.*?)(?:\*\*)?\s*$/gm, '$1\n')
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1');
+
+    const blob = new Blob([cleanText], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -450,3 +492,4 @@ function downloadTxtFile() {
 }
 </script>
 {% endblock content %}
+
