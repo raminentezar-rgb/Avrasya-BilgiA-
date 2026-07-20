@@ -170,3 +170,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 
 LOGIN_URL = 'login'
+
+# ==============================================================================
+# AVRASYA ÜNİVERSİTESİ - PROLİZ OBS & MALİ ENTEGRASYON REST API YAPILANDIRMASI
+# ==============================================================================
+# Öğrenci İşleri Daire Başkanlığı tarafından tahsis edilen resmî erişim bilgileri:
+PROLIZ_OBS_BASE_URL = os.environ.get('PROLIZ_OBS_BASE_URL', 'https://obs.avrasya.edu.tr/ProlizMaliRestApi/api')
+PROLIZ_API_USER = os.environ.get('PROLIZ_API_USER', 'AvrRestUsr')
+PROLIZ_API_PASS = os.environ.get('PROLIZ_API_PASS', 'j!Zui)7+IWQ$L5iZ')
+
